@@ -1546,10 +1546,11 @@ async function translateNoteField(section) {
   const p = getProfile(); if (!p || !p[section]) return;
   const text = (p[section].notes || '').trim();
   if (!text) { if (p[section].notesI18n) delete p[section].notesI18n; saveAll(); return; }
-  // لا تُعِد الترجمة إن لم يتغيّر النص
+  // لا تُعِد الترجمة إن لم يتغيّر النص وكانت ناجحة سابقاً
   if (p[section].notesI18n && p[section].notesI18n._src === text) return;
   try {
-    const { data } = await translateToAll(text);
+    const { data, method } = await translateToAll(text);
+    if (method === 'raw') return; // فشلت الترجمة (غالباً بلا شبكة) — لا تخزّن حتى نعيد المحاولة لاحقاً
     data._src = text;
     p[section].notesI18n = data;
     saveAll();
@@ -1563,7 +1564,8 @@ async function translateCustomTask(room, text) {
   if (!p.tasks.customI18n[room]) p.tasks.customI18n[room] = {};
   if (p.tasks.customI18n[room][text]) return; // مترجمة مسبقاً
   try {
-    const { data } = await translateToAll(text);
+    const { data, method } = await translateToAll(text);
+    if (method === 'raw') return; // فشلت الترجمة — أعِد المحاولة لاحقاً
     p.tasks.customI18n[room][text] = data;
     saveAll();
     // حدّث الشاشة إن كنا في خطوة المهام
@@ -2376,7 +2378,7 @@ function buildPrintHTML(p, mode, langOrBool) {
     taskHTML += `<div class="room-block"><div class="room-title">${rooms[room]}</div><ul>`;
     (DT[room]||[]).forEach(t => { if (ids.includes(t.id)) taskHTML += `<li>${pickLabel(t)}</li>`; });
     custom.forEach(cx => { taskHTML += `<li>${esc(pickCustom(room, cx, lang, p))} <span style="font-size:10px;color:#8A6A3A">✎</span></li>`; });
-    aiCustom.forEach(t => { taskHTML += `<li>${pickLabel(t)} <span style="font-size:10px;color:#4A6B5C">★</span></li>`; });
+    aiCustom.forEach(t => { taskHTML += `<li>${esc(pickLabel(t))} <span style="font-size:10px;color:#4A6B5C">★</span></li>`; });
     taskHTML += `</ul>${roomImages(room, ids)}</div>`;
   });
 
