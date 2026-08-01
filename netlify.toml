@@ -1,7 +1,8 @@
 # اهلا — Ahlan platform (single-file app)
+# Netlify builds the publish folder from the single source file.
 [build]
   publish = "dist"
-  command = ""
+  command = "mkdir -p dist && cp ahlan.html dist/index.html"
 
 [[headers]]
   for = "/*"
