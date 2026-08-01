@@ -1136,39 +1136,60 @@ function switchLoginTab(tab) {
   document.getElementById('loginEmailForm').style.display = tab === 'email' ? 'block' : 'none';
   document.getElementById('loginPhoneForm').style.display = tab === 'phone' ? 'block' : 'none';
 }
+// تخزين آمن — لا يتعطّل التطبيق إذا كان التخزين محجوباً (وضع التصفح الخاص/بعض الجوالات)
+function safeSet(key, val) { try { localStorage.setItem(key, val); return true; } catch(e) { console.warn('storage blocked:', e && e.name); return false; } }
+function safeGet(key) { try { return localStorage.getItem(key); } catch(e) { return null; } }
+function safeRemove(key) { try { localStorage.removeItem(key); } catch(e) {} }
+
+// الدخول الفعلي للتطبيق — يُغلق شاشة الدخول وينتقل للوحة الملفات (لا يتعطّل مهما حدث)
+function enterApp() {
+  try { const ov = document.getElementById('loginOverlay'); if (ov) ov.classList.remove('active'); } catch(e) {}
+  try { navigate('dashboard'); } catch(e) { try { renderDashboard(); } catch(_) {} }
+}
 function doLogin() {
-  const email = document.getElementById('loginEmail').value.trim();
-  const phone = document.getElementById('loginPhone').value.trim();
-  const id = email || phone;
-  if (!id) { showToast(userLang==='ar'?'أدخل البريد أو رقم الجوال':'Enter email or phone'); return; }
-  // تحقق أساسي من الصيغة
-  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showToast(userLang==='ar'?'صيغة البريد غير صحيحة':'Invalid email format'); return; }
-  if (!email && phone && phone.replace(/\D/g,'').length < 8) { showToast(userLang==='ar'?'رقم الجوال غير صحيح':'Invalid phone number'); return; }
-  state.user = { id, type: email ? 'email' : 'phone', since: Date.now() };
-  localStorage.setItem('ahlan_user', JSON.stringify(state.user));
-  loadAll();
-  document.getElementById('loginOverlay').classList.remove('active');
-  renderDashboard();
-  showToast(userLang==='ar'?'✓ تم تسجيل الدخول — بياناتك محفوظة':'✓ Signed in — your data is saved');
+  try {
+    const emailEl = document.getElementById('loginEmail');
+    const phoneEl = document.getElementById('loginPhone');
+    const email = emailEl ? emailEl.value.trim() : '';
+    const phone = phoneEl ? phoneEl.value.trim() : '';
+    const id = email || phone;
+    if (!id) { showToast(userLang==='ar'?'أدخل البريد أو رقم الجوال':'Enter email or phone'); return; }
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showToast(userLang==='ar'?'صيغة البريد غير صحيحة':'Invalid email format'); return; }
+    if (!email && phone && phone.replace(/\D/g,'').length < 8) { showToast(userLang==='ar'?'رقم الجوال غير صحيح':'Invalid phone number'); return; }
+    state.user = { id, type: email ? 'email' : 'phone', since: Date.now() };
+    safeSet('ahlan_user', JSON.stringify(state.user));
+    try { loadAll(); } catch(e) { console.warn(e); }
+    enterApp();
+    showToast(userLang==='ar'?'✓ تم تسجيل الدخول':'✓ Signed in');
+  } catch(e) { console.error('doLogin:', e); enterApp(); }
 }
 function logout() {
   if (!confirm(userLang==='ar'?'تسجيل الخروج؟ ستبقى بياناتك محفوظة لهذا الحساب.':'Sign out? Your data stays saved for this account.')) return;
-  saveAll();
-  localStorage.removeItem('ahlan_user');
+  try { saveAll(); } catch(e) {}
+  safeRemove('ahlan_user');
   state.user = null; state.profiles = []; state.currentProfileId = null;
-  loadAll();
+  try { loadAll(); } catch(e) {}
   navigate('home');
-  document.getElementById('loginOverlay').classList.add('active');
+  const ov = document.getElementById('loginOverlay'); if (ov) ov.classList.add('active');
 }
 function skipLogin() {
-  state.user = null;
-  loadAll();
-  document.getElementById('loginOverlay').classList.remove('active');
-  renderDashboard();
+  try {
+    state.user = null;
+    try { loadAll(); } catch(e) { console.warn(e); }
+    enterApp();
+  } catch(e) { console.error('skipLogin:', e); enterApp(); }
 }
 function checkAuth() {
-  const saved = localStorage.getItem('ahlan_user');
-  if (saved) { state.user = JSON.parse(saved); loadAll(); document.getElementById('loginOverlay').classList.remove('active'); }
+  try {
+    const saved = safeGet('ahlan_user');
+    if (saved) {
+      state.user = JSON.parse(saved);
+      try { loadAll(); } catch(e) {}
+      enterApp();
+      return true;
+    }
+  } catch(e) { console.warn('checkAuth:', e); }
+  return false;
 }
 
 // ============================================================
@@ -1189,28 +1210,41 @@ function startProfile(type) { navigate(type); }
 function renderDashboard() {
   const grid = document.getElementById('profilesGrid');
   if (!grid) return;
-  const typeLabels = { apartment:'<i class="bi bi-building"></i>', villa:'<i class="bi bi-houses"></i>', duplex:'<i class="bi bi-house-up"></i>', studio:'<i class="bi bi-key"></i>', rest_house:'<i class="bi bi-tree"></i>', office:'<i class="bi bi-briefcase"></i>' };
+  const typeLabels = { apartment:'<i class="bi bi-building"></i>', villa:'<i class="bi bi-houses"></i>', duplex:'<i class="bi bi-house-up"></i>', studio:'<i class="bi bi-key"></i>', rest_house:'<i class="bi bi-tree"></i>', office:'<i class="bi bi-briefcase"></i>', driver:'<i class="bi bi-car-front-fill"></i>' };
+  const tl = T[userLang] || T.ar;
   let html = '';
-  state.profiles.forEach(p => {
-    html += `<div class="profile-card" onclick="openProfile('${p.id}')">
-      <div class="profile-card-actions">
-        <button class="mini-btn danger" onclick="event.stopPropagation();deleteProfile('${p.id}')" title="حذف"><i class="bi bi-trash3"></i></button>
-      </div>
-      <div style="font-size:42px;margin-bottom:10px">${typeLabels[p.type]||'<i class="bi bi-houses"></i>'}</div>
-      <div class="profile-card-name">${esc(p.name)}</div>
-      <div class="profile-card-meta">${(T[userLang]||T.ar)[p.type]||p.type} — ${p.home.floors} ${(T[userLang]||T.ar).floors}, ${p.home.bedrooms} ${(T[userLang]||T.ar).bedrooms}</div>
-      <div class="profile-card-stats">
-        <div class="profile-card-stat"><i class="bi bi-people"></i> ${p.home.residents}</div>
-        <div class="profile-card-stat"><i class="bi bi-list-check"></i> ${countTasks(p)} ${userLang==='ar'?'مهمة':'tasks'}</div>
-      </div>
-    </div>`;
+  (state.profiles || []).forEach(p => {
+    try {
+      let meta, stats;
+      if (p.type === 'driver') {
+        const trips = (p.trips || []).length, errands = (p.errands || []).length;
+        meta = `${tl.driver || (userLang==='ar'?'سائق':'Driver')}${(p.driver && p.driver.vehicle) ? ' — ' + esc(p.driver.vehicle) : ''}`;
+        stats = `<div class="profile-card-stat"><i class="bi bi-signpost-split"></i> ${userLang==='ar'?ar(trips):trips} ${userLang==='ar'?'رحلة':'trips'}</div>
+                 <div class="profile-card-stat"><i class="bi bi-cart"></i> ${userLang==='ar'?ar(errands):errands} ${userLang==='ar'?'مشوار':'errands'}</div>`;
+      } else {
+        const home = p.home || {};
+        meta = `${tl[p.type] || p.type}${(home.floors!=null||home.bedrooms!=null) ? ' — ' + (home.floors||0) + ' ' + tl.floors + ', ' + (home.bedrooms||0) + ' ' + tl.bedrooms : ''}`;
+        stats = `<div class="profile-card-stat"><i class="bi bi-people"></i> ${home.residents||0}</div>
+                 <div class="profile-card-stat"><i class="bi bi-list-check"></i> ${countTasks(p)} ${userLang==='ar'?'مهمة':'tasks'}</div>`;
+      }
+      html += `<div class="profile-card" onclick="openProfile('${p.id}')">
+        <div class="profile-card-actions">
+          <button class="mini-btn danger" onclick="event.stopPropagation();deleteProfile('${p.id}')" title="حذف"><i class="bi bi-trash3"></i></button>
+        </div>
+        <div style="font-size:42px;margin-bottom:10px">${typeLabels[p.type]||'<i class="bi bi-houses"></i>'}</div>
+        <div class="profile-card-name">${esc(p.name)}</div>
+        <div class="profile-card-meta">${meta}</div>
+        <div class="profile-card-stats">${stats}</div>
+      </div>`;
+    } catch(e) { console.warn('card render failed', e); }
   });
   html += `<div class="add-profile-card" onclick="createNewProfile()">
     <div class="plus">+</div>
     <div style="font-size:16px;font-weight:700;color:var(--forest)">${UI[userLang].dash_add}</div>
-    <div style="font-size:13px;color:var(--muted);margin-top:6px">${userLang==='ar'?'منزل، شقة، فيلا، أو مكتب':'Home, apartment, villa, or office'}</div>
+    <div style="font-size:13px;color:var(--muted);margin-top:6px">${userLang==='ar'?'منزل · فيلا · مكتب · سائق':'Home · Villa · Office · Driver'}</div>
   </div>`;
   grid.innerHTML = html;
+  applyPictoDOM(grid);
   
   // Toolbar: import by code + backup
   const toolbar = document.getElementById('dashToolbar');
