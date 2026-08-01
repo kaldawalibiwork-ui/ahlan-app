@@ -2850,7 +2850,7 @@ async function exportInteractiveGuide() {
     const { clone, bytes } = await resolveMediaToBase64(p0);
 
     // حزمة الدوال من نفس التطبيق (لضمان تطابق العرض 100%)
-    const fns = [esc, ar, fmtTime, detectSourceLang, svgIcon, videoTag, pickNote, pickCustom, renderMediaInWorker, renderNotesInWorker, buildSpeech, speak]
+    const fns = [esc, ar, fmtTime, detectSourceLang, svgIcon, svgPicto, videoTag, pickNote, pickCustom, renderMediaInWorker, renderNotesInWorker, buildSpeech, speak]
       .map(f => f.toString()).join('\n\n');
 
     const dataDefs =
@@ -2864,6 +2864,7 @@ async function exportInteractiveGuide() {
       'const NOTES_TITLE=' + JSON.stringify(NOTES_TITLE) + ';\n' +
       'const VOICES=' + JSON.stringify(VOICES) + ';\n' +
       'const SVGI=' + JSON.stringify(SVGI) + ';\n' +
+      'const PICTO=' + JSON.stringify(PICTO) + ';\n' +
       'const PROFILE=' + JSON.stringify(clone) + ';\n';
 
     const stubs =
@@ -2874,7 +2875,9 @@ async function exportInteractiveGuide() {
       'function hydrateVideos(){}\n' +
       'function navigate(){}\n' +
       'function showToast(m){var t=document.getElementById("gToast");if(!t)return;t.textContent=m;t.classList.add("show");setTimeout(function(){t.classList.remove("show");},2500);}\n' +
-      'function changeWorkerLang(code){state.workerLang=code;try{renderWorkerView(PROFILE,code);document.getElementById("gLangNote").textContent=(T[code]&&T[code].dir==="rtl")?"اختر لغتك من الأعلى":"Choose your language above";}catch(e){console.error(e);}if(window.speechSynthesis)window.speechSynthesis.cancel();}\n' +
+      // يحوّل أيقونات الخط <i class="bi..."> إلى SVG مضمّن (يعمل بلا إنترنت) — يمرّ على عناصر <i> فقط لتفادي إعادة تحليل الوسائط الضخمة\n' +
+      'function applyPicto(){var list=document.querySelectorAll(\'i[class*="bi-"]\');for(var i=0;i<list.length;i++){var el=list[i];var m=(el.getAttribute("class")||"").match(/bi-([a-z0-9-]+)/);if(!m)continue;var svg=svgPicto(m[1]);if(!svg)continue;var cs=window.getComputedStyle(el);var span=document.createElement("span");span.style.display="inline-flex";span.style.verticalAlign="middle";span.style.fontSize=cs.fontSize;span.style.color=cs.color;span.innerHTML=svg;if(el.parentNode)el.parentNode.replaceChild(span,el);}}\n' +
+      'function changeWorkerLang(code){state.workerLang=code;try{renderWorkerView(PROFILE,code);applyPicto();document.getElementById("gLangNote").textContent=(T[code]&&T[code].dir==="rtl")?"اختر لغتك من الأعلى":"Choose your language above";}catch(e){console.error(e);}if(window.speechSynthesis)window.speechSynthesis.cancel();}\n' +
       'function playFullGuide(){var lang=state.workerLang;var parts=["home","schedule","tasks"].map(function(s){return buildSpeech(null,s,lang);});speak(parts.join(". "),lang,document.getElementById("gPlayBtn"));}\n';
 
     const rv =
@@ -2882,7 +2885,7 @@ async function exportInteractiveGuide() {
       'var renderWorkerView=(' + renderWorkerView.toString() + ');\n';
 
     const boot =
-      'try{location.hash="w=guide";renderWorkerView(PROFILE,"' + lang + '");}catch(e){console.error(e);var wc=document.getElementById("workerContent");if(wc)wc.innerHTML="<p style=\\"padding:40px;text-align:center;color:#722F37\\">"+e.message+"</p>";}\n';
+      'try{location.hash="w=guide";renderWorkerView(PROFILE,"' + lang + '");applyPicto();}catch(e){console.error(e);var wc=document.getElementById("workerContent");if(wc)wc.innerHTML="<p style=\\"padding:40px;text-align:center;color:#722F37\\">"+e.message+"</p>";}\n';
 
     const script = dataDefs + stubs + fns + '\n' + rv + boot;
     const css = collectAppCSS();
