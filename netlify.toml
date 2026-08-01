@@ -1,0 +1,10 @@
+# اهلا — Ahlan platform (single-file app)
+[build]
+  publish = "dist"
+  command = ""
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "no-referrer"
