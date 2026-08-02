@@ -385,6 +385,11 @@ footer{background:var(--forest);color:var(--linen);padding:70px 0 30px;margin-to
 .jc-meta{font-size:14px;color:var(--muted);font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px}
 .jc-days{display:flex;gap:5px;flex-wrap:wrap}
 .jc-day{background:var(--linen-deep);color:var(--sage-deep);border-radius:6px;padding:3px 9px;font-size:11px;font-weight:800}
+.jc-nav{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.map-btn{display:inline-flex;align-items:center;gap:6px;background:var(--sage);color:#fff;border-radius:100px;padding:8px 16px;font-size:13px;font-weight:800;text-decoration:none;cursor:pointer}
+.map-btn:hover{background:var(--sage-deep);color:#fff}
+.map-copy{min-width:38px;height:38px;border:1.5px solid var(--border);background:var(--linen-light);border-radius:100px;cursor:pointer;color:var(--sage-deep);display:inline-flex;align-items:center;justify-content:center;font-size:15px}
+.map-copy:hover{background:var(--sage);color:#fff;border-color:var(--sage)}
 .errand-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:16px;margin-bottom:12px}
 .errand-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px}
 .errand-place-name{font-size:16px;font-weight:800;color:var(--forest)}
@@ -1707,6 +1712,54 @@ async function translateCustomTask(room, text) {
     if (state.currentStep === 3) renderStep(3);
   } catch(e) {}
 }
+
+// يضمن ترجمة كل المحتوى اليدوي (ملاحظات + مهام مخصصة) وتخزينه قبل أي مشاركة/تصدير
+async function ensureContentTranslated(p) {
+  if (!p) return;
+  const jobs = [];
+  ['home','schedule','appliances','products','rules','offdays','driver','driverRules'].forEach(sec => {
+    const sd = p[sec];
+    if (sd && sd.notes && String(sd.notes).trim()) {
+      const src = String(sd.notes).trim();
+      if (!(sd.notesI18n && sd.notesI18n._src === src)) {
+        jobs.push((async () => { try { const r = await translateToAll(src); if (r && r.method !== 'raw') { r.data._src = src; sd.notesI18n = r.data; } } catch(e){} })());
+      }
+    }
+  });
+  if (p.tasks && p.tasks.custom) {
+    if (!p.tasks.customI18n) p.tasks.customI18n = {};
+    Object.keys(p.tasks.custom).forEach(room => {
+      (p.tasks.custom[room] || []).forEach(t => {
+        const text = String(t || '').trim(); if (!text) return;
+        if (!(p.tasks.customI18n[room] && p.tasks.customI18n[room][text])) {
+          jobs.push((async () => { try { const r = await translateToAll(text); if (r && r.method !== 'raw') { if (!p.tasks.customI18n[room]) p.tasks.customI18n[room] = {}; p.tasks.customI18n[room][text] = r.data; } } catch(e){} })());
+        }
+      });
+    });
+  }
+  if (!jobs.length) return;
+  showToast(userLang==='ar'?'جارٍ ترجمة الملاحظات لكل اللغات...':'Translating notes to all languages...');
+  await Promise.all(jobs);
+  try { saveAll(); } catch(e) {}
+}
+
+// رابط خرائط جوجل — يقبل رابطاً جاهزاً أو اسم مكان/عنوان فيبني رابط بحث
+function mapUrl(v) {
+  v = (v || '').trim();
+  if (!v) return '';
+  if (/^https?:\/\//i.test(v) || /^geo:/i.test(v)) return v;
+  return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(v);
+}
+// نسخ نص إلى الحافظة مع إشعار
+function copyText(text, msg) {
+  if (!text) return;
+  const done = () => showToast(msg || (userLang==='ar'?'✓ تم النسخ':'✓ Copied'));
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done).catch(() => { fallbackCopyText(text); done(); });
+  else { fallbackCopyText(text); done(); }
+}
+function fallbackCopyText(text) {
+  try { const ta = document.createElement('textarea'); ta.value = text; ta.style.cssText='position:fixed;opacity:0'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); } catch(e){}
+}
 // اختيار نص الملاحظة بلغة القارئ (من التخزين إن وُجد)
 function pickNote(section, lang, profile) {
   const p = profile || getProfile(); if (!p || !p[section]) return '';
@@ -2051,6 +2104,8 @@ function showShareLink() {
   refreshShareLink();
   switchShareTab('link');
   openModal('modalLink');
+  // اضمن ترجمة الملاحظات ثم أعد توليد الرابط/الكود ليحملا الترجمة
+  ensureContentTranslated(getProfile()).then(() => refreshShareLink()).catch(()=>{});
 }
 
 function showQR() {
@@ -2353,9 +2408,10 @@ function changeWorkerLang(code) {
 // ============================================================
 // PDF EXPORT (Custom A4 layout)
 // ============================================================
-function exportPDF() {
+async function exportPDF() {
   const p = getProfile(); if (!p) return;
   const l = userLang === 'ar';
+  await ensureContentTranslated(p); // اضمن ترجمة الملاحظات قبل البناء
   const html = buildPrintHTML(p, 'pdf', shareLang); // لغة القارئ المختارة
   
   // Method 1: Blob URL (works on most mobile browsers)
@@ -2506,7 +2562,7 @@ function buildPrintHTML(p, mode, langOrBool) {
     );
   }
   schedMap.forEach(([ic,lb,val]) => {
-    if (val) schedRows += `<tr><td>${ic} ${lb}</td><td dir="ltr">${val}</td></tr>`;
+    if (val) schedRows += `<span class="spill">${ic} <b>${lb}</b> <time dir="ltr">${val}</time></span>`;
   });
 
   // Build task list
@@ -2516,11 +2572,11 @@ function buildPrintHTML(p, mode, langOrBool) {
     const custom = (p.tasks && p.tasks.custom && p.tasks.custom[room]) || [];
     const aiCustom = (p.tasks && p.tasks.aiCustom && p.tasks.aiCustom[room]) || [];
     if (!ids.length && !custom.length && !aiCustom.length) return;
-    taskHTML += `<div class="room-block"><div class="room-title">${rooms[room]}</div><ul>`;
-    (DT[room]||[]).forEach(t => { if (ids.includes(t.id)) taskHTML += `<li>${pickLabel(t)}</li>`; });
-    custom.forEach(cx => { taskHTML += `<li>${esc(pickCustom(room, cx, lang, p))} <span style="font-size:10px;color:#8A6A3A">✎</span></li>`; });
-    aiCustom.forEach(t => { taskHTML += `<li>${esc(pickLabel(t))} <span style="font-size:10px;color:#4A6B5C">★</span></li>`; });
-    taskHTML += `</ul>${roomImages(room, ids)}</div>`;
+    let pills = '';
+    (DT[room]||[]).forEach(t => { if (ids.includes(t.id)) pills += `<span class="tpill">${pickLabel(t)}</span>`; });
+    custom.forEach(cx => { pills += `<span class="tpill cust">${esc(pickCustom(room, cx, lang, p))}</span>`; });
+    aiCustom.forEach(t => { pills += `<span class="tpill cust">${esc(pickLabel(t))}</span>`; });
+    taskHTML += `<div class="room-block"><span class="room-title">${rooms[room]}</span><div class="tpills">${pills}</div>${roomImages(room, ids)}</div>`;
   });
 
   // Build rules
@@ -2549,8 +2605,8 @@ body{font-family:'Cairo',Arial,sans-serif;background:#F4EFE6;color:#1F2E26;font-
 .page{max-width:${isInfog?'480px':'780px'};margin:0 auto;padding:${isInfog?'0':'20px'}}
 
 /* Header */
-.hdr{background:linear-gradient(135deg,#4A6B5C,#2A4537);color:white;padding:${isInfog?'40px 24px':'28px 32px'};text-align:center;${isInfog?'border-radius:0;':'border-radius:16px;margin-bottom:20px;'}}
-.hdr h1{font-size:${isInfog?'28px':'26px'};font-weight:800;margin-bottom:6px}
+.hdr{background:linear-gradient(135deg,#4A6B5C,#2A4537);color:white;padding:${isInfog?'40px 24px':'18px 26px'};text-align:center;${isInfog?'border-radius:0;':'border-radius:14px;margin-bottom:10px;'}}
+.hdr h1{font-size:${isInfog?'28px':'23px'};font-weight:800;margin-bottom:4px}
 .hdr .sub{font-size:13px;opacity:.85;font-weight:500}
 .hdr .badge{display:inline-block;background:rgba(255,255,255,.15);padding:4px 14px;border-radius:100px;font-size:12px;margin-top:10px}
 
@@ -2561,14 +2617,14 @@ body{font-family:'Cairo',Arial,sans-serif;background:#F4EFE6;color:#1F2E26;font-
 .btn-close{background:#F4EFE6;color:#1F2E26;border:1.5px solid #E0DAD0;padding:12px 20px;border-radius:12px;font-family:'Cairo',sans-serif;font-size:15px;font-weight:600;cursor:pointer}
 .print-hint{font-size:12px;color:#6B7568;text-align:center;padding:8px 16px 4px}
 
-/* Sections */
-.sec{background:white;border-radius:${isInfog?'0':'16px'};padding:${isInfog?'20px 20px':'22px 24px'};margin-bottom:${isInfog?'3px':'14px'};${isInfog?'':'border:1px solid #E0DAD0;'}}
-.sec.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;background:transparent;padding:0;border:none}
-.sec-title{font-size:${isInfog?'15px':'16px'};font-weight:800;color:#4A6B5C;margin-bottom:14px;display:flex;align-items:center;gap:8px;border-bottom:2px solid #E0DAD0;padding-bottom:8px}
+/* Sections — compact */
+.sec{background:white;border-radius:${isInfog?'0':'14px'};padding:${isInfog?'16px 18px':'13px 16px'};margin-bottom:${isInfog?'3px':'9px'};${isInfog?'':'border:1px solid #E0DAD0;'}}
+.sec.info-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;background:transparent;padding:0;border:none;margin-bottom:9px}
+.sec-title{font-size:${isInfog?'15px':'15px'};font-weight:800;color:#4A6B5C;margin-bottom:9px;display:flex;align-items:center;gap:8px;border-bottom:2px solid #E0DAD0;padding-bottom:6px}
 
 /* Info cards */
-.info-card{background:white;border-radius:12px;padding:16px;text-align:center;border:1px solid #E0DAD0}
-.info-card .num{font-size:28px;font-weight:900;color:#2A4537;line-height:1}
+.info-card{background:white;border-radius:10px;padding:10px 8px;text-align:center;border:1px solid #E0DAD0}
+.info-card .num{font-size:24px;font-weight:900;color:#2A4537;line-height:1}
 .info-card .lbl{font-size:11px;color:#6B7568;font-weight:600;margin-top:4px}
 
 /* Schedule table */
@@ -2577,12 +2633,18 @@ tr:nth-child(even){background:#F4EFE6}
 td{padding:8px 12px;font-size:13px;border-radius:4px}
 td:last-child{font-weight:700;text-align:${l?'left':'right'};color:#2A4537;direction:ltr}
 
-/* Tasks */
-.room-block{margin-bottom:14px}
-.room-title{font-size:13px;font-weight:700;color:#4A6B5C;margin-bottom:6px;padding:4px 10px;background:#F4EFE6;border-radius:6px;display:inline-block}
-ul{list-style:none;padding-right:10px}
-li{font-size:13px;padding:4px 0;border-bottom:1px dashed #E0DAD0;display:flex;align-items:center;gap:8px}
-li::before{content:'✓';color:#4A6B5C;font-weight:800}
+/* Tasks — compact pills */
+.room-block{margin-bottom:10px;display:flex;flex-wrap:wrap;align-items:flex-start;gap:8px}
+.room-title{font-size:13px;font-weight:800;color:#fff;padding:5px 12px;background:#4A6B5C;border-radius:100px;white-space:nowrap;flex-shrink:0}
+.tpills{display:flex;flex-wrap:wrap;gap:6px;flex:1}
+.tpill{background:#F4EFE6;border:1px solid #E0DAD0;border-radius:100px;padding:5px 11px;font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:5px}
+.tpill::before{content:'✓';color:#4A6B5C;font-weight:900;font-size:11px}
+.tpill.cust{background:rgba(200,149,109,.14);border-color:#E0C9A6}
+.tpill.cust::before{content:'✎';color:#8A6A3A}
+/* Schedule — compact chips */
+.spills{display:flex;flex-wrap:wrap;gap:6px}
+.spill{background:#F4EFE6;border:1px solid #E0DAD0;border-radius:100px;padding:5px 12px;font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:6px}
+.spill time{font-weight:800;color:#2A4537}
 
 /* Rules */
 .rules-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -2668,7 +2730,7 @@ ${((p.home && p.home.notes) || ((p.media&&p.media.home_general)||[]).length) ? `
 <!-- Daily Schedule -->
 <div class="sec">
   <div class="sec-title"><i class="bi bi-clock"></i> ${tt.schedule}</div>
-  <table>${schedRows}</table>
+  <div class="spills">${schedRows}</div>
   ${notesBox('schedule')}
 </div>
 
@@ -2754,6 +2816,7 @@ async function ensureInfographicFonts() {
 
 async function exportInfographic() {
   const p = getProfile(); if (!p) return;
+  await ensureContentTranslated(p);
   if (p.type === 'driver') return exportDriverInfographic();
   const lang = shareLang || 'ar';
   const tt = T[lang] || T.ar;
@@ -2975,6 +3038,7 @@ async function exportInteractiveGuide() {
   const lang = shareLang || 'ar';
   showToast(userLang==='ar'?'جارٍ تجهيز الدليل التفاعلي مع الصور والفيديو...':'Building interactive guide...');
   try {
+    await ensureContentTranslated(p0);
     const { clone, bytes } = await resolveMediaToBase64(p0);
 
     // حزمة الدوال من نفس التطبيق (لضمان تطابق العرض 100%)
@@ -3855,6 +3919,7 @@ function renderDriverStep2(p) {
         <div class="trip-field"><label>${l?'إلى':'To'}</label><input type="text" value="${esc(t.to||'')}" oninput="setTrip('${t.id}','to',this.value)" placeholder="${l?'مثال: مدرسة الرياض':'e.g., Riyadh School'}"></div>
       </div>
       <div class="trip-field"><label>${l?'الركاب':'Passengers'}</label><input type="text" value="${esc(t.passengers||'')}" oninput="setTrip('${t.id}','passengers',this.value)" placeholder="${l?'مثال: سارة وعبدالله':'e.g., Sara & Abdullah'}"></div>
+      <div class="trip-field"><label><i class="bi bi-geo-alt-fill" style="color:var(--sage)"></i> ${l?'رابط موقع الوجهة على الخرائط (اختياري)':'Destination map link (optional)'}</label><input type="text" dir="ltr" value="${esc(t.toMap||'')}" oninput="setTrip('${t.id}','toMap',this.value)" placeholder="${l?'الصق رابط خرائط جوجل هنا':'Paste Google Maps link'}"></div>
       <div class="trip-days-label">${l?'أيام الرحلة':'Trip days'}</div>
       <div class="day-chips">${DAY_ORDER.map(dk=>`<span class="day-chip${(t.days||[]).includes(dk)?' day-on':''}" onclick="toggleTripDay('${t.id}','${dk}',this)">${DAYS[dk][l?'ar':'en']}</span>`).join('')}</div>
     </div>`;
@@ -3882,6 +3947,7 @@ function renderDriverStep3(p) {
         ${e.freq!=='daily'?`<div class="trip-field"><label>${l?'اليوم':'Day'}</label><select onchange="setErrand('${e.id}','day',this.value)">${DAY_ORDER.map(dk=>`<option value="${dk}"${e.day===dk?' selected':''}>${DAYS[dk][l?'ar':'en']}</option>`).join('')}</select></div>`:''}
         <div class="trip-field"><label>${l?'الوقت (اختياري)':'Time (optional)'}</label><input type="time" value="${e.time||''}" onchange="setErrand('${e.id}','time',this.value)"></div>
       </div>
+      <div class="trip-field" style="margin-bottom:8px"><label><i class="bi bi-geo-alt-fill" style="color:var(--sage)"></i> ${l?'رابط الموقع على الخرائط (اختياري)':'Map link (optional)'}</label><input type="text" dir="ltr" value="${esc(e.placeMap||'')}" oninput="setErrand('${e.id}','placeMap',this.value)" placeholder="${l?'الصق رابط خرائط جوجل':'Paste Google Maps link'}"></div>
       <div class="trip-days-label">${l?'قائمة المشتريات':'Shopping list'}</div>
       <div class="shop-items">${(e.items||[]).map((it,idx)=>`<span class="shop-item">${esc(it)}<button onclick="removeErrandItem('${e.id}',${idx})">×</button></span>`).join('')||`<span style="color:var(--muted);font-size:13px">${l?'لا توجد أصناف بعد':'No items yet'}</span>`}</div>
       <div class="add-task-row" style="margin-top:8px"><input type="text" id="errItem_${e.id}" placeholder="${l?'أضف صنفاً (مثال: حليب)':'Add item (e.g., Milk)'}" onkeypress="if(event.key==='Enter')addErrandItem('${e.id}')"><button class="btn btn-secondary btn-sm" onclick="addErrandItem('${e.id}')">${l?'إضافة':'Add'}</button></div>
@@ -3938,6 +4004,9 @@ function renderDriverWorkerView(profile, lang) {
   document.documentElement.dir = d.dir;
   const p = profile;
   const dv = p.driver || {};
+  const NAV = ({ar:'التنقّل بالخرائط',en:'Navigate',hi:'नेविगेट करें',am:'መንገድ ጠቁም',tl:'Mag-navigate',id:'Navigasi'})[lang] || 'Navigate';
+  const COPY = ({ar:'نسخ الرابط',en:'Copy link',hi:'लिंक कॉपी',am:'ሊንክ ቅዳ',tl:'Kopyahin',id:'Salin'})[lang] || 'Copy';
+  const navBtns = (url) => url ? `<div class="jc-nav"><a href="${esc(url)}" target="_blank" rel="noopener" class="map-btn"><i class="bi bi-geo-alt-fill"></i> ${NAV}</a><button type="button" class="map-copy" title="${COPY}" onclick="copyText(this.previousElementSibling.getAttribute('href'))"><i class="bi bi-clipboard"></i></button></div>` : '';
   let h = '';
 
   // Header
@@ -3970,6 +4039,7 @@ function renderDriverWorkerView(profile, lang) {
         <div class="journey-card">
           <div class="jc-title">${tripLabel(t.kind, lang)}</div>
           ${(t.from||t.to)?`<div class="jc-route"><span class="jc-pin from"><i class="bi bi-geo-alt-fill"></i></span><span class="jc-loc" data-tr="1">${esc(t.from||'—')}</span><span class="jc-arrow"><i class="bi bi-arrow-${rtl?'left':'right'}"></i></span><span class="jc-pin to"><i class="bi bi-flag-fill"></i></span><span class="jc-loc" data-tr="1">${esc(t.to||'—')}</span></div>`:''}
+          ${navBtns(mapUrl(t.toMap || t.to))}
           ${t.passengers?`<div class="jc-meta"><i class="bi bi-people-fill"></i> <span data-tr="1">${esc(t.passengers)}</span></div>`:''}
           <div class="jc-days">${DAY_ORDER.filter(dk=>(t.days||[]).includes(dk)).map(dk=>`<span class="jc-day">${DAYS[dk][lang]||DAYS[dk].en}</span>`).join('')}</div>
         </div>
@@ -3990,6 +4060,7 @@ function renderDriverWorkerView(profile, lang) {
         <div class="errand-head"><div class="errand-place-name"><i class="bi bi-shop"></i> ${esc(e.place||d.place)}</div><div class="errand-freq">${freqTxt}${dayTxt}${e.time?' · '+fmtTime(e.time,lang):''}</div></div>
         ${(e.items||[]).length?`<div class="errand-list-title"><i class="bi bi-card-checklist"></i> ${d.list} <span style="color:var(--muted);font-weight:600">(${lang==='ar'?ar(e.items.length):e.items.length} ${d.items_count})</span></div>
           <div class="errand-items">${e.items.map(it=>`<span class="errand-item"><i class="bi bi-basket2-fill"></i> <span data-tr="1">${esc(it)}</span></span>`).join('')}</div>`:''}
+        ${navBtns(mapUrl(e.placeMap || e.place))}
       </div>`;
     });
     h += `</div>`;
@@ -4053,7 +4124,8 @@ function buildDriverPrintDoc(p, lang) {
     const k = tripKind(t.kind);
     const route = (t.from||t.to) ? `${esc(t.from||'—')} ← ${esc(t.to||'—')}` : '';
     const days = DAY_ORDER.filter(dk=>(t.days||[]).includes(dk)).map(dk=>DAYS[dk][lang]||DAYS[dk].en).join('، ');
-    return `<div class="dtrip-row"><div class="dtrip-t">${fmtTime(t.time,lang)}${t.ret?`<br><small style="color:#722F37">↩ ${fmtTime(t.ret,lang)}</small>`:''}</div><div class="dtrip-c"><div class="dtrip-k"><i class="bi ${k.icon}"></i> ${tripLabel(t.kind,lang)}</div>${route?`<div class="dtrip-r" dir="${rtl?'rtl':'ltr'}">${route}</div>`:''}${t.passengers?`<div class="dtrip-p"><i class="bi bi-people-fill"></i> ${esc(t.passengers)}</div>`:''}<div class="dtrip-d">${days}</div></div></div>`;
+    const mu = mapUrl(t.toMap || t.to);
+    return `<div class="dtrip-row"><div class="dtrip-t">${fmtTime(t.time,lang)}${t.ret?`<br><small style="color:#722F37">↩ ${fmtTime(t.ret,lang)}</small>`:''}</div><div class="dtrip-c"><div class="dtrip-k"><i class="bi ${k.icon}"></i> ${tripLabel(t.kind,lang)}</div>${route?`<div class="dtrip-r" dir="${rtl?'rtl':'ltr'}">${route}</div>`:''}${t.passengers?`<div class="dtrip-p"><i class="bi bi-people-fill"></i> ${esc(t.passengers)}</div>`:''}<div class="dtrip-d">${days}${mu?` · <a href="${esc(mu)}" style="color:#4A6B5C;font-weight:800" target="_blank">📍 ${lang==='ar'?'الخرائط':'Map'}</a>`:''}</div></div></div>`;
   }).join('');
   const errandsHTML = (p.errands||[]).map(er => {
     const freqTxt = er.freq==='daily'?d.daily:(er.freq==='monthly'?d.monthly:d.weekly);
