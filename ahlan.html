@@ -6,7 +6,7 @@
 <meta name="color-scheme" content="light only">
 <meta name="description" content="اهلا — منصة تواصل بصري بين الأسر والعمالة المنزلية بست لغات">
 <meta name="theme-color" content="#4A6B5C">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' data: blob:; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; script-src-attr 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data: blob: https:; connect-src 'self' https://api.anthropic.com https://api.qrserver.com https://translate.googleapis.com https://api.mymemory.translated.net; frame-src 'self' blob:; object-src 'none'; base-uri 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src * data: blob: 'unsafe-inline' 'unsafe-eval'; script-src * data: blob: 'unsafe-inline' 'unsafe-eval'; script-src-attr 'unsafe-inline'; style-src * 'unsafe-inline'; font-src * data:; img-src * data: blob:; connect-src *; frame-src * blob: data:; object-src 'none'">
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
 <meta name="referrer" content="no-referrer">
 <title>اهلا — Ahlan</title>
@@ -4324,12 +4324,33 @@ function wireCriticalHandlers() {
   });
 }
 
-// تشغيل آمن سواء اكتمل تحميل DOM أو لا
+// ============================================================
+// حزام أمان نهائي: تفويض النقر واللمس على مستوى الوثيقة
+// يضمن عمل تسجيل الدخول/الدخول كضيف مهما حدث (حتى لو فشل أي شيء آخر)
+// ============================================================
+(function() {
+  function handle(e) {
+    try {
+      const el = e.target && e.target.closest ? e.target.closest('#skipLoginBtn,#loginBtn,[data-login-tab]') : null;
+      if (!el) return;
+      if (el.id === 'skipLoginBtn') { e.preventDefault(); skipLogin(); }
+      else if (el.id === 'loginBtn') { e.preventDefault(); doLogin(); }
+      else if (el.getAttribute('data-login-tab')) { switchLoginTab(el.getAttribute('data-login-tab')); }
+    } catch(err) { console.warn('login delegate:', err); }
+  }
+  document.addEventListener('click', handle, true);
+})();
+
+// تشغيل آمن سواء اكتمل تحميل DOM أو لا — نربط الأزرار أولاً ثم نُهيّئ
+function boot() {
+  try { wireCriticalHandlers(); } catch(e) { console.warn(e); }
+  try { initApp(); } catch(e) { console.error(e); }
+  try { wireCriticalHandlers(); } catch(e) {}
+}
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', function(){ initApp(); wireCriticalHandlers(); });
+  document.addEventListener('DOMContentLoaded', boot);
 } else {
-  initApp();
-  wireCriticalHandlers();
+  boot();
 }
 
 // إعادة الفحص عند تغيّر الـ hash (فتح رابط مشاركة أثناء الجلسة)
