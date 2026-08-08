@@ -4359,5 +4359,203 @@ window.addEventListener('hashchange', function() {
 });
 </script>
 
+<!-- AHLAN_SUPPORT_WIDGET_START -->
+<script>
+/* منصّة أهلاً — ودجت الدعم (شات بوت فوري + واتساب + بريد) — مستقل ويعمل بلا إنترنت */
+(function(){
+  if (window.__ahlanSupport) return; window.__ahlanSupport = true;
+
+  /* ===== الإعدادات — عدّل هنا فقط ===== */
+  var CFG = {
+    wa: '966500000000',                       /* رقم واتساب الدعم بصيغة دولية بدون + */
+    email: 'k.aldawalibi.work@gmail.com',     /* بريد استقبال الاقتراحات والدعم الفني */
+    waText: 'مرحباً 👋 لديّ استفسار عن منصة أهلاً',
+    mailSubject: 'اقتراح / دعم فني — منصة أهلاً',
+    mailBody: 'مرحباً فريق أهلاً،%0D%0A%0D%0A(اكتب اقتراحك أو مشكلتك هنا)%0D%0A'
+  };
+
+  var C = {sage:'#4A6B5C',sageD:'#2A4537',forest:'#1F2E26',linen:'#F4EFE6',linenL:'#FAF6EE',
+           wheat:'#C8956D',border:'#E6DFD3',text:'#2A332D',muted:'#6B7568',wa:'#25D366'};
+
+  /* ===== الأيقونات (SVG مضمّن) ===== */
+  var IC = {
+    wa:'<svg viewBox="0 0 24 24" width="28" height="28" fill="#fff"><path d="M17.5 14.4c-.3-.15-1.7-.85-2-.95-.26-.1-.45-.15-.65.15-.19.29-.74.94-.9 1.13-.17.19-.33.22-.62.07-.3-.15-1.25-.46-2.38-1.47-.88-.78-1.47-1.75-1.64-2.05-.17-.29-.02-.45.13-.6.13-.13.29-.34.44-.51.15-.17.19-.29.29-.48.1-.19.05-.36-.02-.51-.08-.15-.65-1.57-.9-2.15-.24-.57-.48-.49-.65-.5H7.9c-.19 0-.5.07-.76.36-.26.29-1 .98-1 2.38s1.02 2.76 1.17 2.95c.15.19 2.02 3.08 4.9 4.32.68.29 1.22.47 1.63.6.69.22 1.31.19 1.8.11.55-.08 1.7-.69 1.94-1.36.24-.67.24-1.24.17-1.36-.07-.12-.26-.19-.55-.34zM12 2C6.48 2 2 6.48 2 12c0 1.77.46 3.44 1.27 4.89L2 22l5.23-1.37A9.95 9.95 0 0 0 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2z"/></svg>',
+    chat:'<svg viewBox="0 0 24 24" width="27" height="27" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+    close:'<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>',
+    send:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg>',
+    mail:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>',
+    waSm:'<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M17.5 14.4c-.3-.15-1.7-.85-2-.95-.26-.1-.45-.15-.65.15-.19.29-.74.94-.9 1.13-.17.19-.33.22-.62.07-.3-.15-1.25-.46-2.38-1.47-.88-.78-1.47-1.75-1.64-2.05-.17-.29-.02-.45.13-.6.13-.13.29-.34.44-.51.15-.17.19-.29.29-.48.1-.19.05-.36-.02-.51-.08-.15-.65-1.57-.9-2.15-.24-.57-.48-.49-.65-.5H7.9c-.19 0-.5.07-.76.36-.26.29-1 .98-1 2.38s1.02 2.76 1.17 2.95c.15.19 2.02 3.08 4.9 4.32 2.88 1.24 2.88.83 3.4.78.52-.05 1.7-.69 1.94-1.36.24-.67.24-1.24.17-1.36-.07-.12-.26-.19-.55-.34zM12 2C6.48 2 2 6.48 2 12c0 1.77.46 3.44 1.27 4.89L2 22l5.23-1.37A9.95 9.95 0 0 0 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2z"/></svg>',
+    logo:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg>'
+  };
+
+  /* ===== قاعدة معرفة الشات بوت ===== */
+  var KB = [
+    {k:['ما هو','ماهو','وش','ايش','what','about','نبذه','تعريف','ماهي','ما هي'],
+     a:'«أهلاً» منصّة سعودية تُنهي حاجز اللغة بين الأسرة والعمالة المنزلية 🏠\nتحوّل تعليمات منزلك أو سائقك إلى دليلٍ بصريّ مترجَم لستّ لغات، بالصوت والأيقونات — يفهمه العامل من النظرة الأولى وبلا إنترنت.',
+     c:['كيف أنشئ ملف؟','اللغات المدعومة','هل هو مجاني؟']},
+    {k:['انشئ','انشاء','اضيف','ابدا','create','new','ملف جديد','كيف اسوي','كيف اعمل'],
+     a:'إنشاء الملف سهل جداً ✨\n1) اضغط «إضافة ملف» في لوحة التحكم.\n2) اختر النوع: منزل 🏠 أو سائق 🚗.\n3) أضف الغرف والمهام أو الرحلات، وصوراً إن رغبت.\n4) عايِن واجهة العامل ثم شاركها.',
+     c:['كيف أشارك مع العامل؟','وحدة السائق','أضف صور وفيديو']},
+    {k:['شارك','مشاركه','ارسل','share','link','رابط','كود','باركود','qr'],
+     a:'تشارك ملفك بثلاث طرق 📤\n• رابط أو كود يفتح على أي جهاز.\n• «دليل تفاعلي كامل»: ملف واحد بالصور والفيديو والصوت — يعمل بلا خادم.\n• إنفوجرافيك للطباعة تعلّقه في المطبخ.\nوكلها بلغة العامل.',
+     c:['هل يعمل بلا إنترنت؟','اللغات المدعومة']},
+    {k:['لغ','لغات','language','لغه','ترجم','translate'],
+     a:'ندعم ٦ لغات 🌍 العربية، الإنجليزية، الهندية، الأمهرية، الفلبينية، الإندونيسية.\nتُترجَم تعليماتك تلقائياً وتُعرض بلغة العامل — بالصوت أيضاً لغير القارئ.',
+     c:['كيف أشارك مع العامل؟','ما هو أهلاً؟']},
+    {k:['انترنت','اونلاين','offline','بدون نت','بلا نت',' نت','النت'],
+     a:'نعم ✅ الموقع والدليل التفاعلي يعملان بلا إنترنت بالكامل: الأيقونات والصور والفيديو والشرح الصوتي مضمّنة.\n(الترجمة الفورية لنصّ جديد فقط تحتاج اتصالاً لحظة كتابته.)',
+     c:['كيف أشارك مع العامل؟','تواصل مع الدعم']},
+    {k:['صور','فيديو','صوت','media','image','video','مقطع','تسجيل'],
+     a:'من داخل محرّر الملف تضيف لكل مهمة صورة أو فيديو أو تسجيلاً صوتياً 🎥\nتظهر بجانب المهمة في واجهة العامل وفي «الدليل التفاعلي الكامل».',
+     c:['كيف أشارك مع العامل؟','هل يعمل بلا إنترنت؟']},
+    {k:['سائق','سياق','driver','رحلات','مشاوير','توصيل','مركب','سياره'],
+     a:'وحدة السائق 🚗 كاملة: جدول رحلات يوميّ، وجهات من←إلى، أوقات الذهاب والعودة، ومشاوير ومشتريات محدّدة بقوائم — بلغة السائق ومع روابط مواقع الخرائط.',
+     c:['كيف أنشئ ملف؟','كيف أشارك مع العامل؟']},
+    {k:['سعر','مجان','free','price','اشتراك','فلوس','تكلف','كم يكلف','باقه'],
+     a:'يمكنك استخدام أهلاً مجّاناً الآن 🎉 (إنشاء ملف، ٦ لغات، مشاركة برابط).\nخطط «بريميوم» بمزايا إضافية (ملفات غير محدودة، دليل تفاعلي بالفيديو، مزامنة سحابية) قادمة قريباً.',
+     c:['كيف أنشئ ملف؟','تواصل مع الدعم']},
+    {k:['خصوصيه','امان','privacy','بيانات','secure','امن','حسابي'],
+     a:'خصوصيتك محفوظة 🔒 بياناتك تُحفظ على جهازك (بلا حسابات معقّدة ولا خوادم)، ولا تُشارَك إلا حين ترسل الرابط بنفسك.',
+     c:['ما هو أهلاً؟','تواصل مع الدعم']},
+    {k:['لا يفتح','لا يدخل','ما يشتغل','مشكل','خطا','عطل','stuck','لا يعمل','تسجيل الدخول','مايفتح','مايدخل','error'],
+     a:'جرّب هذا 🛠️\n1) افتحه كـ«رابط» في متصفّح كامل (Chrome / Safari) لا كملف داخل واتساب.\n2) اضغط «الدخول كضيف» للتجربة فوراً.\nإن استمرّت المشكلة، تواصل معنا مباشرة وسنساعدك 👇',
+     c:['تواصل عبر واتساب','راسلنا بالبريد']},
+    {k:['شكرا','مشكور','thanks','thank','تمام','يعطيك'],
+     a:'العفو 🌿 سعدنا بخدمتك! أنا هنا إن احتجت أي شيء آخر.',
+     c:['ما هو أهلاً؟','تواصل مع الدعم']}
+  ];
+  var QUICK = ['ما هو أهلاً؟','كيف أنشئ ملف؟','كيف أشارك مع العامل؟','اللغات المدعومة','هل يعمل بلا إنترنت؟','تواصل مع الدعم'];
+
+  function norm(s){return (s||'').toLowerCase()
+    .replace(/[\u064B-\u065F\u0670\u0640]/g,'')
+    .replace(/[أإآ]/g,'ا').replace(/[ىي]/g,'ي').replace(/ة/g,'ه').replace(/[ؤ]/g,'و').replace(/[ئ]/g,'ي')
+    .replace(/\s+/g,' ').trim();}
+
+  function waURL(){return 'https://wa.me/'+CFG.wa+'?text='+encodeURIComponent(CFG.waText);}
+  function mailURL(){return 'mailto:'+CFG.email+'?subject='+encodeURIComponent(CFG.mailSubject)+'&body='+CFG.mailBody;}
+
+  /* ===== CSS ===== */
+  var css = ''+
+  '#asup{position:fixed;bottom:20px;left:20px;z-index:2147483000;font-family:Cairo,Tajawal,system-ui,sans-serif;direction:rtl}'+
+  '#asup *{box-sizing:border-box}'+
+  '.asup-fabs{display:flex;flex-direction:column;gap:12px;align-items:center}'+
+  '.asup-fab{width:58px;height:58px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 22px rgba(31,46,38,.28);transition:transform .2s,box-shadow .2s;position:relative}'+
+  '.asup-fab:hover{transform:scale(1.08)}'+
+  '.asup-wa{background:'+C.wa+'}'+
+  '.asup-chat{background:linear-gradient(135deg,'+C.sage+','+C.sageD+')}'+
+  '.asup-fab .asup-badge{position:absolute;top:-3px;right:-3px;width:18px;height:18px;border-radius:50%;background:'+C.wheat+';color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid #fff}'+
+  '.asup-tip{position:absolute;bottom:70px;left:0;background:#fff;color:'+C.forest+';font-size:13px;font-weight:700;padding:10px 14px;border-radius:14px;border-bottom-right-radius:4px;box-shadow:0 8px 22px rgba(31,46,38,.18);white-space:nowrap;cursor:pointer;animation:asupPop .3s ease}'+
+  '.asup-tip b{color:'+C.sage+'}'+
+  '.asup-tip .x{margin-right:8px;color:'+C.muted+';font-weight:900}'+
+  '@keyframes asupPop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}'+
+  '.asup-panel{position:fixed;bottom:90px;left:20px;width:370px;max-width:calc(100vw - 40px);height:560px;max-height:calc(100vh - 120px);background:'+C.linenL+';border-radius:22px;box-shadow:0 24px 60px rgba(31,46,38,.32);display:none;flex-direction:column;overflow:hidden;animation:asupPop .25s ease}'+
+  '.asup-panel.open{display:flex}'+
+  '.asup-head{background:linear-gradient(135deg,'+C.sageD+','+C.sage+');color:#fff;padding:16px 18px;display:flex;align-items:center;gap:12px;flex-shrink:0}'+
+  '.asup-av{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;flex-shrink:0}'+
+  '.asup-htitle b{font-size:16px;font-weight:800;display:block;line-height:1.2}'+
+  '.asup-htitle span{font-size:12px;opacity:.9;display:flex;align-items:center;gap:6px}'+
+  '.asup-dot{width:8px;height:8px;border-radius:50%;background:#7DE0A0;display:inline-block;box-shadow:0 0 0 0 rgba(125,224,160,.7);animation:asupPulse 1.8s infinite}'+
+  '@keyframes asupPulse{0%{box-shadow:0 0 0 0 rgba(125,224,160,.6)}70%{box-shadow:0 0 0 6px rgba(125,224,160,0)}100%{box-shadow:0 0 0 0 rgba(125,224,160,0)}}'+
+  '.asup-x{margin-right:auto;background:rgba(255,255,255,.14);border:none;width:34px;height:34px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center}'+
+  '.asup-x svg{width:18px;height:18px}'+
+  '.asup-body{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;background:'+C.linen+'}'+
+  '.asup-msg{max-width:82%;padding:11px 14px;font-size:13.5px;line-height:1.7;white-space:pre-line;border-radius:16px;box-shadow:0 2px 6px rgba(31,46,38,.05)}'+
+  '.asup-bot{align-self:flex-start;background:#fff;color:'+C.text+';border-bottom-right-radius:5px}'+
+  '.asup-user{align-self:flex-end;background:linear-gradient(135deg,'+C.sage+','+C.sageD+');color:#fff;border-bottom-left-radius:5px}'+
+  '.asup-typing{align-self:flex-start;background:#fff;padding:14px 16px;border-radius:16px;display:flex;gap:5px}'+
+  '.asup-typing i{width:7px;height:7px;border-radius:50%;background:'+C.muted+';opacity:.5;animation:asupBlink 1.2s infinite}'+
+  '.asup-typing i:nth-child(2){animation-delay:.2s}.asup-typing i:nth-child(3){animation-delay:.4s}'+
+  '@keyframes asupBlink{0%,60%,100%{opacity:.3}30%{opacity:1}}'+
+  '.asup-chips{display:flex;flex-wrap:wrap;gap:7px;padding:0 16px 10px;background:'+C.linen+'}'+
+  '.asup-chip{background:#fff;border:1.5px solid '+C.border+';color:'+C.sageD+';font-family:inherit;font-size:12.5px;font-weight:700;padding:8px 13px;border-radius:100px;cursor:pointer;transition:all .18s}'+
+  '.asup-chip:hover{background:'+C.sage+';color:#fff;border-color:'+C.sage+'}'+
+  '.asup-input{display:flex;gap:8px;padding:12px;background:'+C.linenL+';border-top:1px solid '+C.border+';flex-shrink:0}'+
+  '.asup-input input{flex:1;border:1.5px solid '+C.border+';border-radius:100px;padding:11px 16px;font-family:inherit;font-size:13.5px;background:#fff;color:'+C.text+';outline:none}'+
+  '.asup-input input:focus{border-color:'+C.sage+'}'+
+  '.asup-send{background:'+C.sage+';border:none;width:42px;height:42px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}'+
+  '.asup-send:hover{background:'+C.sageD+'}'+
+  '.asup-foot{display:flex;gap:8px;padding:0 12px 12px;background:'+C.linenL+'}'+
+  '.asup-cbtn{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:11px;border-radius:12px;font-family:inherit;font-size:13px;font-weight:800;cursor:pointer;border:none;text-decoration:none}'+
+  '.asup-cwa{background:rgba(37,211,102,.12);color:#128C4A}'+
+  '.asup-cwa:hover{background:'+C.wa+';color:#fff}'+
+  '.asup-cmail{background:rgba(74,107,92,.1);color:'+C.sageD+'}'+
+  '.asup-cmail:hover{background:'+C.sage+';color:#fff}'+
+  '@media(max-width:430px){.asup-panel{height:calc(100vh - 100px);bottom:86px;left:10px;right:10px;width:auto;max-width:none}#asup{left:14px;bottom:14px}}';
+
+  /* ===== DOM ===== */
+  var root = document.createElement('div'); root.id = 'asup';
+  root.innerHTML =
+    '<div class="asup-panel" id="asupPanel">'+
+      '<div class="asup-head">'+
+        '<div class="asup-av">'+IC.logo+'</div>'+
+        '<div class="asup-htitle"><b>مساعد أهلاً</b><span><i class="asup-dot"></i> يردّ فوراً</span></div>'+
+        '<button class="asup-x" id="asupClose" aria-label="إغلاق">'+IC.close+'</button>'+
+      '</div>'+
+      '<div class="asup-body" id="asupBody"></div>'+
+      '<div class="asup-chips" id="asupChips"></div>'+
+      '<div class="asup-input"><input id="asupInput" type="text" placeholder="اكتب سؤالك هنا..." autocomplete="off"><button class="asup-send" id="asupSend" aria-label="إرسال">'+IC.send+'</button></div>'+
+      '<div class="asup-foot">'+
+        '<a class="asup-cbtn asup-cwa" href="'+waURL()+'" target="_blank" rel="noopener">'+IC.waSm+' واتساب</a>'+
+        '<a class="asup-cbtn asup-cmail" href="'+mailURL()+'">'+IC.mail+' البريد</a>'+
+      '</div>'+
+    '</div>'+
+    '<div class="asup-fabs">'+
+      '<div class="asup-tip" id="asupTip"><span class="x">✕</span> تحتاج <b>مساعدة</b>؟ 👋</div>'+
+      '<a class="asup-fab asup-wa" href="'+waURL()+'" target="_blank" rel="noopener" title="تواصل عبر واتساب">'+IC.wa+'</a>'+
+      '<button class="asup-fab asup-chat" id="asupToggle" title="محادثة فورية">'+IC.chat+'<span class="asup-badge">1</span></button>'+
+    '</div>';
+
+  function mount(){
+    var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
+    document.body.appendChild(root);
+    wire();
+  }
+
+  var body, chips, input, panel, toggle, tip, started=false;
+  function wire(){
+    body=document.getElementById('asupBody'); chips=document.getElementById('asupChips');
+    input=document.getElementById('asupInput'); panel=document.getElementById('asupPanel');
+    toggle=document.getElementById('asupToggle'); tip=document.getElementById('asupTip');
+    toggle.addEventListener('click', function(){ panel.classList.contains('open')?closeP():openP(); });
+    document.getElementById('asupClose').addEventListener('click', closeP);
+    document.getElementById('asupSend').addEventListener('click', sendUser);
+    input.addEventListener('keydown', function(e){ if(e.key==='Enter'){ e.preventDefault(); sendUser(); }});
+    tip.addEventListener('click', function(e){ if(e.target.classList.contains('x')){ tip.style.display='none'; return;} openP(); });
+    setTimeout(function(){ if(tip) tip.style.display='none'; }, 9000);
+  }
+
+  function openP(){ panel.classList.add('open'); tip.style.display='none'; var b=toggle.querySelector('.asup-badge'); if(b) b.style.display='none';
+    if(!started){ started=true; botSay('أهلاً وسهلاً بك 🌿 أنا مساعد «أهلاً» الفوري. كيف أقدر أساعدك اليوم؟', QUICK); }
+    setTimeout(function(){ input && input.focus(); }, 200); }
+  function closeP(){ panel.classList.remove('open'); }
+
+  function addMsg(text, who){ var d=document.createElement('div'); d.className='asup-msg '+(who==='user'?'asup-user':'asup-bot'); d.textContent=text; body.appendChild(d); body.scrollTop=body.scrollHeight; return d; }
+  function setChips(list){ chips.innerHTML=''; (list||[]).forEach(function(t){ var b=document.createElement('button'); b.className='asup-chip'; b.textContent=t; b.addEventListener('click', function(){ handle(t); }); chips.appendChild(b); }); }
+  function typing(){ var d=document.createElement('div'); d.className='asup-typing'; d.innerHTML='<i></i><i></i><i></i>'; body.appendChild(d); body.scrollTop=body.scrollHeight; return d; }
+  function botSay(text, cList){ setChips([]); var t=typing(); setTimeout(function(){ t.remove(); addMsg(text.replace(/\\n/g,'\n'),'bot'); setChips(cList); }, 480); }
+
+  function match(q){
+    var n=norm(q), best=null, score=0;
+    for(var i=0;i<KB.length;i++){ var s=0; for(var j=0;j<KB[i].k.length;j++){ if(n.indexOf(norm(KB[i].k[j]))>-1) s++; } if(s>score){score=s;best=KB[i];} }
+    return score>0?best:null;
+  }
+
+  function handle(text){
+    addMsg(text,'user');
+    var n=norm(text);
+    if(n.indexOf('واتساب')>-1 || n.indexOf('whatsapp')>-1){ botSay('يسعدني ذلك! جارٍ فتح واتساب للتواصل مع فريق الدعم مباشرة 💬', ['ما هو أهلاً؟']); window.open(waURL(),'_blank'); return; }
+    if(n.indexOf('بريد')>-1 || n.indexOf('راسلنا')>-1 || n.indexOf('ايميل')>-1 || n.indexOf('email')>-1){ botSay('تمام! سأفتح بريدك لإرسال اقتراحك أو طلب الدعم إلى فريقنا ✉️', ['ما هو أهلاً؟']); window.location.href=mailURL(); return; }
+    if(n.indexOf('تواصل')>-1 || n.indexOf('دعم')>-1 || n.indexOf('مساعده')>-1 || n.indexOf('support')>-1){ botSay('يسعدنا خدمتك 🌟 اختر طريقة التواصل المناسبة لك:', ['تواصل عبر واتساب','راسلنا بالبريد']); return; }
+    var m=match(text);
+    if(m){ botSay(m.a, m.c); }
+    else { botSay('لم أستوعب سؤالك تماماً 🤔 جرّب إعادة صياغته، أو تواصل مع فريقنا مباشرة:', ['تواصل عبر واتساب','راسلنا بالبريد','ما هو أهلاً؟']); }
+  }
+  function sendUser(){ var v=(input.value||'').trim(); if(!v) return; input.value=''; handle(v); }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', mount); else mount();
+})();
+</script>
+
+<!-- AHLAN_SUPPORT_WIDGET_END -->
 </body>
 </html>
