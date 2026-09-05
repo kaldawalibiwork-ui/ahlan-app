@@ -280,6 +280,45 @@ function idbAllKeys(store){
   });
 }
 
+/* ---------- Crypto layer (AES-GCM + PBKDF2) ---------- */
+let KEY=null;            // in-memory CryptoKey after unlock (null = no lock)
+const b64={
+  enc:buf=>btoa(String.fromCharCode(...new Uint8Array(buf))),
+  dec:s=>{const bin=atob(s);const a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);return a;}
+};
+async function deriveKey(pass,saltB64){
+  const salt=b64.dec(saltB64);
+  const base=await crypto.subtle.importKey("raw",new TextEncoder().encode(pass),"PBKDF2",false,["deriveKey"]);
+  return crypto.subtle.deriveKey({name:"PBKDF2",salt,iterations:150000,hash:"SHA-256"},base,{name:"AES-GCM",length:256},false,["encrypt","decrypt"]);
+}
+async function encObj(key,obj){
+  const iv=crypto.getRandomValues(new Uint8Array(12));
+  const data=new TextEncoder().encode(JSON.stringify(obj));
+  const ct=await crypto.subtle.encrypt({name:"AES-GCM",iv},key,data);
+  return {enc:true,iv:b64.enc(iv),ct:b64.enc(ct)};
+}
+async function decObj(key,w){
+  const pt=await crypto.subtle.decrypt({name:"AES-GCM",iv:b64.dec(w.iv)},key,b64.dec(w.ct));
+  return JSON.parse(new TextDecoder().decode(pt));
+}
+async function encBlob(key,blob){
+  const iv=crypto.getRandomValues(new Uint8Array(12));
+  const buf=await blob.arrayBuffer();
+  const ct=await crypto.subtle.encrypt({name:"AES-GCM",iv},key,buf);
+  return {enc:true,iv:b64.enc(iv),ct:b64.enc(ct),type:blob.type};
+}
+async function decBlob(key,w){
+  const pt=await crypto.subtle.decrypt({name:"AES-GCM",iv:b64.dec(w.iv)},key,b64.dec(w.ct));
+  return new Blob([pt],{type:w.type||""});
+}
+/* store/read a file transparently (encrypted when locked) */
+async function putFile(fileId,blob){ await idbSet("files",fileId, KEY?await encBlob(KEY,blob):blob); }
+async function getFile(fileId){
+  const v=await idbGet("files",fileId); if(!v) return null;
+  if(v&&v.enc){ if(!KEY) throw new Error("locked"); return decBlob(KEY,v); }
+  return v; // plain Blob
+}
+
 /* ---------- State ---------- */
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
 let STATE={
@@ -289,10 +328,14 @@ let STATE={
 let saveTimer=null;
 function save(){ // debounced
   clearTimeout(saveTimer);
-  saveTimer=setTimeout(async()=>{ try{ await idbSet("kv","state",STATE); }catch(e){ toast("تعذّر الحفظ: "+e.message,"err"); } },250);
+  saveTimer=setTimeout(async()=>{
+    try{ await idbSet("kv","state", KEY?await encObj(KEY,STATE):STATE); }
+    catch(e){ toast("تعذّر الحفظ: "+e.message,"err"); }
+  },250);
 }
 async function load(){
-  const s=await idbGet("kv","state");
+  let s=await idbGet("kv","state");
+  if(s && s.enc){ s=await decObj(KEY,s); }        // decrypt when locked
   if(s && s.clients){ STATE=s; STATE.settings=Object.assign({calcUrl:"",minutesUrl:"",office:"مكتب ليكسوس القانوني"},s.settings||{}); }
 }
 
@@ -366,9 +409,16 @@ function renderHome(){
   const openCases=STATE.clients.reduce((n,c)=>n+(c.cases||[]).filter(x=>x.status!=="closed").length,0);
   const todayAppts=appts.filter(a=>daysUntil(a.date)===0);
 
+  const rem=reminderItems();
+  const remBanner = rem.length?`<div class="card" style="border-inline-start:5px solid var(--gold);padding:14px 16px;margin-bottom:18px">
+    <b style="color:var(--gold-2)">🔔 تذكيرات (${arNum(rem.length)}):</b>
+    <div style="margin-top:6px;display:flex;flex-direction:column;gap:4px">
+    ${rem.slice(0,6).map(i=>`<div style="font-size:.92rem"><span style="color:${i.kind==="over"?"var(--danger)":"var(--warn)"};font-weight:700">${i.when}</span> — ${esc(i.text)}</div>`).join("")}
+    </div></div>`:"";
+
   $("#app").innerHTML=`
     <div class="page-title"><h1>لوحة المكتب</h1><span style="flex:1"></span></div>
-
+    ${remBanner}
     <div class="grid stats">
       <div class="stat"><b>${arNum(STATE.clients.length)}</b><span>العملاء</span></div>
       <div class="stat"><b>${arNum(openCases)}</b><span>قضايا جارية</span></div>
@@ -587,14 +637,14 @@ async function uploadFiles(c,files){
     if(f.size>25*1048576){toast(f.name+": يتجاوز ٢٥ م.ب","err");continue;}
     const fileId=uid();
     try{
-      await idbSet("files",fileId,f); // stores the Blob/File directly
+      await putFile(fileId,f); // encrypted at rest when a passcode is set
       (c.docs=c.docs||[]).push({fileId,name:f.name,size:f.size,type:f.type,ext:(f.name.split(".").pop()||"").toLowerCase(),added:new Date().toISOString()});
     }catch(e){toast("تعذّر حفظ "+f.name,"err");}
   }
   save();renderClient();toast("تم رفع المستند(ات)","ok");
 }
 async function downloadDoc(c,fileId){
-  const blob=await idbGet("files",fileId);
+  let blob; try{ blob=await getFile(fileId); }catch(e){ toast("تعذّر فك تشفير الملف","err"); return; }
   const meta=(c.docs||[]).find(d=>d.fileId===fileId);
   if(!blob){toast("الملف غير موجود","err");return;}
   const url=URL.createObjectURL(blob);
@@ -725,6 +775,21 @@ function openSettings(){
     <div class="field"><label>رابط «الحاسبات»</label><input id="s_calc" value="${esc(s.calcUrl||"")}" placeholder="https://..."><div class="hint">يظهر كزر في الأعلى. ضعه مرة ويُحفَظ دائمًا.</div></div>
     <div class="field"><label>رابط «موقع المحاضر»</label><input id="s_min" value="${esc(s.minutesUrl||"")}" placeholder="https://..."></div>
     <hr style="border:none;border-top:1px solid var(--line);margin:18px 0">
+    <div style="font-weight:700;margin-bottom:8px">الحماية والتشفير</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      ${KEY
+        ? `<span class="pill open">مُفعّل ومشفّر 🔒</span>
+           <button class="btn sm ghost" id="chg">تغيير الرمز</button>
+           <button class="btn sm ghost" id="lockNow">قفل الآن</button>
+           <button class="btn sm ghost" id="rmLock" style="color:var(--danger)">إلغاء القفل</button>`
+        : `<span class="pill closed">غير مُفعّل</span>
+           <button class="btn sm gold" id="setLock">تفعيل قفل الدخول والتشفير</button>`}
+    </div>
+    <label style="display:flex;align-items:center;gap:8px;margin-top:14px;cursor:pointer">
+      <input type="checkbox" id="s_notify" ${s.notify?"checked":""} style="width:auto"> تنبيهات سطح المكتب بالمواعيد والمهام
+    </label>
+
+    <hr style="border:none;border-top:1px solid var(--line);margin:18px 0">
     <div style="font-weight:700;margin-bottom:8px">النسخ الاحتياطي (يشمل المستندات)</div>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
       <button class="btn sm gold" id="exp">⬇ تصدير نسخة كاملة</button>
@@ -744,6 +809,14 @@ function openSettings(){
     $("#exp").onclick=exportBackup;
     $("#imp").onclick=()=>$("#impFile").click();
     $("#impFile").onchange=e=>importBackup(e.target.files[0],close);
+    // security
+    const bind=(id,fn)=>{const el=$("#"+id);if(el)el.onclick=fn;};
+    bind("setLock",()=>{close();setupLock();});
+    bind("chg",()=>{close();changePasscode();});
+    bind("rmLock",()=>{close();removeLock();});
+    bind("lockNow",lockNow);
+    const nt=$("#s_notify");
+    if(nt)nt.onchange=async e=>{const ok=await toggleNotify(e.target.checked);if(!ok)e.target.checked=false;};
   });
 }
 
@@ -752,7 +825,7 @@ async function exportBackup(){
   const files={};
   const keys=await idbAllKeys("files");
   for(const k of keys){
-    const blob=await idbGet("files",k);
+    const blob=await getFile(k);           // decrypt so the backup is portable
     if(blob) files[k]=await blobToDataURL(blob);
   }
   const dump={_app:"lexus",_v:1,_at:new Date().toISOString(),state:STATE,files};
@@ -775,15 +848,149 @@ async function importBackup(file,close){
     // clear files
     for(const k of await idbAllKeys("files"))await idbDel("files",k);
     // restore files
-    if(dump.files)for(const [k,u] of Object.entries(dump.files))await idbSet("files",k,dataURLtoBlob(u));
+    if(dump.files)for(const [k,u] of Object.entries(dump.files))await putFile(k,dataURLtoBlob(u));
     STATE=dump.state;STATE.settings=Object.assign({calcUrl:"",minutesUrl:"",office:""},STATE.settings||{});
-    await idbSet("kv","state",STATE);
+    await idbSet("kv","state",KEY?await encObj(KEY,STATE):STATE);
     close&&close();go("home");toast("تم استيراد النسخة بنجاح","ok");
   }catch(e){toast("فشل الاستيراد: "+e.message,"err");}
 }
 
+/* ---------- Lock / passcode management ---------- */
+async function reEncryptAllFiles(oldKey,newKey){
+  const keys=await idbAllKeys("files");
+  for(const k of keys){
+    const v=await idbGet("files",k); if(!v) continue;
+    const plain = (v&&v.enc)? await decBlob(oldKey,v) : v;
+    await idbSet("files",k, newKey?await encBlob(newKey,plain):plain);
+  }
+}
+async function setupLock(){
+  modal("تفعيل قفل الدخول والتشفير",`
+    <div class="field"><label>رمز جديد (٤ خانات فأكثر) *</label><input id="p1" type="password" autocomplete="new-password"></div>
+    <div class="field"><label>تأكيد الرمز *</label><input id="p2" type="password" autocomplete="new-password"></div>
+    <div class="hint" style="color:var(--danger)">تحذير: لا يمكن استرجاع البيانات إذا نسيتَ الرمز. احتفظ به في مكان آمن، وصدّر نسخة احتياطية أولًا.</div>
+    <div class="foot"><button class="btn gold" id="ok">تفعيل</button><button class="btn ghost" id="cancel">إلغاء</button></div>
+  `,close=>{
+    $("#cancel").onclick=close;
+    $("#ok").onclick=async()=>{
+      const p1=val("p1"),p2=val("p2");
+      if(p1.length<4){toast("الرمز قصير جدًا","err");return;}
+      if(p1!==p2){toast("الرمز غير متطابق","err");return;}
+      try{
+        const salt=b64.enc(crypto.getRandomValues(new Uint8Array(16)));
+        const newKey=await deriveKey(p1,salt);
+        await reEncryptAllFiles(null,newKey);      // files currently plain
+        KEY=newKey;
+        await idbSet("kv","state",await encObj(KEY,STATE));
+        await idbSet("kv","meta",{enc:true,salt,verifier:await encObj(KEY,"lexus-ok")});
+        close();openSettings();toast("تم تفعيل القفل والتشفير","ok");
+      }catch(e){toast("فشل التفعيل: "+e.message,"err");}
+    };
+  });
+}
+async function changePasscode(){
+  modal("تغيير الرمز",`
+    <div class="field"><label>الرمز الحالي *</label><input id="p0" type="password"></div>
+    <div class="field"><label>الرمز الجديد *</label><input id="p1" type="password"></div>
+    <div class="field"><label>تأكيد الجديد *</label><input id="p2" type="password"></div>
+    <div class="foot"><button class="btn gold" id="ok">تغيير</button><button class="btn ghost" id="cancel">إلغاء</button></div>
+  `,close=>{
+    $("#cancel").onclick=close;
+    $("#ok").onclick=async()=>{
+      const p1=val("p1");
+      if(p1.length<4||p1!==val("p2")){toast("الرمز الجديد غير صالح أو غير متطابق","err");return;}
+      try{
+        const meta=await idbGet("kv","meta");
+        const cur=await deriveKey(val("p0"),meta.salt);
+        try{ await decObj(cur,meta.verifier); }catch(e){ toast("الرمز الحالي خاطئ","err"); return; }
+        const salt=b64.enc(crypto.getRandomValues(new Uint8Array(16)));
+        const newKey=await deriveKey(p1,salt);
+        await reEncryptAllFiles(cur,newKey);
+        KEY=newKey;
+        await idbSet("kv","state",await encObj(KEY,STATE));
+        await idbSet("kv","meta",{enc:true,salt,verifier:await encObj(KEY,"lexus-ok")});
+        close();toast("تم تغيير الرمز","ok");
+      }catch(e){toast("فشل التغيير: "+e.message,"err");}
+    };
+  });
+}
+async function removeLock(){
+  modal("إلغاء القفل",`
+    <div class="field"><label>الرمز الحالي للتأكيد *</label><input id="p0" type="password"></div>
+    <div class="hint">سيُلغى التشفير وتُخزَّن البيانات دون حماية على هذا الجهاز.</div>
+    <div class="foot"><button class="btn gold" id="ok">إلغاء القفل</button><button class="btn ghost" id="cancel">تراجع</button></div>
+  `,close=>{
+    $("#cancel").onclick=close;
+    $("#ok").onclick=async()=>{
+      try{
+        const meta=await idbGet("kv","meta");
+        const cur=await deriveKey(val("p0"),meta.salt);
+        try{ await decObj(cur,meta.verifier); }catch(e){ toast("الرمز خاطئ","err"); return; }
+        await reEncryptAllFiles(cur,null);   // decrypt files to plain
+        KEY=null;
+        await idbSet("kv","state",STATE);
+        await idbDel("kv","meta");
+        close();openSettings();toast("أُلغي القفل","ok");
+      }catch(e){toast("فشل الإلغاء: "+e.message,"err");}
+    };
+  });
+}
+function lockNow(){ if(KEY){ KEY=null; location.reload(); } }
+
+/* boot lock screen — overlay only, keeps the app DOM intact */
+function showLockScreen(meta){
+  return new Promise(resolve=>{
+    $("#modalRoot").innerHTML=`<div class="overlay" style="background:var(--navy)"><div class="modal" style="max-width:380px">
+      <header><svg width="26" height="26" viewBox="0 0 64 64" style="margin-inline-end:8px"><rect width="64" height="64" rx="14" fill="#c9a24a"/><path d="M22 14h6v28h16v6H22z" fill="#0f2a3f"/></svg> ليكسوس — دخول محمي</header>
+      <div class="body">
+        <div class="field"><label>أدخل رمز الدخول</label><input id="lp" type="password" autofocus></div>
+        <div id="lerr" style="color:var(--danger);font-size:.85rem;min-height:20px"></div>
+        <div class="foot"><button class="btn gold" id="lok">دخول</button></div>
+      </div></div></div>`;
+    const tryUnlock=async()=>{
+      try{
+        const k=await deriveKey($("#lp").value,meta.salt);
+        await decObj(k,meta.verifier);   // throws if wrong
+        KEY=k; $("#modalRoot").innerHTML=""; resolve();
+      }catch(e){ $("#lerr").textContent="رمز خاطئ، حاول مجددًا"; $("#lp").value=""; $("#lp").focus(); }
+    };
+    $("#lok").onclick=tryUnlock;
+    $("#lp").onkeydown=e=>{if(e.key==="Enter")tryUnlock();};
+  });
+}
+
+/* ---------- Reminders / notifications ---------- */
+function reminderItems(){
+  const out=[];
+  allAppointments().forEach(a=>{const d=daysUntil(a.date);if(d===0||d===1)out.push({kind:"appt",d,text:a.title+" — "+a.clientName,when:d===0?"اليوم":"غدًا"});});
+  allTasks().forEach(t=>{if(!t.done&&t.due){const d=daysUntil(t.due);if(d<0)out.push({kind:"over",d,text:t.title+" — "+t.clientName,when:"متأخرة"});else if(d===0)out.push({kind:"due",d,text:t.title+" — "+t.clientName,when:"تستحق اليوم"});}});
+  return out;
+}
+async function maybeNotify(){
+  if(!STATE.settings.notify) return;
+  try{
+    if(Notification.permission!=="granted") return;
+    const key="lexus_notified_"+new Date().toISOString().slice(0,10);
+    if(localStorage.getItem(key)) return;           // once per day
+    const items=reminderItems();
+    if(items.length){
+      new Notification("ليكسوس — تذكير اليوم",{body:items.slice(0,5).map(i=>"• "+i.when+": "+i.text).join("\n")});
+      localStorage.setItem(key,"1");
+    }
+  }catch(e){}
+}
+async function toggleNotify(on){
+  if(on){
+    if(!("Notification"in window)){toast("المتصفح لا يدعم التنبيهات","err");return false;}
+    const perm=await Notification.requestPermission();
+    if(perm!=="granted"){toast("لم يُسمح بالتنبيهات","err");return false;}
+  }
+  STATE.settings.notify=on;save();return true;
+}
+
 /* ---------- Theme ---------- */
 function initTheme(){
+  $("#settingsBtn").onclick=openSettings;
   const saved=localStorage.getItem("lexus_theme");
   if(saved)document.documentElement.setAttribute("data-theme",saved);
   $("#themeBtn").onclick=()=>{
@@ -816,10 +1023,15 @@ function seedIfEmpty(){
 /* ---------- Boot ---------- */
 (async function(){
   initTheme();
-  try{ await openDB(); await load(); }
-  catch(e){ toast("تعذّر فتح قاعدة البيانات المحلية","err"); }
+  try{
+    await openDB();
+    const meta=await idbGet("kv","meta");
+    if(meta&&meta.enc){ await showLockScreen(meta); }   // wait for correct passcode
+    await load();
+  }catch(e){ toast("تعذّر فتح قاعدة البيانات المحلية","err"); }
   seedIfEmpty();
   render();
+  maybeNotify();
 })();
 </script>
 </body>
