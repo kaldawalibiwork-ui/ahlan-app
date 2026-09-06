@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<meta name="description" content="ليكسوس — نظام إدارة المكتب القانوني: العملاء، المواعيد، القضايا، المهام، والمستندات">
+<meta name="theme-color" content="#0f2a3f">
+<meta name="referrer" content="no-referrer">
+<title>ليكسوس — إدارة المكتب القانوني</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230f2a3f'/%3E%3Cpath d='M32 12l3 3-9 9 9 9-3 3-12-12z' fill='%23c9a24a'/%3E%3Ctext x='34' y='42' font-family='serif' font-size='26' font-weight='700' fill='%23c9a24a'%3EL%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --navy:#0f2a3f; --navy-2:#16384f; --gold:#c9a24a; --gold-2:#b3893a;
+  --bg:#f4f6f8; --card:#ffffff; --line:#e2e7ec; --ink:#1a2430; --muted:#5f6b7a;
+  --ok:#2e7d5b; --warn:#c47f17; --danger:#b23b3b; --shadow:0 6px 22px rgba(15,42,63,.10);
+  --r:14px;
+}
+:root[data-theme="dark"]{
+  --navy:#0c2334; --navy-2:#123047; --gold:#d3ae57; --gold-2:#c9a24a;
+  --bg:#0b1620; --card:#132534; --line:#22394c; --ink:#e8eef4; --muted:#9db0c2;
+  --shadow:0 6px 22px rgba(0,0,0,.35);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --navy:#0c2334; --navy-2:#123047; --gold:#d3ae57; --gold-2:#c9a24a;
+    --bg:#0b1620; --card:#132534; --line:#22394c; --ink:#e8eef4; --muted:#9db0c2;
+    --shadow:0 6px 22px rgba(0,0,0,.35);
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:"Segoe UI","Tahoma",system-ui,-apple-system,sans-serif;
+  background:var(--bg); color:var(--ink); line-height:1.7; -webkit-text-size-adjust:100%;
+}
+button,input,select,textarea{font-family:inherit;font-size:1rem}
+a{color:var(--gold-2);text-decoration:none}
+.hidden{display:none!important}
+
+/* ===== Top bar ===== */
+header.topbar{
+  position:sticky;top:0;z-index:50;background:var(--navy);color:#fff;
+  display:flex;align-items:center;gap:14px;padding:12px 18px;box-shadow:var(--shadow);
+}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.15rem;letter-spacing:.3px}
+.brand .logo{width:34px;height:34px;flex:0 0 auto}
+.brand small{display:block;font-weight:500;font-size:.7rem;color:var(--gold);letter-spacing:2px}
+.topbar .spacer{flex:1}
+.topbar .icon-btn{
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#fff;
+  width:40px;height:40px;border-radius:10px;cursor:pointer;display:grid;place-items:center;
+  transition:.15s;
+}
+.topbar .icon-btn:hover{background:rgba(255,255,255,.18)}
+.ext-links{display:flex;gap:8px;flex-wrap:wrap}
+.ext-links a{
+  background:var(--gold);color:var(--navy);font-weight:700;padding:8px 14px;border-radius:10px;
+  font-size:.88rem;white-space:nowrap;transition:.15s;
+}
+.ext-links a:hover{background:var(--gold-2)}
+.ext-links a.disabled{background:rgba(255,255,255,.12);color:#cfd8e0;cursor:pointer}
+
+/* ===== Layout ===== */
+.wrap{max-width:1180px;margin:0 auto;padding:22px 18px 80px}
+.page-title{display:flex;align-items:center;gap:12px;margin:6px 0 20px}
+.page-title h1{font-size:1.5rem;margin:0}
+.page-title .back{
+  background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 12px;
+  cursor:pointer;color:var(--ink);font-weight:600;box-shadow:var(--shadow)
+}
+
+/* ===== Cards / grids ===== */
+.grid{display:grid;gap:16px}
+.stats{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.stat{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;
+  box-shadow:var(--shadow);position:relative;overflow:hidden
+}
+.stat b{font-size:1.9rem;display:block;color:var(--navy)}
+:root[data-theme="dark"] .stat b{color:var(--gold)}
+.stat span{color:var(--muted);font-size:.9rem}
+.stat::after{content:"";position:absolute;inset-inline-start:0;top:0;bottom:0;width:5px;background:var(--gold)}
+
+.section{margin-top:26px}
+.section-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.section-head h2{font-size:1.15rem;margin:0}
+.section-head .count{background:var(--gold);color:var(--navy);border-radius:20px;padding:1px 10px;font-size:.8rem;font-weight:700}
+.section-head .spacer{flex:1}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+
+/* client icons */
+.clients-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
+.client-tile{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px 14px;
+  text-align:center;cursor:pointer;box-shadow:var(--shadow);transition:.16s;position:relative
+}
+.client-tile:hover{transform:translateY(-3px);border-color:var(--gold)}
+.avatar{
+  width:64px;height:64px;border-radius:50%;margin:0 auto 10px;display:grid;place-items:center;
+  font-size:1.5rem;font-weight:800;color:#fff;box-shadow:0 4px 10px rgba(0,0,0,.15)
+}
+.client-tile .name{font-weight:700;font-size:1rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.client-tile .meta{color:var(--muted);font-size:.8rem;margin-top:4px}
+.client-tile .badges{display:flex;gap:6px;justify-content:center;margin-top:10px;flex-wrap:wrap}
+.badge{font-size:.72rem;padding:2px 8px;border-radius:20px;background:var(--bg);border:1px solid var(--line);color:var(--muted)}
+.badge.due{background:#fdecec;color:var(--danger);border-color:#f3c9c9}
+:root[data-theme="dark"] .badge.due{background:#3a2020;border-color:#5a2f2f;color:#f2a5a5}
+
+.add-tile{
+  border:2px dashed var(--line);background:transparent;display:grid;place-items:center;
+  min-height:150px;cursor:pointer;color:var(--muted);border-radius:var(--r);font-weight:700;gap:6px;transition:.16s
+}
+.add-tile:hover{border-color:var(--gold);color:var(--gold-2)}
+.add-tile .plus{font-size:2rem;line-height:1}
+
+/* list rows */
+.row{
+  display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--line)
+}
+.row:last-child{border-bottom:none}
+.row .dot{width:10px;height:10px;border-radius:50%;flex:0 0 auto;background:var(--muted)}
+.row .dot.ok{background:var(--ok)} .row .dot.warn{background:var(--warn)} .row .dot.danger{background:var(--danger)}
+.row .main{flex:1;min-width:0}
+.row .main .t{font-weight:600;overflow:hidden;text-overflow:ellipsis}
+.row .main .s{color:var(--muted);font-size:.85rem}
+.row .when{color:var(--muted);font-size:.85rem;white-space:nowrap;text-align:end}
+.row .actions{display:flex;gap:6px}
+.row.done .main .t{text-decoration:line-through;color:var(--muted)}
+.mini-btn{
+  border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;
+  width:32px;height:32px;cursor:pointer;display:grid;place-items:center;transition:.15s
+}
+.mini-btn:hover{border-color:var(--gold);color:var(--gold-2)}
+.mini-btn.danger:hover{border-color:var(--danger);color:var(--danger)}
+
+.empty{padding:34px 16px;text-align:center;color:var(--muted)}
+.empty svg{opacity:.5;margin-bottom:8px}
+
+/* tabs */
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0}
+.tab{
+  padding:9px 16px;border-radius:10px;border:1px solid var(--line);background:var(--card);
+  cursor:pointer;font-weight:600;color:var(--muted);box-shadow:var(--shadow)
+}
+.tab.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+.tab .n{background:var(--gold);color:var(--navy);border-radius:20px;padding:0 7px;font-size:.75rem;margin-inline-start:6px}
+
+/* buttons */
+.btn{
+  background:var(--navy);color:#fff;border:none;border-radius:10px;padding:10px 18px;
+  cursor:pointer;font-weight:700;transition:.15s;box-shadow:var(--shadow)
+}
+.btn:hover{background:var(--navy-2)}
+.btn.gold{background:var(--gold);color:var(--navy)} .btn.gold:hover{background:var(--gold-2)}
+.btn.ghost{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.btn.ghost:hover{border-color:var(--gold)}
+.btn.sm{padding:7px 13px;font-size:.85rem}
+
+/* modal */
+.overlay{position:fixed;inset:0;background:rgba(8,18,28,.55);backdrop-filter:blur(3px);z-index:100;display:grid;place-items:center;padding:16px}
+.modal{
+  background:var(--card);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.4);
+  width:100%;max-width:520px;max-height:90vh;overflow:auto;border:1px solid var(--line)
+}
+.modal header{background:var(--navy);color:#fff;padding:16px 20px;font-weight:800;font-size:1.1rem;position:sticky;top:0;display:flex;align-items:center}
+.modal header .x{margin-inline-start:auto;background:rgba(255,255,255,.12);border:none;color:#fff;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:1.1rem}
+.modal .body{padding:20px}
+.field{margin-bottom:14px}
+.field label{display:block;font-weight:600;margin-bottom:6px;font-size:.9rem}
+.field input,.field select,.field textarea{
+  width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink)
+}
+.field textarea{min-height:80px;resize:vertical}
+.field .hint{color:var(--muted);font-size:.8rem;margin-top:4px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.modal .foot{display:flex;gap:10px;justify-content:flex-start;padding:0 20px 20px}
+
+/* toast */
+#toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:8px;align-items:center}
+.toast{background:var(--navy);color:#fff;padding:11px 20px;border-radius:12px;box-shadow:var(--shadow);font-weight:600;animation:pop .25s}
+.toast.ok{background:var(--ok)} .toast.err{background:var(--danger)}
+@keyframes pop{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* docs */
+.doc{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line)}
+.doc:last-child{border-bottom:none}
+.doc .ic{width:42px;height:42px;border-radius:10px;background:var(--bg);display:grid;place-items:center;flex:0 0 auto;color:var(--gold-2)}
+.doc .main{flex:1;min-width:0}
+.doc .main .t{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.doc .main .s{color:var(--muted);font-size:.82rem}
+
+.searchbar{position:relative;flex:1;max-width:420px}
+.searchbar input{width:100%;padding:9px 38px 9px 14px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}
+.searchbar svg{position:absolute;inset-inline-end:12px;top:50%;transform:translateY(-50%);color:var(--muted)}
+
+.pill{display:inline-block;font-size:.75rem;font-weight:700;padding:2px 10px;border-radius:20px}
+.pill.open{background:#e7f4ee;color:var(--ok)} .pill.closed{background:#eceff2;color:var(--muted)}
+.pill.hold{background:#fdf3e3;color:var(--warn)}
+:root[data-theme="dark"] .pill.open{background:#183328;color:#8fd3b0}
+:root[data-theme="dark"] .pill.closed{background:#22303c;color:#9db0c2}
+:root[data-theme="dark"] .pill.hold{background:#3a2f18;color:#e6c07a}
+
+@media(max-width:640px){
+  .two{grid-template-columns:1fr}
+  .brand small{display:none}
+  .ext-links a{padding:7px 10px;font-size:.8rem}
+  .wrap{padding:16px 12px 80px}
+}
+footer.foot-note{text-align:center;color:var(--muted);font-size:.8rem;padding:24px}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <svg class="logo" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#c9a24a"/><path d="M22 14h6v28h16v6H22z" fill="#0f2a3f"/></svg>
+    <div>ليكسوس<small>LEXUS LEGAL</small></div>
+  </div>
+  <div class="spacer"></div>
+  <nav class="ext-links" id="extLinks"></nav>
+  <button class="icon-btn" id="themeBtn" title="الوضع الليلي">🌓</button>
+  <button class="icon-btn" id="settingsBtn" title="الإعدادات والنسخ الاحتياطي">⚙</button>
+</header>
+
+<main class="wrap" id="app"></main>
+
+<footer class="foot-note">
+  ليكسوس لإدارة المكتب القانوني — تُحفَظ جميع بياناتك محليًا على جهازك ولا تُفقد عند الإغلاق أو التحديث.
+</footer>
+
+<div id="modalRoot"></div>
+<div id="toast"></div>
+
+<script>
+"use strict";
+/* =========================================================================
+   ليكسوس — نظام إدارة مكتب قانوني (ملف واحد، يعمل دون اتصال)
+   التخزين: IndexedDB (بيانات + مستندات). نسخ احتياطي/استيراد بصيغة JSON.
+   ========================================================================= */
+
+/* ---------- IndexedDB layer ---------- */
+const DB_NAME="lexus_db", DB_VER=1;
+let _db=null;
+function openDB(){
+  return new Promise((res,rej)=>{
+    const rq=indexedDB.open(DB_NAME,DB_VER);
+    rq.onupgradeneeded=e=>{
+      const db=e.target.result;
+      if(!db.objectStoreNames.contains("kv")) db.createObjectStore("kv");
+      if(!db.objectStoreNames.contains("files")) db.createObjectStore("files");
+    };
+    rq.onsuccess=e=>{_db=e.target.result;res(_db)};
+    rq.onerror=e=>rej(e.target.error);
+  });
+}
+function idbGet(store,key){
+  return new Promise((res,rej)=>{
+    const tx=_db.transaction(store,"readonly").objectStore(store).get(key);
+    tx.onsuccess=()=>res(tx.result); tx.onerror=()=>rej(tx.error);
+  });
+}
+function idbSet(store,key,val){
+  return new Promise((res,rej)=>{
+    const tx=_db.transaction(store,"readwrite").objectStore(store).put(val,key);
+    tx.onsuccess=()=>res(true); tx.onerror=()=>rej(tx.error);
+  });
+}
+function idbDel(store,key){
+  return new Promise((res,rej)=>{
+    const tx=_db.transaction(store,"readwrite").objectStore(store).delete(key);
+    tx.onsuccess=()=>res(true); tx.onerror=()=>rej(tx.error);
+  });
+}
+function idbAllKeys(store){
+  return new Promise((res,rej)=>{
+    const tx=_db.transaction(store,"readonly").objectStore(store).getAllKeys();
+    tx.onsuccess=()=>res(tx.result); tx.onerror=()=>rej(tx.error);
+  });
+}
+
+/* ---------- Crypto layer (AES-GCM + PBKDF2) ---------- */
+let KEY=null;            // in-memory CryptoKey after unlock (null = no lock)
+const b64={
+  enc:buf=>btoa(String.fromCharCode(...new Uint8Array(buf))),
+  dec:s=>{const bin=atob(s);const a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);return a;}
+};
+async function deriveKey(pass,saltB64){
+  const salt=b64.dec(saltB64);
+  const base=await crypto.subtle.importKey("raw",new TextEncoder().encode(pass),"PBKDF2",false,["deriveKey"]);
+  return crypto.subtle.deriveKey({name:"PBKDF2",salt,iterations:150000,hash:"SHA-256"},base,{name:"AES-GCM",length:256},false,["encrypt","decrypt"]);
+}
+async function encObj(key,obj){
+  const iv=crypto.getRandomValues(new Uint8Array(12));
+  const data=new TextEncoder().encode(JSON.stringify(obj));
+  const ct=await crypto.subtle.encrypt({name:"AES-GCM",iv},key,data);
+  return {enc:true,iv:b64.enc(iv),ct:b64.enc(ct)};
+}
+async function decObj(key,w){
+  const pt=await crypto.subtle.decrypt({name:"AES-GCM",iv:b64.dec(w.iv)},key,b64.dec(w.ct));
+  return JSON.parse(new TextDecoder().decode(pt));
+}
+async function encBlob(key,blob){
+  const iv=crypto.getRandomValues(new Uint8Array(12));
+  const buf=await blob.arrayBuffer();
+  const ct=await crypto.subtle.encrypt({name:"AES-GCM",iv},key,buf);
+  return {enc:true,iv:b64.enc(iv),ct:b64.enc(ct),type:blob.type};
+}
+async function decBlob(key,w){
+  const pt=await crypto.subtle.decrypt({name:"AES-GCM",iv:b64.dec(w.iv)},key,b64.dec(w.ct));
+  return new Blob([pt],{type:w.type||""});
+}
+/* store/read a file transparently (encrypted when locked) */
+async function putFile(fileId,blob){ await idbSet("files",fileId, KEY?await encBlob(KEY,blob):blob); }
+async function getFile(fileId){
+  const v=await idbGet("files",fileId); if(!v) return null;
+  if(v&&v.enc){ if(!KEY) throw new Error("locked"); return decBlob(KEY,v); }
+  return v; // plain Blob
+}
+
+/* ---------- State ---------- */
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+let STATE={
+  clients:[],           // {id,name,phone,email,type,color,notes,cases[],appointments[],tasks[],docs[]}
+  settings:{ calcUrl:"", minutesUrl:"", office:"مكتب ليكسوس القانوني" }
+};
+let saveTimer=null;
+function save(){ // debounced
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(async()=>{
+    try{ await idbSet("kv","state", KEY?await encObj(KEY,STATE):STATE); }
+    catch(e){ toast("تعذّر الحفظ: "+e.message,"err"); }
+  },250);
+}
+async function load(){
+  let s=await idbGet("kv","state");
+  if(s && s.enc){ s=await decObj(KEY,s); }        // decrypt when locked
+  if(s && s.clients){ STATE=s; STATE.settings=Object.assign({calcUrl:"",minutesUrl:"",office:"مكتب ليكسوس القانوني"},s.settings||{}); }
+}
+
+/* ---------- helpers ---------- */
+const $=(s,r=document)=>r.querySelector(s);
+const esc=t=>String(t==null?"":t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const AR={0:"٠",1:"١",2:"٢",3:"٣",4:"٤",5:"٥",6:"٦",7:"٧",8:"٨",9:"٩"};
+const arNum=s=>String(s).replace(/[0-9]/g,d=>AR[d]);
+function initials(name){const p=String(name||"?").trim().split(/\s+/);return ((p[0]||"")[0]||"?")+((p[1]||"")[0]||"");}
+const PALETTE=["#0f2a3f","#7a4b2b","#2e5d54","#5a3d6b","#8a2d3b","#255e88","#846017","#3a4a2e"];
+function colorFor(id){let h=0;for(const c of String(id))h=(h*31+c.charCodeAt(0))>>>0;return PALETTE[h%PALETTE.length];}
+
+function toast(msg,kind=""){
+  const el=document.createElement("div");el.className="toast "+kind;el.textContent=msg;
+  $("#toast").appendChild(el);
+  setTimeout(()=>{el.style.opacity="0";el.style.transition=".3s";setTimeout(()=>el.remove(),300);},2600);
+}
+function fmtDate(d){
+  if(!d) return "—";
+  const dt=new Date(d); if(isNaN(dt)) return esc(d);
+  const days=["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
+  const s=dt.toLocaleDateString("ar-SA-u-nu-arab",{year:"numeric",month:"long",day:"numeric"});
+  let time=""; if(String(d).includes("T")||String(d).includes(":")){ time=" — "+dt.toLocaleTimeString("ar-SA-u-nu-arab",{hour:"2-digit",minute:"2-digit"}); }
+  return days[dt.getDay()]+"، "+s+time;
+}
+function daysUntil(d){ if(!d) return null; const dt=new Date(d),n=new Date(); dt.setHours(0,0,0,0);n.setHours(0,0,0,0); return Math.round((dt-n)/864e5); }
+function humanSize(b){ if(b<1024)return arNum(b)+" ب"; if(b<1048576)return arNum((b/1024).toFixed(1))+" ك.ب"; return arNum((b/1048576).toFixed(1))+" م.ب"; }
+
+/* aggregate all appointments/tasks with client info */
+function allAppointments(){
+  const out=[];
+  STATE.clients.forEach(c=>(c.appointments||[]).forEach(a=>out.push({...a,clientId:c.id,clientName:c.name})));
+  return out.sort((a,b)=>new Date(a.date)-new Date(b.date));
+}
+function allTasks(){
+  const out=[];
+  STATE.clients.forEach(c=>(c.tasks||[]).forEach(t=>out.push({...t,clientId:c.id,clientName:c.name})));
+  return out.sort((a,b)=>(a.done-b.done)||(new Date(a.due||8e15)-new Date(b.due||8e15)));
+}
+const findClient=id=>STATE.clients.find(c=>c.id===id);
+
+/* ---------- Routing ---------- */
+let ROUTE={view:"home",clientId:null,tab:"appointments"};
+function go(view,clientId=null,tab="appointments"){ROUTE={view,clientId,tab};render();window.scrollTo(0,0);}
+
+/* =====================================================================
+   RENDER
+   ===================================================================== */
+function render(){
+  renderExtLinks();
+  if(ROUTE.view==="home") renderHome();
+  else if(ROUTE.view==="client") renderClient();
+}
+
+function renderExtLinks(){
+  const s=STATE.settings;
+  const link=(url,label,icon)=>url
+    ? `<a href="${esc(url)}" target="_blank" rel="noopener">${icon} ${label}</a>`
+    : `<a class="disabled" data-open-settings="1" title="أضف الرابط من الإعدادات">${icon} ${label}</a>`;
+  $("#extLinks").innerHTML = link(s.calcUrl,"الحاسبات","🧮")+link(s.minutesUrl,"المحاضر","📝");
+  $("#extLinks").querySelectorAll("[data-open-settings]").forEach(a=>a.onclick=openSettings);
+}
+
+/* ---------- HOME ---------- */
+function renderHome(){
+  const appts=allAppointments();
+  const tasks=allTasks();
+  const now=new Date();
+  const upcoming=appts.filter(a=>{const d=daysUntil(a.date);return d!==null&&d>=0;}).slice(0,6);
+  const openTasks=tasks.filter(t=>!t.done);
+  const openCases=STATE.clients.reduce((n,c)=>n+(c.cases||[]).filter(x=>x.status!=="closed").length,0);
+  const todayAppts=appts.filter(a=>daysUntil(a.date)===0);
+
+  const rem=reminderItems();
+  const remBanner = rem.length?`<div class="card" style="border-inline-start:5px solid var(--gold);padding:14px 16px;margin-bottom:18px">
+    <b style="color:var(--gold-2)">🔔 تذكيرات (${arNum(rem.length)}):</b>
+    <div style="margin-top:6px;display:flex;flex-direction:column;gap:4px">
+    ${rem.slice(0,6).map(i=>`<div style="font-size:.92rem"><span style="color:${i.kind==="over"?"var(--danger)":"var(--warn)"};font-weight:700">${i.when}</span> — ${esc(i.text)}</div>`).join("")}
+    </div></div>`:"";
+
+  $("#app").innerHTML=`
+    <div class="page-title"><h1>لوحة المكتب</h1><span style="flex:1"></span></div>
+    ${remBanner}
+    <div class="grid stats">
+      <div class="stat"><b>${arNum(STATE.clients.length)}</b><span>العملاء</span></div>
+      <div class="stat"><b>${arNum(openCases)}</b><span>قضايا جارية</span></div>
+      <div class="stat"><b>${arNum(openTasks.length)}</b><span>مهام معلّقة</span></div>
+      <div class="stat"><b>${arNum(todayAppts.length)}</b><span>مواعيد اليوم</span></div>
+    </div>
+
+    <div class="section">
+      <div class="section-head"><h2>المواعيد القادمة</h2><span class="count">${arNum(upcoming.length)}</span>
+        <span class="spacer"></span><button class="btn sm gold" id="quickAppt">+ موعد</button></div>
+      <div class="card" id="apptList"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-head"><h2>المهام المعلّقة</h2><span class="count">${arNum(openTasks.length)}</span>
+        <span class="spacer"></span><button class="btn sm gold" id="quickTask">+ مهمة</button></div>
+      <div class="card" id="taskList"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-head"><h2>العملاء</h2><span class="count">${arNum(STATE.clients.length)}</span>
+        <span class="spacer"></span>
+        <div class="searchbar"><input id="clientSearch" placeholder="بحث عن عميل..."><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4-4"/></svg></div>
+      </div>
+      <div class="grid clients-grid" id="clientsGrid"></div>
+    </div>
+  `;
+
+  // appointments
+  $("#apptList").innerHTML = upcoming.length
+    ? upcoming.map(a=>{
+        const d=daysUntil(a.date);
+        const cls=d===0?"danger":d<=2?"warn":"ok";
+        const lbl=d===0?"اليوم":d===1?"غدًا":arNum(d)+" يوم";
+        return `<div class="row"><span class="dot ${cls}"></span>
+          <div class="main"><div class="t">${esc(a.title)}</div>
+          <div class="s">${esc(a.clientName)}${a.location?" • "+esc(a.location):""}</div></div>
+          <div class="when">${fmtDate(a.date)}<br><b style="color:var(--gold-2)">${lbl}</b></div>
+          <div class="actions"><button class="mini-btn" data-goclient="${a.clientId}" title="ملف العميل">↗</button></div></div>`;
+      }).join("")
+    : emptyBox("لا مواعيد قادمة");
+
+  // tasks
+  $("#taskList").innerHTML = openTasks.length
+    ? openTasks.slice(0,8).map(t=>taskRow(t,t.clientId)).join("")
+    : emptyBox("لا مهام معلّقة — أحسنت!");
+
+  // clients grid
+  drawClients("");
+
+  // events
+  $("#quickAppt").onclick=()=>chooseClientThen(cid=>apptModal(cid));
+  $("#quickTask").onclick=()=>chooseClientThen(cid=>taskModal(cid));
+  $("#clientSearch").oninput=e=>drawClients(e.target.value.trim());
+  bindRowEvents();
+}
+
+function drawClients(q){
+  const list=STATE.clients
+    .filter(c=>!q||c.name.includes(q)||(c.phone||"").includes(q))
+    .sort((a,b)=>a.name.localeCompare(b.name,"ar"));
+  const grid=$("#clientsGrid");
+  grid.innerHTML = list.map(c=>{
+    const openCases=(c.cases||[]).filter(x=>x.status!=="closed").length;
+    const dueTasks=(c.tasks||[]).filter(t=>!t.done).length;
+    const nextAppt=(c.appointments||[]).map(a=>a.date).filter(Boolean).sort()[0];
+    return `<div class="client-tile" data-client="${c.id}">
+      <div class="avatar" style="background:${c.color||colorFor(c.id)}">${esc(initials(c.name))}</div>
+      <div class="name">${esc(c.name)}</div>
+      <div class="meta">${esc(c.type||"عميل")}${c.phone?" • "+arNum(esc(c.phone)):""}</div>
+      <div class="badges">
+        ${openCases?`<span class="badge">${arNum(openCases)} قضية</span>`:""}
+        ${dueTasks?`<span class="badge due">${arNum(dueTasks)} مهمة</span>`:""}
+        ${nextAppt?`<span class="badge">موعد ${daysUntil(nextAppt)>=0?"قادم":"سابق"}</span>`:""}
+      </div>
+    </div>`;
+  }).join("") + `<div class="add-tile" id="addClient"><span class="plus">＋</span>عميل جديد</div>`;
+
+  grid.querySelectorAll("[data-client]").forEach(el=>el.onclick=()=>go("client",el.dataset.client));
+  const add=$("#addClient"); if(add) add.onclick=()=>clientModal();
+}
+
+function emptyBox(msg){
+  return `<div class="empty"><svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 4v5"/></svg><div>${esc(msg)}</div></div>`;
+}
+function taskRow(t,cid){
+  const overdue=t.due&&!t.done&&daysUntil(t.due)<0;
+  return `<div class="row ${t.done?"done":""}">
+    <button class="mini-btn" data-toggletask="${t.id}" data-cid="${cid}" title="تبديل الإنجاز">${t.done?"✓":"○"}</button>
+    <div class="main"><div class="t">${esc(t.title)}</div>
+      <div class="s">${esc(t.clientName||findClient(cid)?.name||"")}${t.due?" • يستحق "+fmtDate(t.due):""}${overdue?' <b style="color:var(--danger)">متأخرة</b>':""}</div></div>
+    <div class="actions">
+      <button class="mini-btn" data-goclient="${cid}" title="ملف العميل">↗</button>
+      <button class="mini-btn danger" data-deltask="${t.id}" data-cid="${cid}" title="حذف">🗑</button>
+    </div></div>`;
+}
+function bindRowEvents(){
+  document.querySelectorAll("[data-goclient]").forEach(b=>b.onclick=()=>go("client",b.dataset.goclient));
+  document.querySelectorAll("[data-toggletask]").forEach(b=>b.onclick=()=>{
+    const c=findClient(b.dataset.cid),t=(c.tasks||[]).find(x=>x.id===b.dataset.toggletask);
+    if(t){t.done=!t.done;save();render();}
+  });
+  document.querySelectorAll("[data-deltask]").forEach(b=>b.onclick=()=>{
+    if(!confirm("حذف هذه المهمة؟"))return;
+    const c=findClient(b.dataset.cid);c.tasks=(c.tasks||[]).filter(x=>x.id!==b.dataset.deltask);save();render();toast("حُذفت المهمة");
+  });
+}
+
+/* ---------- CLIENT PAGE ---------- */
+function renderClient(){
+  const c=findClient(ROUTE.clientId);
+  if(!c){go("home");return;}
+  const tab=ROUTE.tab;
+  const nCases=(c.cases||[]).length, nAppts=(c.appointments||[]).length, nTasks=(c.tasks||[]).filter(t=>!t.done).length, nDocs=(c.docs||[]).length;
+
+  $("#app").innerHTML=`
+    <div class="page-title">
+      <button class="back" id="backBtn">→ رجوع</button>
+      <div class="avatar" style="width:52px;height:52px;font-size:1.2rem;margin:0;background:${c.color||colorFor(c.id)}">${esc(initials(c.name))}</div>
+      <div><h1 style="margin:0">${esc(c.name)}</h1>
+        <div style="color:var(--muted);font-size:.9rem">${esc(c.type||"عميل")}${c.phone?" • "+arNum(esc(c.phone)):""}${c.email?" • "+esc(c.email):""}</div></div>
+      <span style="flex:1"></span>
+      <button class="btn sm ghost" id="editClient">تعديل</button>
+      <button class="btn sm ghost" id="delClient" style="color:var(--danger)">حذف</button>
+    </div>
+    ${c.notes?`<div class="card" style="padding:14px 16px;margin-bottom:6px"><b style="color:var(--gold-2)">ملاحظات:</b> ${esc(c.notes)}</div>`:""}
+
+    <div class="tabs">
+      <div class="tab ${tab==="appointments"?"active":""}" data-tab="appointments">المواعيد<span class="n">${arNum(nAppts)}</span></div>
+      <div class="tab ${tab==="cases"?"active":""}" data-tab="cases">القضايا<span class="n">${arNum(nCases)}</span></div>
+      <div class="tab ${tab==="tasks"?"active":""}" data-tab="tasks">المهام<span class="n">${arNum(nTasks)}</span></div>
+      <div class="tab ${tab==="docs"?"active":""}" data-tab="docs">المستندات<span class="n">${arNum(nDocs)}</span></div>
+    </div>
+    <div id="tabBody"></div>
+  `;
+
+  $("#backBtn").onclick=()=>go("home");
+  $("#editClient").onclick=()=>clientModal(c);
+  $("#delClient").onclick=()=>{
+    if(!confirm("حذف العميل «"+c.name+"» وكل بياناته ومستنداته؟"))return;
+    (c.docs||[]).forEach(d=>idbDel("files",d.fileId));
+    STATE.clients=STATE.clients.filter(x=>x.id!==c.id);save();toast("حُذف العميل");go("home");
+  };
+  document.querySelectorAll("[data-tab]").forEach(t=>t.onclick=()=>{ROUTE.tab=t.dataset.tab;renderClient();});
+  drawTab(c,tab);
+}
+
+function drawTab(c,tab){
+  const body=$("#tabBody");
+  if(tab==="appointments"){
+    const appts=(c.appointments||[]).slice().sort((a,b)=>new Date(a.date)-new Date(b.date));
+    body.innerHTML=`<div class="section-head"><span class="spacer"></span><button class="btn sm gold" id="addA">+ موعد</button></div>
+      <div class="card">${appts.length?appts.map(a=>{
+        const d=daysUntil(a.date);const past=d!==null&&d<0;
+        return `<div class="row"><span class="dot ${past?"":d===0?"danger":d<=2?"warn":"ok"}"></span>
+          <div class="main"><div class="t">${esc(a.title)}</div><div class="s">${a.location?esc(a.location):"—"}${a.notes?" • "+esc(a.notes):""}</div></div>
+          <div class="when">${fmtDate(a.date)}</div>
+          <div class="actions"><button class="mini-btn" data-ea="${a.id}">✎</button><button class="mini-btn danger" data-da="${a.id}">🗑</button></div></div>`;
+      }).join(""):emptyBox("لا مواعيد لهذا العميل")}</div>`;
+    $("#addA").onclick=()=>apptModal(c.id);
+    body.querySelectorAll("[data-ea]").forEach(b=>b.onclick=()=>apptModal(c.id,(c.appointments||[]).find(x=>x.id===b.dataset.ea)));
+    body.querySelectorAll("[data-da]").forEach(b=>b.onclick=()=>{if(confirm("حذف الموعد؟")){c.appointments=c.appointments.filter(x=>x.id!==b.dataset.da);save();renderClient();}});
+  }
+  else if(tab==="cases"){
+    const cases=c.cases||[];
+    body.innerHTML=`<div class="section-head"><span class="spacer"></span><button class="btn sm gold" id="addC">+ قضية</button></div>
+      <div class="card">${cases.length?cases.map(x=>{
+        const pill=x.status==="closed"?"closed":x.status==="hold"?"hold":"open";
+        const lbl=x.status==="closed"?"منتهية":x.status==="hold"?"معلّقة":"جارية";
+        return `<div class="row"><span class="dot"></span>
+          <div class="main"><div class="t">${esc(x.title)} <span class="pill ${pill}">${lbl}</span></div>
+          <div class="s">${x.number?"رقم: "+arNum(esc(x.number)):""}${x.court?" • "+esc(x.court):""}${x.type?" • "+esc(x.type):""}${x.notes?"<br>"+esc(x.notes):""}</div></div>
+          <div class="actions"><button class="mini-btn" data-ec="${x.id}">✎</button><button class="mini-btn danger" data-dc="${x.id}">🗑</button></div></div>`;
+      }).join(""):emptyBox("لا قضايا مسجّلة")}</div>`;
+    $("#addC").onclick=()=>caseModal(c.id);
+    body.querySelectorAll("[data-ec]").forEach(b=>b.onclick=()=>caseModal(c.id,(c.cases||[]).find(x=>x.id===b.dataset.ec)));
+    body.querySelectorAll("[data-dc]").forEach(b=>b.onclick=()=>{if(confirm("حذف القضية؟")){c.cases=c.cases.filter(x=>x.id!==b.dataset.dc);save();renderClient();}});
+  }
+  else if(tab==="tasks"){
+    const tasks=(c.tasks||[]).slice().sort((a,b)=>(a.done-b.done)||(new Date(a.due||8e15)-new Date(b.due||8e15)));
+    body.innerHTML=`<div class="section-head"><span class="spacer"></span><button class="btn sm gold" id="addT">+ مهمة</button></div>
+      <div class="card">${tasks.length?tasks.map(t=>{
+        const overdue=t.due&&!t.done&&daysUntil(t.due)<0;
+        return `<div class="row ${t.done?"done":""}">
+          <button class="mini-btn" data-tt="${t.id}">${t.done?"✓":"○"}</button>
+          <div class="main"><div class="t">${esc(t.title)}</div><div class="s">${t.due?"يستحق "+fmtDate(t.due):"بدون موعد"}${overdue?' <b style="color:var(--danger)">متأخرة</b>':""}${t.notes?" • "+esc(t.notes):""}</div></div>
+          <div class="actions"><button class="mini-btn" data-et="${t.id}">✎</button><button class="mini-btn danger" data-dt="${t.id}">🗑</button></div></div>`;
+      }).join(""):emptyBox("لا مهام")}</div>`;
+    $("#addT").onclick=()=>taskModal(c.id);
+    body.querySelectorAll("[data-tt]").forEach(b=>b.onclick=()=>{const t=c.tasks.find(x=>x.id===b.dataset.tt);t.done=!t.done;save();renderClient();});
+    body.querySelectorAll("[data-et]").forEach(b=>b.onclick=()=>taskModal(c.id,(c.tasks||[]).find(x=>x.id===b.dataset.et)));
+    body.querySelectorAll("[data-dt]").forEach(b=>b.onclick=()=>{if(confirm("حذف المهمة؟")){c.tasks=c.tasks.filter(x=>x.id!==b.dataset.dt);save();renderClient();}});
+  }
+  else if(tab==="docs"){
+    const docs=c.docs||[];
+    body.innerHTML=`<div class="section-head"><span style="color:var(--muted);font-size:.85rem">تُحفَظ المستندات داخل جهازك بأمان.</span><span class="spacer"></span>
+      <button class="btn sm gold" id="upBtn">⬆ رفع مستند</button><input type="file" id="fileIn" multiple class="hidden"></div>
+      <div class="card">${docs.length?docs.map(d=>`<div class="doc">
+        <div class="ic">${d.ext==="pdf"?"📄":/(jpg|jpeg|png|gif|webp)/.test(d.ext)?"🖼":"📎"}</div>
+        <div class="main"><div class="t">${esc(d.name)}</div><div class="s">${humanSize(d.size)} • ${fmtDate(d.added)}</div></div>
+        <div class="actions"><button class="mini-btn" data-dl="${d.fileId}" title="تنزيل / إخراج">⬇</button>
+        <button class="mini-btn danger" data-dd="${d.fileId}" title="حذف">🗑</button></div></div>`).join(""):emptyBox("لا مستندات — ارفع أول مستند")}</div>`;
+    $("#upBtn").onclick=()=>$("#fileIn").click();
+    $("#fileIn").onchange=e=>uploadFiles(c,e.target.files);
+    body.querySelectorAll("[data-dl]").forEach(b=>b.onclick=()=>downloadDoc(c,b.dataset.dl));
+    body.querySelectorAll("[data-dd]").forEach(b=>b.onclick=()=>{
+      if(!confirm("حذف المستند؟"))return;
+      idbDel("files",b.dataset.dd);c.docs=c.docs.filter(x=>x.fileId!==b.dataset.dd);save();renderClient();toast("حُذف المستند");
+    });
+  }
+}
+
+/* ---------- Documents ---------- */
+async function uploadFiles(c,files){
+  for(const f of files){
+    if(f.size>25*1048576){toast(f.name+": يتجاوز ٢٥ م.ب","err");continue;}
+    const fileId=uid();
+    try{
+      await putFile(fileId,f); // encrypted at rest when a passcode is set
+      (c.docs=c.docs||[]).push({fileId,name:f.name,size:f.size,type:f.type,ext:(f.name.split(".").pop()||"").toLowerCase(),added:new Date().toISOString()});
+    }catch(e){toast("تعذّر حفظ "+f.name,"err");}
+  }
+  save();renderClient();toast("تم رفع المستند(ات)","ok");
+}
+async function downloadDoc(c,fileId){
+  let blob; try{ blob=await getFile(fileId); }catch(e){ toast("تعذّر فك تشفير الملف","err"); return; }
+  const meta=(c.docs||[]).find(d=>d.fileId===fileId);
+  if(!blob){toast("الملف غير موجود","err");return;}
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");a.href=url;a.download=meta?meta.name:"document";
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),4000);
+}
+
+/* =====================================================================
+   MODALS
+   ===================================================================== */
+function modal(title,bodyHtml,onMount){
+  const root=$("#modalRoot");
+  root.innerHTML=`<div class="overlay"><div class="modal"><header>${esc(title)}<button class="x" id="mX">✕</button></header><div class="body">${bodyHtml}</div></div></div>`;
+  const close=()=>root.innerHTML="";
+  $("#mX").onclick=close;
+  root.querySelector(".overlay").onclick=e=>{if(e.target===root.querySelector(".overlay"))close();};
+  onMount&&onMount(close);
+  const first=root.querySelector("input,select,textarea");first&&first.focus();
+  return close;
+}
+function val(id){return ($("#"+id)||{}).value||"";}
+
+function clientModal(c){
+  const edit=!!c;
+  modal(edit?"تعديل عميل":"عميل جديد",`
+    <div class="field"><label>اسم العميل *</label><input id="f_name" value="${edit?esc(c.name):""}" placeholder="الاسم الكامل / اسم الشركة"></div>
+    <div class="two">
+      <div class="field"><label>الجوال</label><input id="f_phone" value="${edit?esc(c.phone||""):""}"></div>
+      <div class="field"><label>النوع</label><select id="f_type">
+        ${["عميل","شركة","فرد","جهة حكومية","خصم"].map(t=>`<option ${edit&&c.type===t?"selected":""}>${t}</option>`).join("")}
+      </select></div>
+    </div>
+    <div class="field"><label>البريد الإلكتروني</label><input id="f_email" value="${edit?esc(c.email||""):""}"></div>
+    <div class="field"><label>ملاحظات</label><textarea id="f_notes">${edit?esc(c.notes||""):""}</textarea></div>
+    <div class="foot"><button class="btn gold" id="save">حفظ</button><button class="btn ghost" id="cancel">إلغاء</button></div>
+  `,close=>{
+    $("#cancel").onclick=close;
+    $("#save").onclick=()=>{
+      const name=val("f_name").trim();if(!name){toast("الاسم مطلوب","err");return;}
+      if(edit){Object.assign(c,{name,phone:val("f_phone").trim(),type:val("f_type"),email:val("f_email").trim(),notes:val("f_notes").trim()});}
+      else{const nc={id:uid(),name,phone:val("f_phone").trim(),type:val("f_type"),email:val("f_email").trim(),notes:val("f_notes").trim(),color:colorFor(uid()),cases:[],appointments:[],tasks:[],docs:[]};STATE.clients.push(nc);}
+      save();close();render();toast("تم الحفظ","ok");
+    };
+  });
+}
+
+function apptModal(cid,a){
+  const c=findClient(cid),edit=!!a;
+  modal(edit?"تعديل موعد":"موعد جديد — "+c.name,`
+    <div class="field"><label>عنوان الموعد *</label><input id="f_title" value="${edit?esc(a.title):""}" placeholder="جلسة، اجتماع، مرافعة..."></div>
+    <div class="field"><label>التاريخ والوقت *</label><input id="f_date" type="datetime-local" value="${edit?esc(a.date||""):""}"></div>
+    <div class="field"><label>المكان</label><input id="f_loc" value="${edit?esc(a.location||""):""}" placeholder="المحكمة / المكتب / عن بُعد"></div>
+    <div class="field"><label>ملاحظات</label><textarea id="f_notes">${edit?esc(a.notes||""):""}</textarea></div>
+    <div class="foot"><button class="btn gold" id="save">حفظ</button><button class="btn ghost" id="cancel">إلغاء</button></div>
+  `,close=>{
+    $("#cancel").onclick=close;
+    $("#save").onclick=()=>{
+      const title=val("f_title").trim(),date=val("f_date");
+      if(!title||!date){toast("العنوان والتاريخ مطلوبان","err");return;}
+      const obj={title,date,location:val("f_loc").trim(),notes:val("f_notes").trim()};
+      if(edit)Object.assign(a,obj);else (c.appointments=c.appointments||[]).push({id:uid(),...obj});
+      save();close();ROUTE.view==="client"?renderClient():render();toast("تم الحفظ","ok");
+    };
+  });
+}
+
+function caseModal(cid,x){
+  const c=findClient(cid),edit=!!x;
+  modal(edit?"تعديل قضية":"قضية جديدة — "+c.name,`
+    <div class="field"><label>عنوان القضية *</label><input id="f_title" value="${edit?esc(x.title):""}"></div>
+    <div class="two">
+      <div class="field"><label>رقم القضية</label><input id="f_number" value="${edit?esc(x.number||""):""}"></div>
+      <div class="field"><label>الحالة</label><select id="f_status">
+        <option value="open" ${edit&&x.status==="open"?"selected":""}>جارية</option>
+        <option value="hold" ${edit&&x.status==="hold"?"selected":""}>معلّقة</option>
+        <option value="closed" ${edit&&x.status==="closed"?"selected":""}>منتهية</option>
+      </select></div>
+    </div>
+    <div class="two">
+      <div class="field"><label>المحكمة / الجهة</label><input id="f_court" value="${edit?esc(x.court||""):""}"></div>
+      <div class="field"><label>نوع الدعوى</label><input id="f_type" value="${edit?esc(x.type||""):""}" placeholder="تجارية، عمالية..."></div>
+    </div>
+    <div class="field"><label>ملاحظات / سير القضية</label><textarea id="f_notes">${edit?esc(x.notes||""):""}</textarea></div>
+    <div class="foot"><button class="btn gold" id="save">حفظ</button><button class="btn ghost" id="cancel">إلغاء</button></div>
+  `,close=>{
+    $("#cancel").onclick=close;
+    $("#save").onclick=()=>{
+      const title=val("f_title").trim();if(!title){toast("العنوان مطلوب","err");return;}
+      const obj={title,number:val("f_number").trim(),status:val("f_status"),court:val("f_court").trim(),type:val("f_type").trim(),notes:val("f_notes").trim()};
+      if(edit)Object.assign(x,obj);else (c.cases=c.cases||[]).push({id:uid(),...obj});
+      save();close();renderClient();toast("تم الحفظ","ok");
+    };
+  });
+}
+
+function taskModal(cid,t){
+  const c=findClient(cid),edit=!!t;
+  modal(edit?"تعديل مهمة":"مهمة جديدة — "+c.name,`
+    <div class="field"><label>عنوان المهمة *</label><input id="f_title" value="${edit?esc(t.title):""}"></div>
+    <div class="field"><label>تاريخ الاستحقاق</label><input id="f_due" type="date" value="${edit?esc(t.due||""):""}"></div>
+    <div class="field"><label>ملاحظات</label><textarea id="f_notes">${edit?esc(t.notes||""):""}</textarea></div>
+    <div class="foot"><button class="btn gold" id="save">حفظ</button><button class="btn ghost" id="cancel">إلغاء</button></div>
+  `,close=>{
+    $("#cancel").onclick=close;
+    $("#save").onclick=()=>{
+      const title=val("f_title").trim();if(!title){toast("العنوان مطلوب","err");return;}
+      const obj={title,due:val("f_due"),notes:val("f_notes").trim()};
+      if(edit)Object.assign(t,obj);else (c.tasks=c.tasks||[]).push({id:uid(),done:false,...obj});
+      save();close();ROUTE.view==="client"?renderClient():render();toast("تم الحفظ","ok");
+    };
+  });
+}
+
+/* pick a client before quick-add */
+function chooseClientThen(cb){
+  if(!STATE.clients.length){toast("أضف عميلًا أولًا","err");clientModal();return;}
+  modal("اختر العميل",`
+    <div class="field"><label>العميل</label><select id="f_pick">${STATE.clients.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join("")}</select></div>
+    <div class="foot"><button class="btn gold" id="ok">متابعة</button><button class="btn ghost" id="cancel">إلغاء</button></div>
+  `,close=>{$("#cancel").onclick=close;$("#ok").onclick=()=>{const id=val("f_pick");close();cb(id);};});
+}
+
+/* ---------- Settings + Backup ---------- */
+function openSettings(){
+  const s=STATE.settings;
+  modal("الإعدادات والنسخ الاحتياطي",`
+    <div class="field"><label>اسم المكتب</label><input id="s_office" value="${esc(s.office||"")}"></div>
+    <div class="field"><label>رابط «الحاسبات»</label><input id="s_calc" value="${esc(s.calcUrl||"")}" placeholder="https://..."><div class="hint">يظهر كزر في الأعلى. ضعه مرة ويُحفَظ دائمًا.</div></div>
+    <div class="field"><label>رابط «موقع المحاضر»</label><input id="s_min" value="${esc(s.minutesUrl||"")}" placeholder="https://..."></div>
+    <hr style="border:none;border-top:1px solid var(--line);margin:18px 0">
+    <div style="font-weight:700;margin-bottom:8px">الحماية والتشفير</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      ${KEY
+        ? `<span class="pill open">مُفعّل ومشفّر 🔒</span>
+           <button class="btn sm ghost" id="chg">تغيير الرمز</button>
+           <button class="btn sm ghost" id="lockNow">قفل الآن</button>
+           <button class="btn sm ghost" id="rmLock" style="color:var(--danger)">إلغاء القفل</button>`
+        : `<span class="pill closed">غير مُفعّل</span>
+           <button class="btn sm gold" id="setLock">تفعيل قفل الدخول والتشفير</button>`}
+    </div>
+    <label style="display:flex;align-items:center;gap:8px;margin-top:14px;cursor:pointer">
+      <input type="checkbox" id="s_notify" ${s.notify?"checked":""} style="width:auto"> تنبيهات سطح المكتب بالمواعيد والمهام
+    </label>
+
+    <hr style="border:none;border-top:1px solid var(--line);margin:18px 0">
+    <div style="font-weight:700;margin-bottom:8px">النسخ الاحتياطي (يشمل المستندات)</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn sm gold" id="exp">⬇ تصدير نسخة كاملة</button>
+      <button class="btn sm ghost" id="imp">⬆ استيراد نسخة</button>
+      <input type="file" id="impFile" accept=".json" class="hidden">
+    </div>
+    <div class="hint" style="margin-top:8px">احفظ النسخة في مكان آمن لنقل بياناتك بين الأجهزة.</div>
+    <div class="foot"><button class="btn gold" id="save">حفظ الإعدادات</button><button class="btn ghost" id="cancel">إغلاق</button></div>
+  `,close=>{
+    $("#cancel").onclick=close;
+    $("#save").onclick=()=>{
+      STATE.settings.office=val("s_office").trim();
+      STATE.settings.calcUrl=val("s_calc").trim();
+      STATE.settings.minutesUrl=val("s_min").trim();
+      save();close();render();toast("حُفظت الإعدادات","ok");
+    };
+    $("#exp").onclick=exportBackup;
+    $("#imp").onclick=()=>$("#impFile").click();
+    $("#impFile").onchange=e=>importBackup(e.target.files[0],close);
+    // security
+    const bind=(id,fn)=>{const el=$("#"+id);if(el)el.onclick=fn;};
+    bind("setLock",()=>{close();setupLock();});
+    bind("chg",()=>{close();changePasscode();});
+    bind("rmLock",()=>{close();removeLock();});
+    bind("lockNow",lockNow);
+    const nt=$("#s_notify");
+    if(nt)nt.onchange=async e=>{const ok=await toggleNotify(e.target.checked);if(!ok)e.target.checked=false;};
+  });
+}
+
+async function exportBackup(){
+  toast("جارٍ تجهيز النسخة...");
+  const files={};
+  const keys=await idbAllKeys("files");
+  for(const k of keys){
+    const blob=await getFile(k);           // decrypt so the backup is portable
+    if(blob) files[k]=await blobToDataURL(blob);
+  }
+  const dump={_app:"lexus",_v:1,_at:new Date().toISOString(),state:STATE,files};
+  const blob=new Blob([JSON.stringify(dump)],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");a.href=url;
+  a.download="نسخة-ليكسوس-"+new Date().toISOString().slice(0,10)+".json";
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),4000);
+  toast("تم تصدير النسخة","ok");
+}
+function blobToDataURL(blob){return new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result);fr.readAsDataURL(blob);});}
+function dataURLtoBlob(u){const[m,b64]=u.split(",");const mime=(m.match(/:(.*?);/)||[])[1]||"";const bin=atob(b64);const arr=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);return new Blob([arr],{type:mime});}
+
+async function importBackup(file,close){
+  if(!file)return;
+  if(!confirm("سيستبدل الاستيراد كل البيانات الحالية. هل تريد المتابعة؟"))return;
+  try{
+    const txt=await file.text();const dump=JSON.parse(txt);
+    if(dump._app!=="lexus"||!dump.state)throw new Error("ملف غير صالح");
+    // clear files
+    for(const k of await idbAllKeys("files"))await idbDel("files",k);
+    // restore files
+    if(dump.files)for(const [k,u] of Object.entries(dump.files))await putFile(k,dataURLtoBlob(u));
+    STATE=dump.state;STATE.settings=Object.assign({calcUrl:"",minutesUrl:"",office:""},STATE.settings||{});
+    await idbSet("kv","state",KEY?await encObj(KEY,STATE):STATE);
+    close&&close();go("home");toast("تم استيراد النسخة بنجاح","ok");
+  }catch(e){toast("فشل الاستيراد: "+e.message,"err");}
+}
+
+/* ---------- Lock / passcode management ---------- */
+async function reEncryptAllFiles(oldKey,newKey){
+  const keys=await idbAllKeys("files");
+  for(const k of keys){
+    const v=await idbGet("files",k); if(!v) continue;
+    const plain = (v&&v.enc)? await decBlob(oldKey,v) : v;
+    await idbSet("files",k, newKey?await encBlob(newKey,plain):plain);
+  }
+}
+async function setupLock(){
+  modal("تفعيل قفل الدخول والتشفير",`
+    <div class="field"><label>رمز جديد (٤ خانات فأكثر) *</label><input id="p1" type="password" autocomplete="new-password"></div>
+    <div class="field"><label>تأكيد الرمز *</label><input id="p2" type="password" autocomplete="new-password"></div>
+    <div class="hint" style="color:var(--danger)">تحذير: لا يمكن استرجاع البيانات إذا نسيتَ الرمز. احتفظ به في مكان آمن، وصدّر نسخة احتياطية أولًا.</div>
+    <div class="foot"><button class="btn gold" id="ok">تفعيل</button><button class="btn ghost" id="cancel">إلغاء</button></div>
+  `,close=>{
+    $("#cancel").onclick=close;
+    $("#ok").onclick=async()=>{
+      const p1=val("p1"),p2=val("p2");
+      if(p1.length<4){toast("الرمز قصير جدًا","err");return;}
+      if(p1!==p2){toast("الرمز غير متطابق","err");return;}
+      try{
+        const salt=b64.enc(crypto.getRandomValues(new Uint8Array(16)));
+        const newKey=await deriveKey(p1,salt);
+        await reEncryptAllFiles(null,newKey);      // files currently plain
+        KEY=newKey;
+        await idbSet("kv","state",await encObj(KEY,STATE));
+        await idbSet("kv","meta",{enc:true,salt,verifier:await encObj(KEY,"lexus-ok")});
+        close();openSettings();toast("تم تفعيل القفل والتشفير","ok");
+      }catch(e){toast("فشل التفعيل: "+e.message,"err");}
+    };
+  });
+}
+async function changePasscode(){
+  modal("تغيير الرمز",`
+    <div class="field"><label>الرمز الحالي *</label><input id="p0" type="password"></div>
+    <div class="field"><label>الرمز الجديد *</label><input id="p1" type="password"></div>
+    <div class="field"><label>تأكيد الجديد *</label><input id="p2" type="password"></div>
+    <div class="foot"><button class="btn gold" id="ok">تغيير</button><button class="btn ghost" id="cancel">إلغاء</button></div>
+  `,close=>{
+    $("#cancel").onclick=close;
+    $("#ok").onclick=async()=>{
+      const p1=val("p1");
+      if(p1.length<4||p1!==val("p2")){toast("الرمز الجديد غير صالح أو غير متطابق","err");return;}
+      try{
+        const meta=await idbGet("kv","meta");
+        const cur=await deriveKey(val("p0"),meta.salt);
+        try{ await decObj(cur,meta.verifier); }catch(e){ toast("الرمز الحالي خاطئ","err"); return; }
+        const salt=b64.enc(crypto.getRandomValues(new Uint8Array(16)));
+        const newKey=await deriveKey(p1,salt);
+        await reEncryptAllFiles(cur,newKey);
+        KEY=newKey;
+        await idbSet("kv","state",await encObj(KEY,STATE));
+        await idbSet("kv","meta",{enc:true,salt,verifier:await encObj(KEY,"lexus-ok")});
+        close();toast("تم تغيير الرمز","ok");
+      }catch(e){toast("فشل التغيير: "+e.message,"err");}
+    };
+  });
+}
+async function removeLock(){
+  modal("إلغاء القفل",`
+    <div class="field"><label>الرمز الحالي للتأكيد *</label><input id="p0" type="password"></div>
+    <div class="hint">سيُلغى التشفير وتُخزَّن البيانات دون حماية على هذا الجهاز.</div>
+    <div class="foot"><button class="btn gold" id="ok">إلغاء القفل</button><button class="btn ghost" id="cancel">تراجع</button></div>
+  `,close=>{
+    $("#cancel").onclick=close;
+    $("#ok").onclick=async()=>{
+      try{
+        const meta=await idbGet("kv","meta");
+        const cur=await deriveKey(val("p0"),meta.salt);
+        try{ await decObj(cur,meta.verifier); }catch(e){ toast("الرمز خاطئ","err"); return; }
+        await reEncryptAllFiles(cur,null);   // decrypt files to plain
+        KEY=null;
+        await idbSet("kv","state",STATE);
+        await idbDel("kv","meta");
+        close();openSettings();toast("أُلغي القفل","ok");
+      }catch(e){toast("فشل الإلغاء: "+e.message,"err");}
+    };
+  });
+}
+function lockNow(){ if(KEY){ KEY=null; location.reload(); } }
+
+/* boot lock screen — overlay only, keeps the app DOM intact */
+function showLockScreen(meta){
+  return new Promise(resolve=>{
+    $("#modalRoot").innerHTML=`<div class="overlay" style="background:var(--navy)"><div class="modal" style="max-width:380px">
+      <header><svg width="26" height="26" viewBox="0 0 64 64" style="margin-inline-end:8px"><rect width="64" height="64" rx="14" fill="#c9a24a"/><path d="M22 14h6v28h16v6H22z" fill="#0f2a3f"/></svg> ليكسوس — دخول محمي</header>
+      <div class="body">
+        <div class="field"><label>أدخل رمز الدخول</label><input id="lp" type="password" autofocus></div>
+        <div id="lerr" style="color:var(--danger);font-size:.85rem;min-height:20px"></div>
+        <div class="foot"><button class="btn gold" id="lok">دخول</button></div>
+      </div></div></div>`;
+    const tryUnlock=async()=>{
+      try{
+        const k=await deriveKey($("#lp").value,meta.salt);
+        await decObj(k,meta.verifier);   // throws if wrong
+        KEY=k; $("#modalRoot").innerHTML=""; resolve();
+      }catch(e){ $("#lerr").textContent="رمز خاطئ، حاول مجددًا"; $("#lp").value=""; $("#lp").focus(); }
+    };
+    $("#lok").onclick=tryUnlock;
+    $("#lp").onkeydown=e=>{if(e.key==="Enter")tryUnlock();};
+  });
+}
+
+/* ---------- Reminders / notifications ---------- */
+function reminderItems(){
+  const out=[];
+  allAppointments().forEach(a=>{const d=daysUntil(a.date);if(d===0||d===1)out.push({kind:"appt",d,text:a.title+" — "+a.clientName,when:d===0?"اليوم":"غدًا"});});
+  allTasks().forEach(t=>{if(!t.done&&t.due){const d=daysUntil(t.due);if(d<0)out.push({kind:"over",d,text:t.title+" — "+t.clientName,when:"متأخرة"});else if(d===0)out.push({kind:"due",d,text:t.title+" — "+t.clientName,when:"تستحق اليوم"});}});
+  return out;
+}
+async function maybeNotify(){
+  if(!STATE.settings.notify) return;
+  try{
+    if(Notification.permission!=="granted") return;
+    const key="lexus_notified_"+new Date().toISOString().slice(0,10);
+    if(localStorage.getItem(key)) return;           // once per day
+    const items=reminderItems();
+    if(items.length){
+      new Notification("ليكسوس — تذكير اليوم",{body:items.slice(0,5).map(i=>"• "+i.when+": "+i.text).join("\n")});
+      localStorage.setItem(key,"1");
+    }
+  }catch(e){}
+}
+async function toggleNotify(on){
+  if(on){
+    if(!("Notification"in window)){toast("المتصفح لا يدعم التنبيهات","err");return false;}
+    const perm=await Notification.requestPermission();
+    if(perm!=="granted"){toast("لم يُسمح بالتنبيهات","err");return false;}
+  }
+  STATE.settings.notify=on;save();return true;
+}
+
+/* ---------- Theme ---------- */
+function initTheme(){
+  $("#settingsBtn").onclick=openSettings;
+  const saved=localStorage.getItem("lexus_theme");
+  if(saved)document.documentElement.setAttribute("data-theme",saved);
+  $("#themeBtn").onclick=()=>{
+    const cur=document.documentElement.getAttribute("data-theme");
+    const next=cur==="dark"?"light":"dark";
+    document.documentElement.setAttribute("data-theme",next);
+    try{localStorage.setItem("lexus_theme",next);}catch(e){}
+  };
+}
+
+/* ---------- Seed demo (first run only) ---------- */
+function seedIfEmpty(){
+  if(STATE.clients.length)return;
+  const today=new Date();
+  const iso=(d,h=10)=>{const x=new Date(today);x.setDate(x.getDate()+d);x.setHours(h,0,0,0);return x.toISOString().slice(0,16);};
+  const dt=d=>{const x=new Date(today);x.setDate(x.getDate()+d);return x.toISOString().slice(0,10);};
+  STATE.clients=[
+    {id:uid(),name:"شركة التوأم الأربعة",type:"شركة",phone:"",email:"",color:PALETTE[0],notes:"عميل استراتيجي — أمانة مجلس الإدارة.",
+     cases:[{id:uid(),title:"نزاع تجاري على تنفيذ عقد توريد",number:"١٤٤٧/ت/١٢٣",status:"open",court:"المحكمة التجارية بالرياض",type:"تجارية",notes:"بانتظار الرد على المذكرة الجوابية."}],
+     appointments:[{id:uid(),title:"جلسة مرافعة",date:iso(2,11),location:"المحكمة التجارية — الرياض",notes:""}],
+     tasks:[{id:uid(),title:"إعداد مذكرة جوابية",due:dt(1),done:false,notes:""},{id:uid(),title:"مراجعة محضر مجلس الإدارة",due:dt(5),done:false,notes:""}],docs:[]},
+    {id:uid(),name:"عميل — عقد عمل",type:"فرد",phone:"",email:"",color:PALETTE[2],notes:"",
+     cases:[{id:uid(),title:"دعوى مطالبة عمالية",number:"",status:"hold",court:"محكمة العمل",type:"عمالية",notes:"جمع المستندات."}],
+     appointments:[{id:uid(),title:"اجتماع استشاري",date:iso(0,13),location:"المكتب",notes:""}],
+     tasks:[{id:uid(),title:"صياغة صحيفة الدعوى",due:dt(3),done:false,notes:""}],docs:[]}
+  ];
+  save();
+}
+
+/* ---------- Boot ---------- */
+(async function(){
+  initTheme();
+  try{
+    await openDB();
+    const meta=await idbGet("kv","meta");
+    if(meta&&meta.enc){ await showLockScreen(meta); }   // wait for correct passcode
+    await load();
+  }catch(e){ toast("تعذّر فتح قاعدة البيانات المحلية","err"); }
+  seedIfEmpty();
+  render();
+  maybeNotify();
+})();
+</script>
+</body>
+</html>
