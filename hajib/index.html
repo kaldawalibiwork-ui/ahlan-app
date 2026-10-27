@@ -46,7 +46,7 @@ a{color:var(--gold-2)}
 .portal{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);color:#fff;text-decoration:none;border-radius:9px;padding:4px 10px;font-size:.78rem;line-height:1.3}
 .portal small{display:block;color:rgba(255,255,255,.62);font-size:.66rem}
 .portal:hover{background:rgba(255,255,255,.16)}
-.portal.gold{background:var(--gold);color:#fff;border-color:var(--gold)} .portal.gold small{color:rgba(255,255,255,.85)}
+.portal.gold{background:var(--gold);color:var(--on-acc,#fff);border-color:var(--gold)} .portal.gold small{color:var(--on-acc,#fff);opacity:.8}
 .sp{flex:1}
 .gsearch{position:relative;min-width:200px;flex:0 1 280px}
 .gsearch input{width:100%;border:none;border-radius:10px;padding:8px 12px;background:rgba(255,255,255,.12);color:#fff}
@@ -56,13 +56,13 @@ a{color:var(--gold-2)}
 .gres div:hover{background:var(--gold-soft)}
 .ibtn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);color:#fff;border-radius:10px;height:36px;min-width:36px;padding:0 10px;cursor:pointer;position:relative}
 .ibtn:hover{background:rgba(255,255,255,.2)}
-.dot-n{position:absolute;top:-6px;inset-inline-start:-6px;background:var(--gold);color:#fff;border-radius:20px;font-size:.68rem;padding:0 6px;font-weight:800}
+.dot-n{position:absolute;top:-6px;inset-inline-start:-6px;background:var(--gold);color:var(--on-acc,#fff);border-radius:20px;font-size:.68rem;padding:0 6px;font-weight:800}
 .tool-row{display:flex;gap:8px;padding:0 16px 10px;flex-wrap:wrap;align-items:center}
 .tbtn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);color:#fff;border-radius:9px;padding:5px 12px;cursor:pointer;font-size:.85rem}
-.tbtn.gold{background:var(--gold);color:#fff;border-color:var(--gold);font-weight:700}
+.tbtn.gold{background:var(--gold);color:var(--on-acc,#fff);border-color:var(--gold);font-weight:700}
 .nav{display:flex;gap:4px;overflow-x:auto;background:var(--card);border-bottom:1px solid var(--line);padding:8px 12px;position:sticky;z-index:30;scrollbar-width:thin}
 .nav button{border:none;background:transparent;padding:7px 13px;border-radius:9px;cursor:pointer;white-space:nowrap;color:var(--muted);font-weight:600}
-.nav button.on{background:var(--pri);color:#fff}
+.nav button.on{background:var(--sel,var(--pri));color:var(--sel-t,#fff)}
 .nav button:hover:not(.on){background:var(--gold-soft);color:var(--ink)}
 main{max-width:1280px;margin:0 auto;padding:18px 16px 70px}
 h1{font-size:1.35rem;margin:0}
@@ -79,8 +79,8 @@ h1{font-size:1.35rem;margin:0}
 /* buttons */
 .btn{border:1px solid var(--line);background:var(--card);border-radius:9px;padding:7px 13px;cursor:pointer;font-weight:600;white-space:nowrap}
 .btn:hover{border-color:var(--gold)}
-.btn.p{background:var(--pri);border-color:var(--pri);color:#fff}
-.btn.g{background:var(--gold);border-color:var(--gold);color:#fff}
+.btn.p{background:var(--sel,var(--pri));border-color:var(--sel,var(--pri));color:var(--sel-t,#fff)}
+.btn.g{background:var(--gold);border-color:var(--gold);color:var(--on-acc,#fff)}
 h1,h3,.brand,.kpi b,.md-h b,.whead b{font-family:var(--head,inherit)}
 .idcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:8px 0}
 .idc{border:2px solid var(--line);border-radius:12px;overflow:hidden;cursor:pointer;background:var(--card)}
@@ -91,7 +91,7 @@ h1,h3,.brand,.kpi b,.md-h b,.whead b{font-family:var(--head,inherit)}
 .btn.s{padding:4px 9px;font-size:.8rem}
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:var(--card)}
 .seg button{border:none;background:transparent;padding:6px 12px;cursor:pointer;font-size:.85rem;color:var(--muted)}
-.seg button.on{background:var(--pri);color:#fff}
+.seg button.on{background:var(--sel,var(--pri));color:var(--sel-t,#fff)}
 .filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
 .filters input,.filters select{border:1px solid var(--line);background:var(--card);border-radius:9px;padding:7px 10px}
 .filters input[type=search]{flex:1;min-width:180px}
@@ -142,7 +142,7 @@ table.t tr.click{cursor:pointer}
 .fd .hint{color:var(--muted);font-size:.76rem;margin-top:3px}
 .tabs{display:flex;gap:4px;flex-wrap:wrap;border-bottom:1px solid var(--line);margin:-4px 0 12px;padding-bottom:8px}
 .tabs button{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:5px 11px;cursor:pointer;font-size:.84rem}
-.tabs button.on{background:var(--pri);color:#fff;border-color:var(--pri)}
+.tabs button.on{background:var(--sel,var(--pri));color:var(--sel-t,#fff);border-color:var(--sel,var(--pri))}
 .kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px}
 .kv div{background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:7px 10px}
 .kv span{display:block;color:var(--muted);font-size:.74rem}
@@ -276,8 +276,8 @@ const LOGO={
   mizan:'<path d="M32 13v34M22 47h20M14 21h36" stroke="P" stroke-width="3.4" stroke-linecap="round" fill="none"/><path d="M14 21l-6 13a6 6 0 0 0 12 0zM50 21l-6 13a6 6 0 0 0 12 0z" fill="P"/><circle cx="32" cy="13" r="3.4" fill="P"/>',
   qasr:'<path d="M15 53V33c0-10 7.6-18 17-18s17 8 17 18v20" fill="none" stroke="P" stroke-width="3.4"/><path d="M23 53V35c0-6 4-10.5 9-10.5s9 4.5 9 10.5v18" fill="P"/><path d="M11 53h42" stroke="P" stroke-width="3.4" stroke-linecap="round"/>'};
 const IDS={
-  diwan:{name:"الديوان",desc:"كحلي ونحاسي — خط كوفي حديث (Noto Kufi Arabic): رسمي واضح للمكاتب",font:"'Noto Kufi Arabic'",head:"'Noto Kufi Arabic'",
-    L:{pri:"#14213d",pri2:"#22365f",acc:"#b5651d",acc2:"#97521a",soft:"#f6eadf",bg:"#f3f4f7",accL:"#e3a56d"},D:{pri:"#101a30",pri2:"#1b2a4a",acc:"#c97a36",acc2:"#b5651d",soft:"#35281c",bg:"#0b101b",card:"#131b2b",line:"#233049",accL:"#e3a56d"}},
+  diwan:{name:"الديوان",desc:"كحلي وتيفاني — خط كوفي حديث (Noto Kufi Arabic): رسمي واضح للمكاتب",font:"'Noto Kufi Arabic'",head:"'Noto Kufi Arabic'",
+    L:{pri:"#14213d",pri2:"#22365f",acc:"#0ABAB5",acc2:"#06716D",soft:"#e2f6f5",bg:"#f3f5f8",accL:"#81D8D0",onAcc:"#14213d"},D:{pri:"#101a30",pri2:"#1b2a4a",acc:"#0ABAB5",acc2:"#81D8D0",soft:"#12302f",bg:"#0b101b",card:"#131b2b",line:"#233049",accL:"#81D8D0",onAcc:"#0b101b"}},
   midad:{name:"المِداد",desc:"عنابي ورملي — خط نسخ كلاسيكي (Amiri للعناوين وNoto Naskh للنص): وقار قضائي",font:"'Noto Naskh Arabic'",head:"'Amiri'",
     L:{pri:"#5b1a2b",pri2:"#76263b",acc:"#9a7442",acc2:"#7e5e34",soft:"#f3ebdf",bg:"#f7f3ee",accL:"#dcc6a2"},D:{pri:"#3d111d",pri2:"#5a1d2c",acc:"#b08a55",acc2:"#9a7442",soft:"#3a2e1f",bg:"#140b0e",card:"#1f1418",line:"#3a2429",accL:"#dcc6a2"}},
   mizan:{name:"الميزان",desc:"فحمي وفيروزي — خط عصري تقني (IBM Plex Sans Arabic): بسيط وعالي الوضوح في الجداول",font:"'IBM Plex Sans Arabic'",head:"'IBM Plex Sans Arabic'",
@@ -288,7 +288,7 @@ const curId=()=>IDS[S.settings.identity]||IDS.diwan;
 const logoSVG=(k,size=34,I=IDS[k]||IDS.diwan)=>`<svg width="${size}" height="${size}" viewBox="0 0 64 64"><rect width="64" height="64" rx="15" fill="${I.L.accL}"/>${LOGO[k]||LOGO.diwan}</svg>`.replace(/"P"/g,`"${I.L.pri}"`).replace(/"A"/g,`"${I.L.accL}"`);
 function isDark(){const a=document.documentElement.getAttribute("data-theme");return a==="dark"||(a!=="light"&&matchMedia("(prefers-color-scheme: dark)").matches);}
 function applyId(){const k=IDS[S.settings.identity]?S.settings.identity:"diwan";const I=IDS[k];const v=isDark()?{...I.L,...I.D}:I.L;const st=document.documentElement.style;
-  [["--pri",v.pri],["--pri-2",v.pri2],["--gold",v.acc],["--gold-2",v.acc2],["--gold-soft",v.soft],["--bg",v.bg],["--acc-l",v.accL],["--head",I.head+",serif"]].forEach(([n,x])=>st.setProperty(n,x));
+  [["--pri",v.pri],["--pri-2",v.pri2],["--gold",v.acc],["--gold-2",v.acc2],["--gold-soft",v.soft],["--bg",v.bg],["--acc-l",v.accL],["--on-acc",v.onAcc||"#fff"],["--sel",isDark()?v.acc:v.pri],["--sel-t",isDark()?(v.onAcc||"#fff"):"#fff"],["--head",I.head+",serif"]].forEach(([n,x])=>st.setProperty(n,x));
   ["--card","--line"].forEach(n=>{const x=v[n.slice(2)];x?st.setProperty(n,x):st.removeProperty(n);});
   document.body.style.fontFamily=I.font+",'Segoe UI',Tahoma,system-ui,sans-serif";$("#brandLogo").innerHTML=logoSVG(k);
   const fav=$('link[rel="icon"]');if(fav)fav.href="data:image/svg+xml,"+encodeURIComponent(logoSVG(k,64));$('meta[name="theme-color"]').setAttribute("content",v.pri);}
