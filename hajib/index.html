@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<meta name="description" content="الحاجب المنصور القانوني — لوحة واحدة للقضايا والجلسات والوكالات والتنفيذ والمخالفات، مع السكرتير القانوني والتقارير">
+<meta name="theme-color" content="#123d2f">
+<meta name="referrer" content="no-referrer">
+<title>الحاجب المنصور القانوني</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23c9a24a'/%3E%3Cpath d='M32 14v34M20 48h24M14 24h36M14 24l-6 14h12zM50 24l-6 14h12z' stroke='%23123d2f' stroke-width='3' fill='none' stroke-linejoin='round'/%3E%3C/svg%3E">
+<script src="xlsx.full.min.js" defer></script>
+<style>
+:root{
+  --pri:#123d2f; --pri-2:#1b5442; --gold:#c9a24a; --gold-2:#b08a35; --gold-soft:#f6eedb;
+  --bg:#f3f1ec; --card:#fff; --line:#e3e0d8; --ink:#1d2622; --muted:#66706b;
+  --ok:#2e7d5b; --ok-soft:#e5f3ec; --warn:#b7791f; --warn-soft:#fbf1df; --bad:#b23b3b; --bad-soft:#fbe9e9;
+  --info:#2f5f9e; --info-soft:#e7eef8; --shadow:0 4px 18px rgba(18,61,47,.08); --r:14px;
+}
+:root[data-theme="dark"]{
+  --pri:#0e2f24; --pri-2:#174636; --gold:#d6b25c; --gold-2:#c9a24a; --gold-soft:#3a3220;
+  --bg:#0d1714; --card:#15231e; --line:#26392f; --ink:#e7eee9; --muted:#9fb1a8;
+  --ok-soft:#173428; --warn-soft:#3a2f18; --bad-soft:#3a1f1f; --info-soft:#1b2a3d; --shadow:0 4px 18px rgba(0,0,0,.35);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --pri:#0e2f24; --pri-2:#174636; --gold:#d6b25c; --gold-2:#c9a24a; --gold-soft:#3a3220;
+    --bg:#0d1714; --card:#15231e; --line:#26392f; --ink:#e7eee9; --muted:#9fb1a8;
+    --ok-soft:#173428; --warn-soft:#3a2f18; --bad-soft:#3a1f1f; --info-soft:#1b2a3d; --shadow:0 4px 18px rgba(0,0,0,.35);
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:"Segoe UI",Tahoma,system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);line-height:1.65;font-size:15px}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--gold-2)}
+.hidden{display:none!important}
+.muted{color:var(--muted)} .sm{font-size:.82rem} .b{font-weight:700}
+/* top */
+.top{background:var(--pri);color:#fff;position:sticky;top:0;z-index:40;box-shadow:var(--shadow)}
+.top-row{display:flex;align-items:center;gap:10px;padding:10px 16px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.05rem;white-space:nowrap}
+.brand small{display:block;font-weight:500;font-size:.68rem;color:var(--gold);letter-spacing:.5px}
+.portals{display:flex;gap:6px;flex-wrap:wrap}
+.portal{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);color:#fff;text-decoration:none;border-radius:9px;padding:4px 10px;font-size:.78rem;line-height:1.3}
+.portal small{display:block;color:#b9cbc2;font-size:.66rem}
+.portal:hover{background:rgba(255,255,255,.16)}
+.portal.gold{background:var(--gold);color:var(--pri);border-color:var(--gold)} .portal.gold small{color:var(--pri)}
+.sp{flex:1}
+.gsearch{position:relative;min-width:200px;flex:0 1 280px}
+.gsearch input{width:100%;border:none;border-radius:10px;padding:8px 12px;background:rgba(255,255,255,.12);color:#fff}
+.gsearch input::placeholder{color:#b9cbc2}
+.gres{position:absolute;top:110%;inset-inline:0;background:var(--card);color:var(--ink);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.25);max-height:360px;overflow:auto;z-index:60}
+.gres div{padding:9px 12px;border-bottom:1px solid var(--line);cursor:pointer}
+.gres div:hover{background:var(--gold-soft)}
+.ibtn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);color:#fff;border-radius:10px;height:36px;min-width:36px;padding:0 10px;cursor:pointer;position:relative}
+.ibtn:hover{background:rgba(255,255,255,.2)}
+.dot-n{position:absolute;top:-6px;inset-inline-start:-6px;background:var(--gold);color:var(--pri);border-radius:20px;font-size:.68rem;padding:0 6px;font-weight:800}
+.tool-row{display:flex;gap:8px;padding:0 16px 10px;flex-wrap:wrap;align-items:center}
+.tbtn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);color:#fff;border-radius:9px;padding:5px 12px;cursor:pointer;font-size:.85rem}
+.tbtn.gold{background:var(--gold);color:var(--pri);border-color:var(--gold);font-weight:700}
+.nav{display:flex;gap:4px;overflow-x:auto;background:var(--card);border-bottom:1px solid var(--line);padding:8px 12px;position:sticky;z-index:30;scrollbar-width:thin}
+.nav button{border:none;background:transparent;padding:7px 13px;border-radius:9px;cursor:pointer;white-space:nowrap;color:var(--muted);font-weight:600}
+.nav button.on{background:var(--pri);color:#fff}
+.nav button:hover:not(.on){background:var(--gold-soft);color:var(--ink)}
+main{max-width:1280px;margin:0 auto;padding:18px 16px 70px}
+h1{font-size:1.35rem;margin:0}
+.head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+/* kpis */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;box-shadow:var(--shadow);border-inline-start:5px solid var(--pri)}
+.kpi b{display:block;font-size:1.6rem;line-height:1.2}
+.kpi span{color:var(--muted);font-size:.82rem}
+.kpi.g{border-inline-start-color:var(--gold)} .kpi.r{border-inline-start-color:var(--bad)} .kpi.o{border-inline-start-color:var(--warn)} .kpi.i{border-inline-start-color:var(--info)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:14px}
+.card+.card{margin-top:14px}
+.card h3{margin:0 0 10px;font-size:1.02rem}
+/* buttons */
+.btn{border:1px solid var(--line);background:var(--card);border-radius:9px;padding:7px 13px;cursor:pointer;font-weight:600;white-space:nowrap}
+.btn:hover{border-color:var(--gold)}
+.btn.p{background:var(--pri);border-color:var(--pri);color:#fff}
+.btn.g{background:var(--gold);border-color:var(--gold);color:var(--pri)}
+.btn.d{color:var(--bad)} .btn.d:hover{border-color:var(--bad)}
+.btn.s{padding:4px 9px;font-size:.8rem}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:var(--card)}
+.seg button{border:none;background:transparent;padding:6px 12px;cursor:pointer;font-size:.85rem;color:var(--muted)}
+.seg button.on{background:var(--pri);color:#fff}
+.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.filters input,.filters select{border:1px solid var(--line);background:var(--card);border-radius:9px;padding:7px 10px}
+.filters input[type=search]{flex:1;min-width:180px}
+/* pills */
+.pill{display:inline-block;border-radius:20px;padding:1px 9px;font-size:.74rem;font-weight:700;white-space:nowrap;border:1px solid transparent}
+.p-ok{background:var(--ok-soft);color:var(--ok)} .p-warn{background:var(--warn-soft);color:var(--warn)} .p-bad{background:var(--bad-soft);color:var(--bad)}
+.p-info{background:var(--info-soft);color:var(--info)} .p-mut{background:var(--bg);color:var(--muted);border-color:var(--line)} .p-gold{background:var(--gold-soft);color:var(--gold-2)}
+/* tables */
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+table.t{width:100%;border-collapse:collapse;font-size:.88rem}
+table.t th{background:var(--pri);color:#fff;text-align:start;padding:9px 10px;font-weight:700;white-space:nowrap;position:sticky;top:0}
+table.t td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+table.t tr:hover td{background:var(--gold-soft)}
+table.t tr.click{cursor:pointer}
+.acts{display:flex;gap:4px;flex-wrap:wrap}
+.empty{padding:28px;text-align:center;color:var(--muted)}
+/* week */
+.week{display:grid;grid-template-columns:repeat(var(--cols,5),minmax(170px,1fr));gap:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--card)}
+.wcol{border-inline-start:1px solid var(--line);min-height:260px;display:flex;flex-direction:column}
+.wcol:first-child{border-inline-start:none}
+.whead{background:var(--bg);padding:8px 10px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:6px}
+.whead.today{background:var(--gold-soft)}
+.whead b{display:block} .whead .sm{line-height:1.3}
+.wbody{padding:8px;display:flex;flex-direction:column;gap:8px;flex:1}
+.sess{border:1px solid var(--line);border-inline-start:4px solid var(--info);border-radius:10px;padding:8px;cursor:pointer;background:var(--card);font-size:.82rem}
+.sess:hover{border-color:var(--gold)}
+.sess.held{border-inline-start-color:var(--ok)} .sess.ended{border-inline-start-color:var(--muted)} .sess.ev{border-inline-start-color:var(--gold)}
+.sess .tm{font-weight:800;font-size:.95rem;display:flex;justify-content:space-between;align-items:center}
+.cnt{background:var(--pri);color:#fff;border-radius:20px;padding:0 8px;font-size:.75rem;font-weight:700}
+/* client tiles */
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px 10px;text-align:center;cursor:pointer;box-shadow:var(--shadow)}
+.tile:hover{border-color:var(--gold);transform:translateY(-2px)}
+.av{width:56px;height:56px;border-radius:50%;margin:0 auto 8px;display:grid;place-items:center;color:#fff;font-weight:800;font-size:1.2rem}
+/* modal */
+#modals .ov{position:fixed;inset:0;background:rgba(6,20,15,.55);display:grid;place-items:center;padding:14px;z-index:100}
+.md{background:var(--card);border-radius:16px;width:100%;max-width:560px;max-height:92vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.4);border:1px solid var(--line)}
+.md.lg{max-width:980px}
+.md-h{background:var(--pri);color:#fff;padding:13px 16px;border-radius:16px 16px 0 0;display:flex;align-items:center;gap:8px}
+.md-h .x{margin-inline-start:auto;background:rgba(255,255,255,.12);border:none;color:#fff;border-radius:8px;width:32px;height:32px;cursor:pointer}
+.md-b{padding:16px;overflow:auto}
+.md-f{padding:12px 16px;border-top:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px}
+.fd label{display:block;font-weight:600;font-size:.84rem;margin-bottom:4px}
+.fd input,.fd select,.fd textarea{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:9px;padding:8px 10px}
+.fd textarea{min-height:76px;resize:vertical}
+.fd.full{grid-column:1/-1}
+.fd .hint{color:var(--muted);font-size:.76rem;margin-top:3px}
+.tabs{display:flex;gap:4px;flex-wrap:wrap;border-bottom:1px solid var(--line);margin:-4px 0 12px;padding-bottom:8px}
+.tabs button{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:5px 11px;cursor:pointer;font-size:.84rem}
+.tabs button.on{background:var(--pri);color:#fff;border-color:var(--pri)}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px}
+.kv div{background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:7px 10px}
+.kv span{display:block;color:var(--muted);font-size:.74rem}
+.note{border:1px solid var(--line);border-inline-start:4px solid var(--gold);border-radius:10px;padding:8px 10px;margin-bottom:8px;background:var(--card)}
+.banner{border-radius:12px;padding:10px 14px;margin-bottom:12px;border:1px solid var(--line)}
+.banner.w{background:var(--warn-soft);border-color:#ecd6a8} .banner.i{background:var(--info-soft)} .banner.r{background:var(--bad-soft)}
+.chat{display:flex;flex-direction:column;gap:8px;max-height:420px;overflow:auto;padding:4px}
+.msg{padding:9px 12px;border-radius:12px;white-space:pre-wrap;max-width:92%}
+.msg.u{background:var(--pri);color:#fff;align-self:flex-start}
+.msg.a{background:var(--bg);border:1px solid var(--line);align-self:flex-end}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.chip{border:1px solid var(--line);background:var(--card);border-radius:20px;padding:4px 11px;cursor:pointer;font-size:.8rem}
+.chip:hover{border-color:var(--gold)}
+.drop{border:2px dashed var(--line);border-radius:12px;padding:18px;text-align:center;color:var(--muted);cursor:pointer}
+.drop:hover,.drop.on{border-color:var(--gold);color:var(--gold-2)}
+#toasts{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:300;display:flex;flex-direction:column;gap:6px;align-items:center}
+.toast{background:var(--pri);color:#fff;padding:9px 16px;border-radius:11px;box-shadow:var(--shadow);font-weight:600}
+.toast.ok{background:var(--ok)} .toast.err{background:var(--bad)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:760px){.top{position:static}.portal small{display:none}.portal{padding:3px 8px}.tool-row .tbtn{padding:4px 8px;font-size:.8rem}.gsearch{flex:1 1 100%}.grid2,.fg{grid-template-columns:1fr}.brand small{display:none}.week{grid-template-columns:1fr}.wcol{border-inline-start:none;border-top:1px solid var(--line);min-height:auto}}
+footer{text-align:center;color:var(--muted);font-size:.78rem;padding:20px}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-row">
+    <div class="brand">
+      <svg width="34" height="34" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#c9a24a"/><path d="M32 14v34M20 48h24M14 24h36M14 24l-6 14h12zM50 24l-6 14h12z" stroke="#123d2f" stroke-width="3" fill="none" stroke-linejoin="round"/></svg>
+      <div>الحاجب المنصور القانوني<small id="brandSub">سكرتير المحامي</small></div>
+    </div>
+    <nav class="portals" id="portals"></nav>
+    <span class="sp"></span>
+    <div class="gsearch"><input id="gq" placeholder="ابحث برقم القضية أو اسم الطرف أو الموكل..." autocomplete="off"><div class="gres hidden" id="gres"></div></div>
+  </div>
+  <div class="tool-row">
+    <span class="sm" style="color:#b9cbc2" id="lastSave">—</span>
+    <span class="sp"></span>
+    <button class="tbtn" data-act="go" data-v="assistant">✨ المساعد القانوني</button>
+    <button class="tbtn" data-act="go" data-v="secretary">🗓 السكرتير</button>
+    <button class="tbtn" data-act="exportICS" title="أضف الجلسات والمواعيد لتقويم جوالك مع التنبيهات">📅 تصدير للتقويم</button>
+    <button class="tbtn gold" data-act="openImport">⬆ استيراد من Excel</button>
+    <button class="ibtn" data-act="alerts" title="التنبيهات">🔔<span class="dot-n hidden" id="alertN"></span></button>
+    <button class="ibtn" data-act="theme" title="الوضع الليلي">🌓</button>
+    <button class="ibtn" data-act="settings" title="الإعدادات">⚙</button>
+  </div>
+</header>
+<nav class="nav" id="nav"></nav>
+<main id="app"></main>
+<footer>الحاجب المنصور القانوني — بياناتك محفوظة على جهازك فقط. أداة مساعدة لا تحل محل المنصات الرسمية؛ راجع البيانات قبل أي إجراء نظامي.</footer>
+<div id="modals"></div>
+<div id="toasts"></div>
+
+<script>
+"use strict";
+/* ======================================================================
+   الحاجب المنصور القانوني — تطبيق ويب في ملف واحد
+   التخزين: IndexedDB (بيانات + مستندات) مع قفل وتشفير اختياري AES-GCM
+   ====================================================================== */
+
+/* ---------------- IndexedDB ---------------- */
+const DB_NAME="hajib_db";let _db=null;
+function openDB(){return new Promise((res,rej)=>{const r=indexedDB.open(DB_NAME,1);
+  r.onupgradeneeded=e=>{const d=e.target.result;["kv","files"].forEach(s=>{if(!d.objectStoreNames.contains(s))d.createObjectStore(s);});};
+  r.onsuccess=e=>{_db=e.target.result;res(_db);};r.onerror=()=>rej(r.error);});}
+const idb=(store,mode,fn)=>new Promise((res,rej)=>{const q=fn(_db.transaction(store,mode).objectStore(store));q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error);});
+const idbGet=(s,k)=>idb(s,"readonly",o=>o.get(k));
+const idbSet=(s,k,v)=>idb(s,"readwrite",o=>o.put(v,k));
+const idbDel=(s,k)=>idb(s,"readwrite",o=>o.delete(k));
+const idbKeys=s=>idb(s,"readonly",o=>o.getAllKeys());
+
+/* ---------------- Crypto ---------------- */
+let KEY=null;
+const b64={enc:b=>{const u=new Uint8Array(b);let s="";for(let i=0;i<u.length;i+=32768)s+=String.fromCharCode.apply(null,u.subarray(i,i+32768));return btoa(s);},
+  dec:s=>{const bin=atob(s);const a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);return a;}};
+async function deriveKey(pass,salt){const base=await crypto.subtle.importKey("raw",new TextEncoder().encode(pass),"PBKDF2",false,["deriveKey"]);
+  return crypto.subtle.deriveKey({name:"PBKDF2",salt:b64.dec(salt),iterations:150000,hash:"SHA-256"},base,{name:"AES-GCM",length:256},false,["encrypt","decrypt"]);}
+async function encObj(k,o){const iv=crypto.getRandomValues(new Uint8Array(12));const ct=await crypto.subtle.encrypt({name:"AES-GCM",iv},k,new TextEncoder().encode(JSON.stringify(o)));return{enc:true,iv:b64.enc(iv),ct:b64.enc(ct)};}
+async function decObj(k,w){const pt=await crypto.subtle.decrypt({name:"AES-GCM",iv:b64.dec(w.iv)},k,b64.dec(w.ct));return JSON.parse(new TextDecoder().decode(pt));}
+async function encBlob(k,blob){const iv=crypto.getRandomValues(new Uint8Array(12));const ct=await crypto.subtle.encrypt({name:"AES-GCM",iv},k,await blob.arrayBuffer());return{enc:true,iv:b64.enc(iv),ct:b64.enc(ct),type:blob.type};}
+async function decBlob(k,w){const pt=await crypto.subtle.decrypt({name:"AES-GCM",iv:b64.dec(w.iv)},k,b64.dec(w.ct));return new Blob([pt],{type:w.type||""});}
+async function putFile(id,blob){await idbSet("files",id,KEY?await encBlob(KEY,blob):blob);}
+async function getFile(id){const v=await idbGet("files",id);if(!v)return null;if(v.enc){if(!KEY)throw new Error("locked");return decBlob(KEY,v);}return v;}
+
+/* ---------------- State ---------------- */
+const DEF_SETTINGS={office:"",lawyer:"",remindMins:"30,10",appealDays:30,violP1:60,violP2:60,calcUrl:"",minutesUrl:"",apiKey:"",model:"claude-sonnet-5-5",notify:false,letterhead:true};
+let S={clients:[],cases:[],poas:[],execs:[],viols:[],events:[],laws:[],changes:[],settings:{...DEF_SETTINGS}};
+let saveT=null;
+function save(){clearTimeout(saveT);saveT=setTimeout(async()=>{try{await idbSet("kv","state",KEY?await encObj(KEY,S):S);
+  $("#lastSave").textContent="آخر حفظ: "+new Date().toLocaleTimeString("ar-SA-u-nu-latn",{hour:"2-digit",minute:"2-digit"});}catch(e){toast("تعذّر الحفظ: "+e.message,"err");}},200);}
+async function load(){let s=await idbGet("kv","state");if(s&&s.enc)s=await decObj(KEY,s);
+  if(s&&s.cases){S=Object.assign({clients:[],cases:[],poas:[],execs:[],viols:[],events:[],laws:[],changes:[]},s);S.settings={...DEF_SETTINGS,...(s.settings||{})};}}
+function logChange(text,ref){S.changes.unshift({id:uid(),at:new Date().toISOString(),text,ref:ref||null,read:false});if(S.changes.length>500)S.changes.length=500;}
+
+/* ---------------- Utils ---------------- */
+const $=(q,r=document)=>r.querySelector(q);
+const $$=(q,r=document)=>[...r.querySelectorAll(q)];
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+const esc=t=>String(t==null?"":t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const num=v=>{const n=Number(String(v==null?"":v).replace(/[٠-٩]/g,d=>"٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[^\d.\-]/g,""));return isNaN(n)?0:n;};
+const money=v=>num(v).toLocaleString("en-US")+" ر.س";
+const pad=n=>String(n).padStart(2,"0");
+const isoD=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const todayISO=()=>isoD(new Date());
+const addDays=(iso,n)=>{const d=new Date(iso+"T00:00:00");d.setDate(d.getDate()+Number(n));return isoD(d);};
+const dt=(date,time)=>new Date((date||todayISO())+"T"+(time||"00:00")+":00");
+function daysTo(iso){if(!iso)return null;const a=new Date(iso+"T00:00:00"),b=new Date(todayISO()+"T00:00:00");return Math.round((a-b)/864e5);}
+const FG=new Intl.DateTimeFormat("ar-SA-u-ca-gregory-nu-latn",{day:"numeric",month:"long",year:"numeric"});
+const FH=new Intl.DateTimeFormat("ar-SA-u-ca-islamic-umalqura-nu-latn",{day:"numeric",month:"long",year:"numeric"});
+const FHs=new Intl.DateTimeFormat("ar-SA-u-ca-islamic-umalqura-nu-latn",{day:"numeric",month:"long"});
+const FW=new Intl.DateTimeFormat("ar-SA",{weekday:"long"});
+const gD=iso=>iso?FG.format(new Date(iso+"T12:00:00")):"—";
+const hD=iso=>iso?FH.format(new Date(iso+"T12:00:00")):"—";
+const wD=iso=>iso?FW.format(new Date(iso+"T12:00:00")):"";
+const both=iso=>iso?`${wD(iso)} ${hD(iso)} — ${gD(iso)}`:"—";
+function tm(t){if(!t)return"";let[h,m]=t.split(":").map(Number);const p=h<12?"ص":"م";h=h%12||12;return h+":"+pad(m)+" "+p;}
+function initials(n){const p=String(n||"؟").trim().split(/\s+/);return(p[0]||"")[0]+((p[1]||"")[0]||"");}
+const PAL=["#123d2f","#7a4b2b","#2f5f9e","#5a3d6b","#8a2d3b","#3a6b4f","#846017","#255e70"];
+const colorOf=s=>{let h=0;for(const c of String(s))h=(h*31+c.charCodeAt(0))>>>0;return PAL[h%PAL.length];};
+function toast(m,k=""){const e=document.createElement("div");e.className="toast "+k;e.textContent=m;$("#toasts").appendChild(e);setTimeout(()=>e.remove(),2800);}
+function download(blob,name){const u=URL.createObjectURL(blob);const a=document.createElement("a");a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),5000);}
+const humanSize=b=>b<1024?b+" B":b<1048576?(b/1024).toFixed(1)+" KB":(b/1048576).toFixed(1)+" MB";
+const clientName=id=>(S.clients.find(c=>c.id===id)||{}).name||"";
+const getCase=id=>S.cases.find(c=>c.id===id);
+function remainPill(d,warnAt=30){if(d==null)return'<span class="pill p-mut">—</span>';if(d<0)return`<span class="pill p-mut">منتهية منذ ${-d} يوم</span>`;
+  if(d===0)return'<span class="pill p-bad">اليوم</span>';return`<span class="pill ${d<=7?"p-bad":d<=warnAt?"p-warn":"p-ok"}">${d} يوم</span>`;}
+
+/* ---------------- Labels ---------------- */
+const CASE_ST={open:["قيد النظر","p-info"],judged:["صدر فيها حكم","p-gold"],closed:["منتهية","p-mut"]};
+const SESS_ST={scheduled:["مجدولة","p-info"],held:["منعقدة","p-ok"],ended:["منتهية","p-mut"]};
+const CAT={najiz:"ناجز — وزارة العدل",muin:"معين — ديوان المظالم"};
+const EXEC_ST={active:["قيد التنفيذ","p-info"],waiting:["بانتظار الرد","p-warn"],paid:["مسدد","p-ok"],ended:["منتهي","p-mut"]};
+const VSRC={efaa:"إيفاء — المنشآت",ind:"إيفاء أفراد",hrsd:"الموارد البشرية"};
+const VST={unpaid:["لم تُسدَّد","p-bad"],paid:["مسدَّدة","p-ok"],objection:["عليها اعتراض أو تسوية","p-warn"],enforce:["محوّلة للتنفيذ","p-bad"]};
+const pill=(map,k)=>{const v=map[k]||[k||"—","p-mut"];return`<span class="pill ${v[1]}">${esc(v[0])}</span>`;};
+
+/* ---------------- Derived ---------------- */
+function allSessions(){const out=[];S.cases.forEach(c=>(c.sessions||[]).forEach(s=>out.push({...s,caseId:c.id,c})));return out.sort((a,b)=>dt(a.date,a.time)-dt(b.date,b.time));}
+function nextSession(c){const t=todayISO();return(c.sessions||[]).filter(s=>s.date>=t&&s.status!=="ended").sort((a,b)=>dt(a.date,a.time)-dt(b.date,b.time))[0]||null;}
+function lastSession(c){const t=todayISO();return(c.sessions||[]).filter(s=>s.date<t).sort((a,b)=>dt(b.date,b.time)-dt(a.date,a.time))[0]||null;}
+function priority(c){const n=nextSession(c);const d=n?daysTo(n.date):null;if(d!=null&&d<=3)return["عاجل","p-bad",0];if(d!=null&&d<=14)return["متابعة","p-warn",1];return["مستقر","p-ok",2];}
+function appealInfo(j){const base=j.received||j.date;if(!base)return null;const days=Number(j.appealDays||S.settings.appealDays||30);const end=addDays(base,days);return{end,left:daysTo(end)};}
+function violDeadlines(v){if(!v.date)return null;const p1=addDays(v.date,S.settings.violP1),p2=addDays(p1,S.settings.violP2);const l1=daysTo(p1),l2=daysTo(p2);
+  let action,left,cls;if(v.status==="paid"){action="مسددة — لا إجراء";left=null;cls="p-ok";}
+  else if(l1>=0){action="تقديم تظلم أمام الجهة المصدرة";left=l1;cls=l1<=7?"p-bad":"p-info";}
+  else if(l2>=0){action="التظلم أمام ديوان المظالم قبل انتهاء المهلة";left=l2;cls=l2<=7?"p-bad":"p-warn";}
+  else{action="انتهت المهل — مراجعة قانونية";left=null;cls="p-mut";}
+  return{p1,p2,l1,l2,action,left,cls};}
+function alertsList(){const out=[];const now=new Date();
+  allSessions().forEach(s=>{if(s.status==="ended")return;const ms=dt(s.date,s.time)-now;if(ms>0&&ms<=36e5*48)out.push({t:"جلسة",txt:`${s.kind||"جلسة"} — قضية ${s.c.no||""} — ${both(s.date)} ${tm(s.time)}`,act:"case",id:s.caseId});});
+  S.events.forEach(e=>{if(e.done)return;const ms=dt(e.date,e.time)-now;if(ms>-36e5&&ms<=36e5*48)out.push({t:"موعد",txt:`${e.title} — ${both(e.date)} ${tm(e.time)}`,act:"go",v:"secretary"});});
+  S.poas.forEach(p=>{const d=daysTo(p.expires);if(d!=null&&d>=0&&d<=30)out.push({t:"وكالة",txt:`الوكالة ${p.no||""} (${clientName(p.clientId)}) تنتهي خلال ${d} يوم`,act:"go",v:"poas"});});
+  S.cases.forEach(c=>(c.judgments||[]).forEach(j=>{const a=appealInfo(j);if(a&&a.left>=0&&a.left<=10&&!j.appealed)out.push({t:"مهلة اعتراض",txt:`حكم القضية ${c.no||""}: تنتهي مهلة الاعتراض خلال ${a.left} يوم (${gD(a.end)})`,act:"case",id:c.id});}));
+  S.viols.forEach(v=>{const d=violDeadlines(v);if(d&&d.left!=null&&d.left<=7)out.push({t:"مخالفة",txt:`${v.entity}: ${d.action} — متبقٍ ${d.left} يوم`,act:"go",v:"viol_"+v.src});});
+  const nv=S.viols.filter(v=>v.isNew).length;if(nv)out.push({t:"جديد",txt:`${nv} مخالفة جديدة لم تُراجَع`,act:"go",v:"viol_efaa"});
+  return out;}
+
+/* ---------------- Modal stack ---------------- */
+function modal(title,body,{lg=false,foot="",onMount}={}){const ov=document.createElement("div");ov.className="ov";
+  ov.innerHTML=`<div class="md ${lg?"lg":""}"><div class="md-h"><b>${esc(title)}</b><button class="x" title="إغلاق">✕</button></div><div class="md-b">${body}</div>${foot?`<div class="md-f">${foot}</div>`:""}</div>`;
+  $("#modals").appendChild(ov);const close=()=>ov.remove();ov.querySelector(".x").onclick=close;
+  ov.addEventListener("mousedown",e=>{if(e.target===ov)close();});
+  onMount&&onMount(ov,close);const f=ov.querySelector(".md-b input:not([type=checkbox]),.md-b select,.md-b textarea");f&&setTimeout(()=>f.focus(),30);return{ov,close};}
+function confirmBox(msg){return confirm(msg);}
+
+/* generic form */
+function fieldHTML(f,v){const val=v==null?(f.def==null?"":f.def):v;const id="f_"+f.k;let inp;
+  if(f.t==="select")inp=`<select id="${id}">${f.opts.map(o=>{const[k,l]=Array.isArray(o)?o:[o,o];return`<option value="${esc(k)}" ${String(k)===String(val)?"selected":""}>${esc(l)}</option>`;}).join("")}</select>`;
+  else if(f.t==="textarea")inp=`<textarea id="${id}" placeholder="${esc(f.ph||"")}">${esc(val)}</textarea>`;
+  else if(f.t==="check")return`<div class="fd ${f.full?"full":""}"><label style="display:flex;gap:8px;align-items:center;cursor:pointer"><input type="checkbox" id="${id}" ${val?"checked":""} style="width:auto"> ${esc(f.l)}</label></div>`;
+  else if(f.t==="client")inp=`<input id="${id}" list="dl_clients" value="${esc(clientName(val)||val||"")}" placeholder="اكتب اسم الموكل أو اختره"><datalist id="dl_clients">${S.clients.map(c=>`<option value="${esc(c.name)}">`).join("")}</datalist>`;
+  else inp=`<input id="${id}" type="${f.t||"text"}" value="${esc(val)}" placeholder="${esc(f.ph||"")}" ${f.t==="number"?'step="any"':""}>`;
+  return`<div class="fd ${f.full?"full":""}"><label>${esc(f.l)}${f.req?" *":""}</label>${inp}${f.hint?`<div class="hint">${esc(f.hint)}</div>`:""}</div>`;}
+function resolveClient(name){name=String(name||"").trim();if(!name)return"";let c=S.clients.find(x=>x.name===name);
+  if(!c){c={id:uid(),name,type:"فرد",phone:"",email:"",idno:"",notes:""};S.clients.push(c);logChange("أُضيف موكل جديد: "+name);}return c.id;}
+function readForm(ov,fields){const o={};for(const f of fields){const el=ov.querySelector("#f_"+f.k);if(!el)continue;
+  let v=f.t==="check"?el.checked:el.value.trim();if(f.t==="number")v=v===""?"":num(v);if(f.t==="client")v=resolveClient(v);o[f.k]=v;}
+  for(const f of fields)if(f.req&&(o[f.k]===""||o[f.k]==null)){toast("الحقل «"+f.l+"» مطلوب","err");return null;}return o;}
+function formModal(title,fields,obj,onSave,{extraFoot=""}={}){
+  modal(title,`<div class="fg">${fields.map(f=>fieldHTML(f,obj?obj[f.k]:undefined)).join("")}</div>`,{
+    foot:`<button class="btn g" data-role="save">حفظ</button><button class="btn" data-role="cancel">إلغاء</button>${extraFoot}`,
+    onMount:(ov,close)=>{ov.querySelector('[data-role=cancel]').onclick=close;
+      ov.querySelector('[data-role=save]').onclick=()=>{const v=readForm(ov,fields);if(!v)return;if(onSave(v,close)!==false){close();save();refresh();toast("تم الحفظ","ok");}};}});}
+
+/* ---------------- Field specs ---------------- */
+const F_CASE=[
+  {k:"no",l:"رقم القضية",req:true},{k:"cat",l:"المنصة",t:"select",opts:Object.entries(CAT),def:"najiz"},
+  {k:"court",l:"المحكمة"},{k:"circuit",l:"الدائرة"},
+  {k:"type",l:"التصنيف / نوع الدعوى",ph:"عمالية، تجارية، إدارية..."},{k:"status",l:"حالة القضية",t:"select",opts:Object.entries(CASE_ST).map(([k,v])=>[k,v[0]]),def:"open"},
+  {k:"clientId",l:"الموكل",t:"client"},{k:"role",l:"صفة الموكل",t:"select",opts:["مدعي","مدعى عليه","طالب","مطلوب ضده","متدخل"],def:"مدعي"},
+  {k:"opponent",l:"الخصم"},{k:"filed",l:"تاريخ القيد",t:"date"},
+  {k:"subject",l:"موضوع الدعوى",t:"textarea",full:true},{k:"claims",l:"الطلبات في الدعوى",t:"textarea",full:true}];
+const F_SESS=[{k:"date",l:"التاريخ",t:"date",req:true},{k:"time",l:"الوقت",t:"time",def:"09:00"},
+  {k:"kind",l:"نوع الجلسة",t:"select",opts:["جلسة أولى","جلسة مرافعة","جلسة صلح","جلسة نطق بالحكم","جلسة تحضيرية","جلسة خبرة"],def:"جلسة مرافعة"},
+  {k:"status",l:"الحالة",t:"select",opts:Object.entries(SESS_ST).map(([k,v])=>[k,v[0]]),def:"scheduled"},
+  {k:"virtual",l:"جلسة مرئية",t:"check"},{k:"link",l:"رابط الجلسة المرئية",t:"url"},{k:"result",l:"ما دار في الجلسة / النتيجة",t:"textarea",full:true}];
+const F_JUDG=[{k:"no",l:"رقم الحكم"},{k:"degree",l:"درجة الحكم",t:"select",opts:["ابتدائي","استئناف","نهائي","مستعجل"],def:"ابتدائي"},
+  {k:"date",l:"تاريخ الحكم",t:"date",req:true},{k:"received",l:"تاريخ استلام الحكم",t:"date",hint:"تُحسب مهلة الاعتراض منه، وإن تُرك فمن تاريخ الحكم"},
+  {k:"appealDays",l:"مدة الاعتراض (يوم)",t:"number",hint:"افتراضي من الإعدادات — تحقّق من المدة النظامية لنوع الحكم"},{k:"judge",l:"القاضي / الدائرة"},
+  {k:"ruling",l:"منطوق الحكم",t:"textarea",full:true},{k:"reasons",l:"الأسباب",t:"textarea",full:true},{k:"appealed",l:"تم تقديم الاعتراض",t:"check"}];
+const F_POA=[{k:"no",l:"رقم الوكالة",req:true},{k:"clientId",l:"الموكل",t:"client",req:true},
+  {k:"kind",l:"نوع الوكالة",t:"select",opts:["وكالة قضائية","وكالة خاصة","وكالة عامة"],def:"وكالة قضائية"},{k:"issued",l:"تاريخ الإصدار",t:"date"},
+  {k:"expires",l:"تاريخ الانتهاء",t:"date",req:true},{k:"notes",l:"ملاحظات (أين وصلت الوكالة...)",t:"textarea",full:true}];
+const F_EXEC=[{k:"no",l:"رقم الطلب",req:true},{k:"src",l:"المصدر",t:"select",opts:[["najiz","محكمة التنفيذ — ناجز"],["admin","التنفيذ الإداري — ديوان المظالم"]],def:"najiz"},
+  {k:"kind",l:"نوع الطلب",ph:"طلب تنفيذ حكم / سند تنفيذي..."},{k:"status",l:"الحالة",t:"select",opts:Object.entries(EXEC_ST).map(([k,v])=>[k,v[0]]),def:"active"},
+  {k:"applicant",l:"طالب التنفيذ"},{k:"against",l:"المنفذ ضده / الجهة",req:true},{k:"clientId",l:"الموكل",t:"client"},{k:"filed",l:"تاريخ التقديم",t:"date"},
+  {k:"amount",l:"المبلغ المطالب به",t:"number"},{k:"collected",l:"المحصَّل",t:"number"},
+  {k:"reason",l:"السند / سبب الطلب"},{k:"deadline",l:"نهاية مهلة الأمر",t:"date"},
+  {k:"lastDecision",l:"آخر قرار",full:true},{k:"decisionDate",l:"تاريخ آخر قرار",t:"date"},{k:"notes",l:"ملاحظات",t:"textarea",full:true}];
+const F_CLIENT=[{k:"name",l:"الاسم",req:true},{k:"type",l:"النوع",t:"select",opts:["فرد","شركة","منشأة","جهة حكومية"],def:"فرد"},
+  {k:"idno",l:"الهوية / السجل التجاري"},{k:"phone",l:"الجوال"},{k:"email",l:"البريد"},{k:"notes",l:"ملاحظات",t:"textarea",full:true}];
+const F_VIOL=src=>[
+  {k:"entity",l:src==="ind"?"اسم الشخص":"المنشأة",req:true},{k:"entityId",l:src==="ind"?"رقم الهوية / الإقامة":src==="hrsd"?"رقم الملف / السجل":"السجل التجاري"},
+  ...(src==="ind"?[{k:"dob",l:"تاريخ الميلاد"}]:[]),
+  {k:"no",l:"رقم المخالفة",req:true},{k:"ref",l:src==="hrsd"?"بند المخالفة":"رقم مرجع الجهة"},
+  {k:"authority",l:"الجهة المصدرة"},{k:"kind",l:"التصنيف",t:"select",opts:["عامة","مرورية","نظام العمل","أخرى"],def:src==="hrsd"?"نظام العمل":src==="ind"?"مرورية":"عامة"},
+  {k:"reason",l:"سبب المخالفة / الوصف",full:true},{k:"date",l:"تاريخ المخالفة",t:"date",req:true},{k:"amount",l:"القيمة (ر.س)",t:"number"},
+  {k:"due",l:"تاريخ استحقاق الدفع",t:"date"},{k:"status",l:"الحالة",t:"select",opts:Object.entries(VST).map(([k,v])=>[k,v[0]]),def:"unpaid"},
+  {k:"payNo",l:"رقم السداد"},{k:"objNo",l:"رقم الاعتراض / التسوية"},...(src==="hrsd"?[{k:"worker",l:"العامل المخالف"}]:[]),
+  {k:"notes",l:"شرح / ملاحظات",t:"textarea",full:true}];
+const F_EVENT=[{k:"kind",l:"النوع",t:"select",opts:["موعد","جلسة","جلسة صلح","اجتماع","زيارة","اتصال","مهمة"],def:"موعد"},{k:"title",l:"العنوان / التفاصيل",req:true},
+  {k:"person",l:"الشخص / الجهة"},{k:"place",l:"المكان"},{k:"date",l:"التاريخ",t:"date",req:true},{k:"time",l:"الوقت",t:"time",def:"09:00"},
+  {k:"repeat",l:"التكرار",t:"select",opts:[["none","مرة واحدة"],["daily","كل يوم"],["weekly","كل أسبوع"],["monthly","كل شهر"]],def:"none"},
+  {k:"remindTxt",l:"ذكّرني قبل (بالدقائق، مفصولة بفاصلة)",def:"60",hint:"مثال: 10,60,1440 = قبل ١٠ دقائق وساعة ويوم"},{k:"note",l:"ملاحظة",t:"textarea",full:true}];
+
+/* ---------------- Routing / nav ---------------- */
+const NAV=[["week","لوحة الأسبوع"],["cases","القضايا"],["muin","معين"],["poas","الوكالات"],["execs","التنفيذ"],["adminexec","التنفيذ الإداري"],["clients","الموكلون"],
+  ["viol_efaa","إيفاء"],["viol_ind","إيفاء أفراد"],["viol_hrsd","الموارد البشرية"],["secretary","السكرتير"],["assistant","المساعد القانوني"],["laws","الأنظمة"],["reports","التقارير"],["changes","التغييرات"]];
+let R={v:"week",week:0,wf:"all",cf:{q:"",court:"",st:"",ss:"all"},client:null,vEntity:""};
+function go(v){R.v=v;R.vEntity="";refresh();scrollTo(0,0);}
+function refresh(){renderNav();renderPortals();(VIEW[R.v.startsWith("viol_")?"viol":R.v]||VIEW.week)();updateAlertN();}
+function renderNav(){const unread=S.changes.filter(c=>!c.read).length;
+  $("#nav").innerHTML=NAV.map(([k,l])=>`<button class="${R.v===k?"on":""}" data-act="go" data-v="${k}">${l}${k==="changes"&&unread?` <span class="cnt">${unread}</span>`:""}</button>`).join("");
+  navTop();$("#brandSub").textContent=S.settings.office||"سكرتير المحامي";}
+function navTop(){$("#nav").style.top=getComputedStyle($(".top")).position==="sticky"?$(".top").offsetHeight+"px":"0px";}
+function renderPortals(){const s=S.settings;const P=[["ناجز","وزارة العدل","https://new.najiz.sa"],["ديوان المظالم","معين / التنفيذ الإداري","https://www.bog.gov.sa"],
+  ["إيفاء","المخالفات","https://efaa.sa"],["الموارد البشرية","مخالفات نظام العمل","https://es.hrsd.gov.sa"],["الأنظمة","هيئة الخبراء","https://laws.boe.gov.sa"]];
+  $("#portals").innerHTML=P.map(p=>`<a class="portal" href="${p[2]}" target="_blank" rel="noopener">${p[0]}<small>${p[1]}</small></a>`).join("")+
+   (s.calcUrl?`<a class="portal gold" href="${esc(s.calcUrl)}" target="_blank" rel="noopener">🧮 الحاسبات<small>أدواتي</small></a>`:`<a class="portal" href="#" data-act="settings">🧮 الحاسبات<small>أضف الرابط</small></a>`)+
+   (s.minutesUrl?`<a class="portal gold" href="${esc(s.minutesUrl)}" target="_blank" rel="noopener">📝 المحاضر<small>موقعي</small></a>`:`<a class="portal" href="#" data-act="settings">📝 المحاضر<small>أضف الرابط</small></a>`);}
+function updateAlertN(){const n=alertsList().length;const el=$("#alertN");el.textContent=n;el.classList.toggle("hidden",!n);}
+
+/* generic table */
+function table(cols,rows,{click,empty="لا توجد بيانات"}={}){if(!rows.length)return`<div class="tw"><div class="empty">${empty}</div></div>`;
+  return`<div class="tw"><table class="t"><thead><tr>${cols.map(c=>`<th>${c.l}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr ${click?`class="click" data-act="${click(r)[0]}" data-id="${click(r)[1]}"`:""}>${cols.map(c=>`<td>${c.h(r)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;}
+const exportBtns=(key,arg="")=>`<button class="btn s" data-act="rep" data-r="${key}" data-a="${esc(arg)}" data-f="xlsx">Excel</button><button class="btn s" data-act="rep" data-r="${key}" data-a="${esc(arg)}" data-f="doc">Word</button><button class="btn s" data-act="rep" data-r="${key}" data-a="${esc(arg)}" data-f="pdf">PDF</button>`;
+
+/* ====================== VIEWS ====================== */
+const VIEW={};
+
+/* ---- Week board ---- */
+VIEW.week=function(){const t=todayISO();const base=new Date(t+"T00:00:00");base.setDate(base.getDate()-base.getDay()+R.week*7);
+  const days=[...Array(7)].map((_,i)=>{const d=new Date(base);d.setDate(d.getDate()+i);return isoD(d);});
+  const items=d=>{const ss=allSessions().filter(s=>s.date===d&&(R.wf==="all"||s.status===R.wf)).map(s=>({...s,isS:true}));
+    const ev=R.wf==="all"||R.wf==="scheduled"?S.events.filter(e=>occursOn(e,d)&&!e.done).map(e=>({...e,isE:true})):[];
+    return[...ss,...ev].sort((a,b)=>(a.time||"").localeCompare(b.time||""));};
+  let shown=days.slice(0,5);days.slice(5).forEach(d=>{if(items(d).length)shown.push(d);});
+  const weekCount=days.reduce((n,d)=>n+allSessions().filter(s=>s.date===d).length,0);
+  const k={today:allSessions().filter(s=>s.date===t).length,week:weekCount,open:S.cases.filter(c=>c.status==="open").length,
+    closed:S.cases.filter(c=>c.status!=="open").length,poa:S.poas.filter(p=>{const d=daysTo(p.expires);return d!=null&&d>=0&&d<=30;}).length,
+    ex:S.execs.filter(e=>e.status==="active"||e.status==="waiting").length};
+  $("#app").innerHTML=`
+  <div class="kpis">
+    <div class="kpi"><b>${k.today}</b><span>جلسات اليوم</span></div><div class="kpi i"><b>${k.week}</b><span>جلسات هذا الأسبوع</span></div>
+    <div class="kpi"><b>${k.open}</b><span>قضايا قيد النظر</span></div><div class="kpi"><b>${k.closed}</b><span>قضايا منتهية / صدر فيها حكم</span></div>
+    <div class="kpi g"><b>${k.poa}</b><span>وكالات تنتهي خلال ٣٠ يومًا</span></div><div class="kpi o"><b>${k.ex}</b><span>طلبات تنفيذ قائمة</span></div>
+  </div>
+  <div class="card">
+    <div class="head"><div><h1>${R.week===0?"هذا الأسبوع":R.week<0?"أسبوع سابق":"أسبوع قادم"} — ${k.week} جلسات</h1>
+      <div class="muted sm">${hD(days[0])} ← ${hD(days[6])} · ${gD(days[0])} ← ${gD(days[6])}</div></div><span class="sp"></span>
+      <div class="seg">${[["all","الكل"],["scheduled","مجدولة"],["held","منعقدة"],["ended","منتهية"]].map(([k2,l])=>`<button class="${R.wf===k2?"on":""}" data-act="wf" data-v="${k2}">${l}</button>`).join("")}</div>
+      <button class="btn" data-act="wk" data-v="-1">›</button><button class="btn" data-act="wk" data-v="0">اليوم</button><button class="btn" data-act="wk" data-v="1">‹</button>
+      <button class="btn g" data-act="addSessionPick">+ جلسة</button>
+    </div>
+    <div class="week" style="--cols:${shown.length}">${shown.map(d=>{const it=items(d);return`<div class="wcol"><div class="whead ${d===t?"today":""}"><div><b>${wD(d)}${d===t?" (اليوم)":""}</b><div class="sm muted">${FHs.format(new Date(d+"T12:00:00"))}<br>${gD(d)}</div></div><span class="cnt">${it.length}</span></div>
+      <div class="wbody">${it.length?it.map(x=>x.isS?sessCard(x):evCard(x)).join(""):'<div class="muted sm" style="text-align:center;padding:20px 0">لا جلسات</div>'}</div></div>`;}).join("")}</div>
+    <div class="sm muted" style="margin-top:8px">● مجدولة &nbsp; ● منعقدة &nbsp; ● منتهية &nbsp; ● مواعيد السكرتير (ذهبي)</div>
+  </div>
+  <div class="grid2" style="margin-top:14px">
+    <div class="card"><h3>🔔 تنبيهات قريبة</h3>${alertsHTML(6)}</div>
+    <div class="card"><h3>الموكلون</h3><div class="tiles">${S.clients.slice(0,8).map(tileHTML).join("")}<div class="tile" data-act="addClient" style="display:grid;place-items:center;color:var(--muted)"><b style="font-size:1.6rem">＋</b>موكل جديد</div></div></div>
+  </div>`;};
+function sessCard(s){const c=s.c;return`<div class="sess ${s.status}" data-act="case" data-id="${c.id}" data-tab="sessions">
+  <div class="tm">${tm(s.time)||"—"} ${pill(SESS_ST,s.status)}</div><div><b>قضية ${esc(c.no)}</b></div><div>${esc(s.kind||"")}</div>
+  <div class="muted">${esc(c.court||"")}${c.circuit?" — "+esc(c.circuit):""}</div><div class="muted">${esc(clientName(c.clientId))}</div>
+  <div style="margin-top:4px">${c.role?`<span class="pill p-mut">${esc(c.role)}</span> `:""}${s.virtual?'<span class="pill p-ok">🎥 مرئية</span>':""}</div></div>`;}
+function evCard(e){return`<div class="sess ev" data-act="editEvent" data-id="${e.id}"><div class="tm">${tm(e.time)} <span class="pill p-gold">${esc(e.kind)}</span></div><div><b>${esc(e.title)}</b></div>${e.person?`<div class="muted">${esc(e.person)}</div>`:""}${e.place?`<div class="muted">📍 ${esc(e.place)}</div>`:""}</div>`;}
+function alertsHTML(max=50){const a=alertsList();if(!a.length)return'<div class="empty">لا تنبيهات — كل شيء تحت السيطرة</div>';
+  return a.slice(0,max).map(x=>`<div class="note" style="cursor:pointer" data-act="${x.act}" data-id="${x.id||""}" data-v="${x.v||""}"><span class="pill p-gold">${x.t}</span> ${esc(x.txt)}</div>`).join("");}
+function tileHTML(c){const cs=S.cases.filter(x=>x.clientId===c.id);const up=cs.map(nextSession).filter(Boolean).length;
+  return`<div class="tile" data-act="client" data-id="${c.id}"><div class="av" style="background:${colorOf(c.id)}">${esc(initials(c.name))}</div><div class="b" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(c.name)}</div><div class="sm muted">${esc(c.type||"")}</div>
+  <div style="margin-top:6px">${cs.length?`<span class="pill p-mut">${cs.length} قضية</span> `:""}${up?`<span class="pill p-info">${up} جلسة قادمة</span>`:""}</div></div>`;}
+function occursOn(e,d){if(e.date===d)return true;if(!e.repeat||e.repeat==="none"||d<e.date)return false;
+  if(e.repeat==="daily")return true;if(e.repeat==="weekly")return new Date(d+"T12:00:00").getDay()===new Date(e.date+"T12:00:00").getDay();
+  if(e.repeat==="monthly")return d.slice(8)===e.date.slice(8);return false;}
+
+/* ---- Cases (najiz / muin) ---- */
+VIEW.cases=()=>casesView("najiz");VIEW.muin=()=>casesView("muin");
+function casesView(cat){const f=R.cf;const t=todayISO();
+  let list=S.cases.filter(c=>(c.cat||"najiz")===cat);const courts=[...new Set(list.map(c=>c.court).filter(Boolean))];
+  const counts={all:list.length,open:list.filter(c=>c.status==="open").length,done:list.filter(c=>c.status!=="open").length};
+  if(f.q){const q=f.q.toLowerCase();list=list.filter(c=>[c.no,c.court,c.circuit,c.opponent,clientName(c.clientId),c.type,c.subject].join(" ").toLowerCase().includes(q));}
+  if(f.court)list=list.filter(c=>c.court===f.court);if(f.st)list=list.filter(c=>c.status===f.st);
+  if(f.ss==="up")list=list.filter(c=>nextSession(c));if(f.ss==="past")list=list.filter(c=>!nextSession(c));
+  list.sort((a,b)=>priority(a)[2]-priority(b)[2]||((nextSession(a)||{date:"9"}).date).localeCompare((nextSession(b)||{date:"9"}).date));
+  $("#app").innerHTML=`<div class="head"><h1>${cat==="muin"?"معين — القضايا الإدارية (ديوان المظالم)":"القضايا — ناجز"}</h1><span class="pill p-mut">${counts.all} قضية</span><span class="sp"></span>
+    ${exportBtns("cases",cat)}<button class="btn g" data-act="addCase" data-v="${cat}">+ قضية</button></div>
+  <div class="filters"><div class="seg">${[["","الكل "+counts.all],["open","قيد النظر "+counts.open],["judged","صدر فيها حكم"],["closed","منتهية"]].map(([k,l])=>`<button class="${f.st===k?"on":""}" data-act="cf" data-k="st" data-v="${k}">${l}</button>`).join("")}</div>
+    <div class="seg">${[["all","كل الجلسات"],["up","القادمة"],["past","بلا جلسة قادمة"]].map(([k,l])=>`<button class="${f.ss===k?"on":""}" data-act="cf" data-k="ss" data-v="${k}">${l}</button>`).join("")}</div>
+    <input type="search" id="cq" placeholder="رقم القضية أو الطرف أو المحكمة..." value="${esc(f.q)}">
+    <select id="ccourt"><option value="">كل المحاكم (${courts.length})</option>${courts.map(c=>`<option ${f.court===c?"selected":""}>${esc(c)}</option>`).join("")}</select></div>
+  ${table([{l:"رقم القضية",h:c=>`<b>${esc(c.no)}</b><br><span class="pill ${priority(c)[1]}">${priority(c)[0]}</span>`},
+    {l:"المحكمة / الدائرة",h:c=>`${esc(c.court||"—")}<div class="sm muted">${esc(c.circuit||"")}${c.type?" · "+esc(c.type):""}</div>`},
+    {l:"الأطراف",h:c=>`${esc(clientName(c.clientId)||"—")} <span class="muted">ضد</span> ${esc(c.opponent||"—")}<div class="sm muted">صفة الموكل: ${esc(c.role||"—")}</div>`},
+    {l:"حالة القضية",h:c=>pill(CASE_ST,c.status)},
+    {l:"الجلسة",h:c=>{const n=nextSession(c),l=n||lastSession(c);if(!l)return'<span class="muted">—</span>';
+      return`<span class="pill ${n?"p-gold":"p-mut"}">${n?"القادمة":"آخر جلسة"}</span><div>${both(l.date)}</div><div class="sm muted">${tm(l.time)} · ${esc(l.kind||"")}</div>`;}},
+    {l:"",h:c=>{const n=nextSession(c);return n&&n.virtual?(n.link?`<a href="${esc(n.link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">🎥</a>`:"🎥"):"";}}],
+    list,{click:c=>["case",c.id],empty:"لا قضايا مطابقة — أضف قضية أو استوردها من Excel"})}`;
+  $("#cq").oninput=e=>{R.cf.q=e.target.value;const pos=e.target.selectionStart;casesView(cat);const n=$("#cq");n.focus();n.setSelectionRange(pos,pos);};
+  $("#ccourt").onchange=e=>{R.cf.court=e.target.value;casesView(cat);};}
+
+/* ---- Case card ---- */
+const CASE_TABS=[["details","التفاصيل"],["sessions","الجلسات"],["file","الملف القانوني"],["ai","✨ المساعد القانوني"],["notes","الملاحظات"],["requests","الطلبات"],["parties","الأطراف"],["judgments","الأحكام"]];
+function openCase(id,tab="details"){const c=getCase(id);if(!c)return;
+  const m=modal("قضية رقم "+c.no,`<div id="cc"></div>`,{lg:true});m.ov.dataset.case=id;drawCase(m.ov,tab);}
+function drawCase(ov,tab){const c=getCase(ov.dataset.case);if(!c){ov.remove();return;}ov.dataset.tab=tab;
+  const n=nextSession(c);const box=ov.querySelector("#cc");
+  const head=`<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px">
+    <div><b style="font-size:1.1rem">${esc(clientName(c.clientId)||"—")}</b> <span class="muted">ضد</span> <b>${esc(c.opponent||"—")}</b>
+    <div style="margin-top:4px">${pill(CASE_ST,c.status)} <span class="pill p-mut">${esc(CAT[c.cat||"najiz"])}</span> ${c.type?`<span class="pill p-mut">${esc(c.type)}</span>`:""} ${c.role?`<span class="pill p-gold">صفة الموكل: ${esc(c.role)}</span>`:""} ${c.court?`<span class="pill p-mut">${esc(c.court)}</span>`:""}</div></div><span class="sp"></span>
+    <button class="btn s" data-act="rep" data-r="case" data-a="${c.id}" data-f="pdf">📄 تقرير القضية</button><button class="btn s" data-act="rep" data-r="case" data-a="${c.id}" data-f="doc">Word</button>
+    <button class="btn s" data-act="copy" data-v="${esc(c.no)}">نسخ الرقم</button><a class="btn s" href="${c.cat==="muin"?"https://www.bog.gov.sa":"https://new.najiz.sa"}" target="_blank" rel="noopener">فتح في ${c.cat==="muin"?"ديوان المظالم":"ناجز"} ↗</a>
+    <button class="btn s" data-act="editCase" data-id="${c.id}">تعديل</button><button class="btn s d" data-act="delCase" data-id="${c.id}">حذف</button></div>
+    <div class="tabs">${CASE_TABS.map(([k,l])=>{const cnt={sessions:(c.sessions||[]).length,notes:(c.notes||[]).length,requests:(c.requests||[]).length,parties:(c.parties||[]).length,judgments:(c.judgments||[]).length,file:(c.docs||[]).length}[k];
+      return`<button class="${tab===k?"on":""}" data-act="ctab" data-v="${k}">${l}${cnt!=null?` (${cnt})`:""}</button>`;}).join("")}</div>`;
+  let body="";
+  if(tab==="details"){body=`${n?`<div class="banner w"><b>الجلسة القادمة:</b> ${both(n.date)} — ${tm(n.time)} · ${esc(n.kind||"")} ${pill(SESS_ST,n.status)} ${n.virtual?'<span class="pill p-ok">🎥 مرئية</span>':""}</div>`:'<div class="banner i">لا توجد جلسة قادمة مسجّلة.</div>'}
+    <div class="kv">${[["رقم القضية",c.no],["حالة القضية",CASE_ST[c.status]?CASE_ST[c.status][0]:""],["التصنيف",c.type],["تاريخ القيد",c.filed?hD(c.filed)+" — "+gD(c.filed):""],["المحكمة",c.court],["الدائرة",c.circuit],["الموكل",clientName(c.clientId)],["الخصم",c.opponent],["الأولوية",priority(c)[0]]].map(([a,b])=>`<div><span>${a}</span>${esc(b||"—")}</div>`).join("")}</div>
+    ${c.subject?`<div class="note" style="margin-top:10px"><b>موضوع الدعوى:</b><br>${esc(c.subject)}</div>`:""}${c.claims?`<div class="note"><b>الطلبات:</b><br>${esc(c.claims)}</div>`:""}`;}
+  if(tab==="sessions"){const ss=(c.sessions||[]).slice().sort((a,b)=>dt(b.date,b.time)-dt(a.date,a.time));
+    body=`<div style="margin-bottom:8px"><button class="btn g s" data-act="addSess" data-id="${c.id}">+ جلسة</button></div>${ss.length?ss.map(s=>`<div class="note"><div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap"><b>${esc(s.kind||"جلسة")}</b> ${pill(SESS_ST,s.status)} ${s.virtual?'<span class="pill p-ok">🎥 مرئية</span>':""}<span class="sp" style="flex:1"></span>
+      ${s.link?`<a class="btn s" href="${esc(s.link)}" target="_blank" rel="noopener">دخول الجلسة</a>`:""}<button class="btn s" data-act="editSess" data-id="${c.id}" data-s="${s.id}">تعديل</button><button class="btn s d" data-act="delSess" data-id="${c.id}" data-s="${s.id}">حذف</button></div>
+      <div class="muted sm">${both(s.date)} — ${tm(s.time)}</div>${s.result?`<div style="margin-top:4px">${esc(s.result)}</div>`:""}</div>`).join(""):'<div class="empty">لا جلسات</div>'}`;}
+  if(tab==="file"){const docs=c.docs||[];body=`<div class="banner i">🔒 الملف القانوني: ارفع اللوائح والعقود والمستندات وصور الأحكام. تُحفظ على جهازك فقط (ومشفّرة إن فعّلت القفل)، ويستطيع المساعد القانوني قراءة الملفات النصية بإذنك.</div>
+    <div class="drop" data-act="pickFiles" data-id="${c.id}">اسحب الملفات هنا أو اضغط للاختيار (PDF، صور، Word، أي ملف)</div><input type="file" id="cfiles" multiple class="hidden" data-change="caseFiles" data-id="${c.id}">
+    <div style="margin-top:10px">${docs.length?docs.map(d=>`<div class="note" style="display:flex;gap:8px;align-items:center"><span>📎</span><div style="flex:1;min-width:0"><b style="word-break:break-all">${esc(d.name)}</b><div class="sm muted">${humanSize(d.size)} · ${gD(d.added.slice(0,10))}</div></div>
+      <button class="btn s" data-act="openDoc" data-f="${d.id}">فتح</button><button class="btn s" data-act="dlDoc" data-id="${c.id}" data-f="${d.id}">تنزيل</button><button class="btn s d" data-act="delDoc" data-id="${c.id}" data-f="${d.id}">حذف</button></div>`).join(""):'<div class="muted sm">لا ملفات بعد.</div>'}</div>`;}
+  if(tab==="ai")body=aiPanel(c.id);
+  if(tab==="notes"){body=`<div class="fd"><textarea id="newNote" placeholder="اكتب ملاحظة... تُحفظ بتاريخها"></textarea></div><button class="btn g s" data-act="addNote" data-id="${c.id}" style="margin:6px 0 10px">حفظ الملاحظة</button>
+    ${(c.notes||[]).map(x=>`<div class="note"><div class="sm muted">${new Date(x.at).toLocaleString("ar-SA-u-nu-latn")}<button class="btn s d" style="float:left" data-act="delNote" data-id="${c.id}" data-n="${x.id}">حذف</button></div>${esc(x.text)}</div>`).join("")||'<div class="muted sm">لا ملاحظات.</div>'}`;}
+  if(tab==="requests"){body=`<div style="margin-bottom:8px"><button class="btn g s" data-act="addReq" data-id="${c.id}">+ طلب</button></div>${table([{l:"الطلب",h:r=>esc(r.title)},{l:"التاريخ",h:r=>gD(r.date)},{l:"الحالة",h:r=>`<span class="pill ${r.status==="مقبول"?"p-ok":r.status==="مرفوض"?"p-bad":"p-warn"}">${esc(r.status)}</span>`},{l:"الرد",h:r=>esc(r.reply||"—")},
+      {l:"",h:r=>`<div class="acts"><button class="btn s" data-act="editReq" data-id="${c.id}" data-r="${r.id}">تعديل</button><button class="btn s d" data-act="delReq" data-id="${c.id}" data-r="${r.id}">حذف</button></div>`}],c.requests||[],{empty:"لا طلبات"})}`;}
+  if(tab==="parties"){body=`<div style="margin-bottom:8px"><button class="btn g s" data-act="addParty" data-id="${c.id}">+ طرف</button></div>${table([{l:"الاسم",h:p=>esc(p.name)},{l:"الصفة",h:p=>esc(p.role)},{l:"الهوية / السجل",h:p=>esc(p.idno||"—")},{l:"الوكيل",h:p=>esc(p.agent||"—")},
+      {l:"",h:p=>`<div class="acts"><button class="btn s" data-act="editParty" data-id="${c.id}" data-p="${p.id}">تعديل</button><button class="btn s d" data-act="delParty" data-id="${c.id}" data-p="${p.id}">حذف</button></div>`}],c.parties||[],{empty:"لا أطراف مسجّلة"})}`;}
+  if(tab==="judgments"){body=`<div style="margin-bottom:8px"><button class="btn g s" data-act="addJudg" data-id="${c.id}">+ حكم</button></div>${(c.judgments||[]).map(j=>{const a=appealInfo(j);return`<div class="note"><div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><b>حكم ${esc(j.degree||"")} ${j.no?"— "+esc(j.no):""}</b>
+      ${a?(j.appealed?'<span class="pill p-ok">قُدّم الاعتراض</span>':a.left>=0?`<span class="pill ${a.left<=7?"p-bad":"p-warn"}">مهلة الاعتراض: متبقٍ ${a.left} يوم (حتى ${gD(a.end)})</span>`:'<span class="pill p-mut">انتهت مهلة الاعتراض</span>'):""}
+      <span style="flex:1"></span><button class="btn s" data-act="editJudg" data-id="${c.id}" data-j="${j.id}">تعديل</button><button class="btn s d" data-act="delJudg" data-id="${c.id}" data-j="${j.id}">حذف</button></div>
+      <div class="sm muted">${both(j.date)}${j.judge?" · "+esc(j.judge):""}</div>${j.ruling?`<details open><summary>المنطوق</summary>${esc(j.ruling)}</details>`:""}${j.reasons?`<details><summary>الأسباب</summary>${esc(j.reasons)}</details>`:""}</div>`;}).join("")||'<div class="muted sm">لا أحكام.</div>'}
+    <div class="sm muted">تنبيه: مدة الاعتراض تُحسب آليًا بحسب القيمة المدخلة؛ تحقّق من المدة النظامية لنوع الحكم وطريقة الاعتراض.</div>`;}
+  box.innerHTML=head+body;if(tab==="ai")bindAi(box,c.id);}
+function redrawCase(){const ov=[...$$("#modals .ov")].reverse().find(o=>o.dataset.case);if(ov)drawCase(ov,ov.dataset.tab);}
+function subEdit(caseId,listKey,fields,item,title){const c=getCase(caseId);formModal(title,fields,item,v=>{
+  if(item)Object.assign(item,v);else(c[listKey]=c[listKey]||[]).push({id:uid(),...v});logChange(`${item?"تعديل":"إضافة"} ${title.replace(/^(إضافة|تعديل)\s*/,"")} — قضية ${c.no}`,{case:c.id});setTimeout(redrawCase,0);});}
+
+/* ---- POAs ---- */
+VIEW.poas=function(){const f=R.pf||"all";let list=S.poas.slice();const q=(R.pq||"").toLowerCase();
+  const st=p=>{const d=daysTo(p.expires);return d==null?"":d<0?"ended":d<=30?"soon":"valid";};
+  const cnt={all:list.length,valid:list.filter(p=>st(p)==="valid").length,soon:list.filter(p=>st(p)==="soon").length,ended:list.filter(p=>st(p)==="ended").length};
+  if(f!=="all")list=list.filter(p=>st(p)===f);if(q)list=list.filter(p=>(p.no+" "+clientName(p.clientId)).toLowerCase().includes(q));
+  list.sort((a,b)=>(a.expires||"").localeCompare(b.expires||""));
+  $("#app").innerHTML=`<div class="head"><h1>الوكالات</h1><span class="pill p-mut">${cnt.all} وكالة</span><span class="sp"></span>${exportBtns("poas")}<button class="btn g" data-act="addPoa">+ وكالة</button></div>
+  <div class="filters"><div class="seg">${[["all","الكل "+cnt.all],["valid","سارية "+cnt.valid],["soon","تنتهي خلال ٣٠ يومًا "+cnt.soon],["ended","منتهية "+cnt.ended]].map(([k,l])=>`<button class="${f===k?"on":""}" data-act="pf" data-v="${k}">${l}</button>`).join("")}</div>
+  <input type="search" id="pq" placeholder="رقم الوكالة أو اسم الموكل..." value="${esc(R.pq||"")}"></div>
+  ${table([{l:"رقم الوكالة",h:p=>`<b>${esc(p.no)}</b>`},{l:"الموكل",h:p=>esc(clientName(p.clientId))},{l:"نوع الوكالة",h:p=>esc(p.kind)},{l:"تاريخ الإصدار",h:p=>`${hD(p.issued)}<div class="sm muted">${gD(p.issued)}</div>`},
+    {l:"تاريخ الانتهاء",h:p=>`${gD(p.expires)}<div class="sm muted">${hD(p.expires)}</div>`},{l:"المتبقي",h:p=>remainPill(daysTo(p.expires))},
+    {l:"الحالة",h:p=>{const s=st(p);return s==="ended"?'<span class="pill p-mut">منتهية</span>':s==="soon"?'<span class="pill p-gold">تنتهي قريبًا</span>':'<span class="pill p-ok">سارية</span>';}},
+    {l:"",h:p=>`<div class="acts"><button class="btn s" data-act="editPoa" data-id="${p.id}">تعديل</button><button class="btn s d" data-act="delPoa" data-id="${p.id}">حذف</button></div>`}],list,{empty:"لا وكالات"})}`;
+  $("#pq").oninput=e=>{R.pq=e.target.value;VIEW.poas();const n=$("#pq");n.focus();n.setSelectionRange(n.value.length,n.value.length);};};
+
+/* ---- Executions ---- */
+VIEW.execs=()=>execView("najiz");VIEW.adminexec=()=>execView("admin");
+function execView(src){let list=S.execs.filter(e=>(e.src||"najiz")===src);const f=R.ef||"all";const q=(R.eq||"").toLowerCase();
+  const cnt={all:list.length,active:list.filter(e=>e.status==="active"||e.status==="waiting").length,done:list.filter(e=>e.status==="paid"||e.status==="ended").length};
+  if(f==="active")list=list.filter(e=>e.status==="active"||e.status==="waiting");if(f==="done")list=list.filter(e=>e.status==="paid"||e.status==="ended");
+  if(q)list=list.filter(e=>[e.no,e.applicant,e.against,e.kind,clientName(e.clientId)].join(" ").toLowerCase().includes(q));
+  const tot=list.reduce((a,e)=>(a.m+=num(e.amount),a.c+=num(e.collected),a),{m:0,c:0});
+  const groups=src==="admin"?Object.values(S.execs.filter(e=>e.src==="admin").reduce((g,e)=>{const k=e.against||"—";(g[k]=g[k]||{name:k,rows:[]}).rows.push(e);return g;},{})):[];
+  $("#app").innerHTML=`<div class="head"><h1>${src==="admin"?"التنفيذ الإداري — ديوان المظالم":"التنفيذ — محكمة التنفيذ (ناجز)"}</h1><span class="sp"></span>${exportBtns("execs",src)}<button class="btn g" data-act="addExec" data-v="${src}">+ طلب تنفيذ</button></div>
+  <div class="kpis"><div class="kpi"><b>${cnt.active}</b><span>قيد التنفيذ</span></div><div class="kpi"><b>${cnt.done}</b><span>منتهية / مسددة</span></div>
+    <div class="kpi i"><b>${money(tot.m)}</b><span>المطالب به</span></div><div class="kpi g"><b>${money(tot.c)}</b><span>المحصَّل</span></div><div class="kpi r"><b>${money(tot.m-tot.c)}</b><span>المتبقي</span></div></div>
+  ${src==="admin"&&groups.length?`<div class="card" style="margin-bottom:14px"><h3>ملفات الجهات المنفَّذ ضدها — ${groups.length}</h3>${table([{l:"الجهة",h:g=>`<b>${esc(g.name)}</b>`},{l:"عدد الأوامر",h:g=>g.rows.length},
+    {l:"إجمالي المطالب",h:g=>money(g.rows.reduce((a,e)=>a+num(e.amount),0))},{l:"المحصَّل",h:g=>money(g.rows.reduce((a,e)=>a+num(e.collected),0))},
+    {l:"متأخر",h:g=>{const n=g.rows.filter(e=>e.deadline&&daysTo(e.deadline)<0&&e.status!=="paid").length;return n?`<span class="pill p-bad">${n}</span>`:"0";}},
+    {l:"ملف",h:g=>`<div class="acts">${exportBtns("adminEntity",g.name)}</div>`}],groups)}</div>`:""}
+  <div class="filters"><div class="seg">${[["all","الكل "+cnt.all],["active","قيد التنفيذ "+cnt.active],["done","منتهية "+cnt.done]].map(([k,l])=>`<button class="${f===k?"on":""}" data-act="ef" data-v="${k}">${l}</button>`).join("")}</div>
+  <input type="search" id="eq" placeholder="بحث..." value="${esc(R.eq||"")}"></div>
+  ${table([{l:"رقم الطلب",h:e=>`<b>${esc(e.no)}</b><div class="sm muted">${esc(e.kind||"")}</div>`},{l:"الحالة",h:e=>pill(EXEC_ST,e.status)},{l:"المنفذ ضده",h:e=>esc(e.against)},{l:"طالب التنفيذ",h:e=>esc(e.applicant||clientName(e.clientId)||"—")},
+    {l:"المطالبة",h:e=>money(e.amount)},{l:"المحصَّل",h:e=>money(e.collected)},{l:"المتبقي",h:e=>money(num(e.amount)-num(e.collected))},
+    ...(src==="admin"?[{l:"نهاية المهلة",h:e=>e.deadline?`${gD(e.deadline)}<br>${e.status==="paid"?'<span class="pill p-ok">مسدد</span>':daysTo(e.deadline)<0?'<span class="pill p-bad">متأخر</span>':`<span class="pill p-info">داخل المهلة — ${daysTo(e.deadline)} يوم</span>`}`:"—"}]:[]),
+    {l:"آخر قرار",h:e=>`${esc(e.lastDecision||"—")}<div class="sm muted">${e.decisionDate?gD(e.decisionDate):""}</div>`},{l:"تاريخ التقديم",h:e=>hD(e.filed)},
+    {l:"",h:e=>`<div class="acts"><button class="btn s" data-act="editExec" data-id="${e.id}">تعديل</button><button class="btn s d" data-act="delExec" data-id="${e.id}">حذف</button></div>`}],list,{empty:"لا طلبات تنفيذ"})}`;
+  $("#eq").oninput=e=>{R.eq=e.target.value;execView(src);const n=$("#eq");n.focus();n.setSelectionRange(n.value.length,n.value.length);};}
+
+/* ---- Clients ---- */
+VIEW.clients=function(){if(R.client&&S.clients.find(c=>c.id===R.client))return clientPage(R.client);R.client=null;const q=(R.clq||"").toLowerCase();
+  const list=S.clients.filter(c=>!q||(c.name+" "+c.idno+" "+c.phone).toLowerCase().includes(q)).sort((a,b)=>a.name.localeCompare(b.name,"ar"));
+  $("#app").innerHTML=`<div class="head"><h1>الموكلون</h1><span class="pill p-mut">${S.clients.length}</span><span class="sp"></span>${exportBtns("clients")}
+    <button class="btn" data-act="harvestClients" title="ينشئ ملفات للموكلين الموجودين في القضايا والوكالات والتنفيذ دون أن يمس بياناتهم">⟳ حصر الموكلين</button><button class="btn g" data-act="addClient">+ موكل</button></div>
+  <div class="filters"><input type="search" id="clq" placeholder="ابحث باسم الموكل أو رقمه..." value="${esc(R.clq||"")}"></div>
+  <div class="tiles" style="margin-bottom:14px">${list.map(tileHTML).join("")}</div>
+  ${table([{l:"الموكل",h:c=>`<b>${esc(c.name)}</b><div class="sm muted">${esc(c.type||"")}</div>`},{l:"القضايا",h:c=>S.cases.filter(x=>x.clientId===c.id).length},
+    {l:"جلسات قادمة",h:c=>S.cases.filter(x=>x.clientId===c.id).filter(nextSession).length},{l:"طلبات التنفيذ",h:c=>S.execs.filter(x=>x.clientId===c.id).length||"—"},
+    {l:"الوكالات",h:c=>{const p=S.poas.filter(x=>x.clientId===c.id);return p.length?p.map(x=>`${esc(x.no)} ${remainPill(daysTo(x.expires))}`).join("<br>"):"—";}}],list,{click:c=>["client",c.id]})}`;
+  $("#clq").oninput=e=>{R.clq=e.target.value;VIEW.clients();const n=$("#clq");n.focus();n.setSelectionRange(n.value.length,n.value.length);};};
+function clientPage(id){const c=S.clients.find(x=>x.id===id);const cs=S.cases.filter(x=>x.clientId===id);
+  const ss=allSessions().filter(s=>s.c.clientId===id&&s.date>=todayISO());const ps=S.poas.filter(x=>x.clientId===id);const es=S.execs.filter(x=>x.clientId===id);
+  const evs=S.events.filter(e=>!e.done&&e.person&&e.person.includes(c.name));
+  $("#app").innerHTML=`<div class="head"><button class="btn" data-act="clientBack">→ رجوع</button><div class="av" style="background:${colorOf(c.id)};margin:0;width:48px;height:48px">${esc(initials(c.name))}</div>
+    <div><h1>${esc(c.name)}</h1><div class="sm muted">${esc(c.type||"")}${c.idno?" · "+esc(c.idno):""}${c.phone?" · "+esc(c.phone):""}${c.email?" · "+esc(c.email):""}</div></div><span class="sp"></span>
+    ${exportBtns("client",c.id)}<button class="btn" data-act="editClient" data-id="${c.id}">تعديل</button><button class="btn d" data-act="delClient" data-id="${c.id}">حذف</button></div>
+  ${c.notes?`<div class="banner i">${esc(c.notes)}</div>`:""}
+  <div class="kpis"><div class="kpi"><b>${cs.length}</b><span>القضايا</span></div><div class="kpi i"><b>${ss.length}</b><span>جلسات قادمة</span></div><div class="kpi g"><b>${ps.length}</b><span>الوكالات</span></div><div class="kpi o"><b>${es.length}</b><span>طلبات التنفيذ</span></div></div>
+  <div class="card"><h3>الجلسات والمواعيد القادمة</h3>${table([{l:"التاريخ",h:s=>both(s.date)},{l:"الوقت",h:s=>tm(s.time)},{l:"القضية",h:s=>esc(s.c.no)},{l:"النوع",h:s=>esc(s.kind||"")},{l:"المحكمة",h:s=>esc(s.c.court||"")}],ss,{click:s=>["case",s.caseId],empty:"لا جلسات قادمة"})}
+    ${evs.length?`<div style="margin-top:10px">${evs.map(evCard).join("")}</div>`:""}</div>
+  <div class="card"><h3>القضايا <button class="btn g s" data-act="addCase" data-v="najiz" data-client="${c.id}">+ قضية</button></h3>${table([{l:"رقم القضية",h:x=>`<b>${esc(x.no)}</b>`},{l:"المحكمة",h:x=>esc(x.court||"")},{l:"الخصم",h:x=>esc(x.opponent||"")},{l:"الحالة",h:x=>pill(CASE_ST,x.status)},{l:"الأولوية",h:x=>`<span class="pill ${priority(x)[1]}">${priority(x)[0]}</span>`}],cs,{click:x=>["case",x.id],empty:"لا قضايا"})}</div>
+  <div class="grid2"><div class="card"><h3>الوكالات</h3>${table([{l:"الرقم",h:p=>esc(p.no)},{l:"النوع",h:p=>esc(p.kind)},{l:"المتبقي",h:p=>remainPill(daysTo(p.expires))}],ps,{empty:"لا وكالات"})}</div>
+  <div class="card"><h3>التنفيذ</h3>${table([{l:"الرقم",h:e=>esc(e.no)},{l:"الحالة",h:e=>pill(EXEC_ST,e.status)},{l:"المتبقي",h:e=>money(num(e.amount)-num(e.collected))}],es,{empty:"لا طلبات"})}</div></div>`;}
+
+/* ---- Violations ---- */
+VIEW.viol=function(){const src=R.v.slice(5);const all=S.viols.filter(v=>v.src===src);
+  const groups=Object.values(all.reduce((g,v)=>{const k=v.entity||"—";(g[k]=g[k]||{name:k,id:v.entityId,rows:[]}).rows.push(v);return g;},{})).sort((a,b)=>sumV(b.rows)-sumV(a.rows));
+  let list=R.vEntity?all.filter(v=>v.entity===R.vEntity):all;const q=(R.vq||"").toLowerCase();if(q)list=list.filter(v=>[v.entity,v.entityId,v.no,v.ref,v.reason,v.authority].join(" ").toLowerCase().includes(q));
+  list=list.slice().sort((a,b)=>(b.date||"").localeCompare(a.date||""));
+  const unpaid=all.filter(v=>v.status!=="paid");const nNew=all.filter(v=>v.isNew).length;
+  $("#app").innerHTML=`<div class="head"><h1>${VSRC[src]}</h1><span class="sp"></span>${exportBtns("viol",src)}
+    ${nNew?`<button class="btn" data-act="markRead" data-v="${src}">✓ تمت مراجعة الجديد (${nNew})</button>`:""}<button class="btn" data-act="openImport">⬆ استيراد Excel</button><button class="btn g" data-act="addViol" data-v="${src}">+ مخالفة</button></div>
+  <div class="banner i sm">لا يمكن لموقع ويب قراءة حسابك في المنصة الحكومية مباشرةً. أدخل المخالفات يدويًا أو صدّرها من المنصة واستوردها هنا بملف Excel؛ ويحسب النظام المهل ويُظهر الجديد ويُصدر التقارير.</div>
+  <div class="kpis"><div class="kpi"><b>${all.length}</b><span>عدد المخالفات</span></div><div class="kpi i"><b>${money(sumV(all))}</b><span>إجمالي الغرامات</span></div>
+    <div class="kpi r"><b>${money(sumV(unpaid))}</b><span>غير المسدَّد (${unpaid.length})</span></div><div class="kpi g"><b>${money(sumV(all.filter(v=>v.status==="paid")))}</b><span>المسدَّد</span></div><div class="kpi o"><b>${nNew}</b><span>جديد لم يُراجَع</span></div></div>
+  <div class="card" style="margin-bottom:14px"><h3>${src==="ind"?"الأشخاص":"المنشآت"} — ${groups.length}</h3>${table([{l:src==="ind"?"الاسم":"المنشأة",h:g=>`<b>${esc(g.name)}</b>`},{l:src==="ind"?"الهوية":"السجل / الملف",h:g=>esc(g.id||"—")},
+    {l:"المخالفات",h:g=>`${g.rows.length} — ${money(sumV(g.rows))}`},{l:"غير مسدد",h:g=>money(sumV(g.rows.filter(v=>v.status!=="paid")))},
+    {l:"الحالة",h:g=>{const n=g.rows.filter(v=>v.isNew).length;return n?`<span class="pill p-gold">جديد ${n}</span>`:'<span class="pill p-ok">✓ لا جديد</span>';}},
+    {l:"أقرب مهلة",h:g=>{const ls=g.rows.map(violDeadlines).filter(d=>d&&d.left!=null).sort((a,b)=>a.left-b.left)[0];return ls?`<span class="pill ${ls.cls}">${ls.left} يوم</span>`:"—";}},
+    {l:"ملف",h:g=>`<div class="acts"><button class="btn s ${R.vEntity===g.name?"p":""}" data-act="vEntity" data-v="${esc(g.name)}">فتح الملف</button>${exportBtns("violEntity",src+"|"+g.name)}</div>`}],groups,{empty:"لا بيانات بعد"})}</div>
+  <div class="filters">${R.vEntity?`<span class="pill p-gold">ملف: ${esc(R.vEntity)}</span><button class="btn s" data-act="vEntity" data-v="">عرض الكل</button>`:""}<input type="search" id="vq" placeholder="ابحث في المخالفات..." value="${esc(R.vq||"")}"></div>
+  ${table([{l:"#",h:v=>`${v.isNew?'<span class="pill p-gold">جديد</span><br>':""}<b>${esc(v.no)}</b><div class="sm muted">${esc(v.ref||"")}</div>`},{l:src==="ind"?"الشخص":"المنشأة",h:v=>esc(v.entity)},
+    {l:"السبب / الشرح",h:v=>`${esc(v.reason||"—")}<div class="sm muted">${esc(v.authority||"")}${v.worker?" · العامل: "+esc(v.worker):""}</div>`},{l:"التاريخ",h:v=>gD(v.date)},{l:"القيمة",h:v=>money(v.amount)},
+    {l:"الحالة",h:v=>pill(VST,v.status)+(v.objNo?`<div class="sm muted">${esc(v.objNo)}</div>`:"")},
+    ...(src==="hrsd"?[{l:"عمر المخالفة",h:v=>v.date?(-daysTo(v.date))+" يومًا":"—"}]:[{l:"المهلة / الإجراء المقترح",h:v=>{const d=violDeadlines(v);return d?`<span class="pill ${d.cls}">${d.left!=null?"متبقٍ "+d.left+" يوم":"—"}</span><div class="sm">${d.action}</div><div class="sm muted">مهلة ١: ${gD(d.p1)} · مهلة ٢: ${gD(d.p2)}</div>`:"—";}}]),
+    {l:"",h:v=>`<div class="acts"><button class="btn s" data-act="editViol" data-id="${v.id}">تعديل</button><button class="btn s d" data-act="delViol" data-id="${v.id}">حذف</button></div>`}],list,{empty:"لا مخالفات"})}
+  <div class="sm muted" style="margin-top:8px">تُحسب مهل التظلم افتراضيًا: ${S.settings.violP1} يومًا أمام الجهة المصدرة ثم ${S.settings.violP2} يومًا أمام ديوان المظالم من تاريخ المخالفة (قابلة للتعديل من الإعدادات). راجع النظام الخاص بالجهة المصدرة قبل الاعتماد.</div>`;
+  $("#vq").oninput=e=>{R.vq=e.target.value;VIEW.viol();const n=$("#vq");n.focus();n.setSelectionRange(n.value.length,n.value.length);};};
+const sumV=rows=>rows.reduce((a,v)=>a+num(v.amount),0);
+
+/* ---- Secretary ---- */
+VIEW.secretary=function(){const up=S.events.filter(e=>!e.done).sort((a,b)=>dt(nextOcc(a),a.time)-dt(nextOcc(b),b.time));const done=S.events.filter(e=>e.done).slice(-10).reverse();
+  $("#app").innerHTML=`<div class="head"><h1>🗓 السكرتير الشخصي</h1></div>
+  <div class="card"><div class="muted sm" style="margin-bottom:6px">اكتب موعدك بكلامك العادي، وأنا أفهم النوع والشخص والمكان والتاريخ والوقت والتكرار ووقت التذكير. راجع المعاينة واحفظ.</div>
+    <div class="fd"><textarea id="nl" placeholder="مثال: اجتماع مع الموكل أحمد بكرة الساعة 5 العصر في المكتب ذكرني قبل ساعة"></textarea></div>
+    <div class="chips">${["جلسة صلح يوم الاثنين الساعة 10 صباحًا ذكرني قبل ساعة","زيارة المستشفى يوم الخميس الساعة 4 مساءً","سداد القسط يوم 25 ذكرني قبل يومين","كل أسبوع يوم الأحد الساعة 9 اجتماع الفريق","اتصال مع العميل خالد اليوم الساعة 8 مساء ذكرني قبل 10 دقائق"].map(x=>`<span class="chip" data-act="nlEx" data-v="${esc(x)}">${esc(x)}</span>`).join("")}</div>
+    <button class="btn g" data-act="nlParse">افهم الموعد ←</button></div>
+  <div class="card"><h3>القادمة (${up.length})</h3>${up.length?up.map(e=>{const d=nextOcc(e);return`<div class="note"><div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><b>${esc(e.kind)}: ${esc(e.title)}</b>
+      ${e.repeat&&e.repeat!=="none"?`<span class="pill p-gold">${{daily:"كل يوم",weekly:"كل أسبوع",monthly:"كل شهر"}[e.repeat]}</span>`:""}<span style="flex:1"></span>
+      <button class="btn s" data-act="testRemind" data-id="${e.id}">إرسال الآن (تجربة)</button><button class="btn s" data-act="editEvent" data-id="${e.id}">تعديل</button><button class="btn s" data-act="snooze" data-id="${e.id}">تأجيل ساعة</button>
+      <button class="btn s" data-act="doneEvent" data-id="${e.id}">✓ تم</button><button class="btn s d" data-act="delEvent" data-id="${e.id}">حذف</button></div>
+      <div class="sm muted">${both(d)} — ${tm(e.time)}${e.person?" · مع "+esc(e.person):""}${e.place?" · 📍 "+esc(e.place):""}</div>
+      <div class="sm muted">التذكير: ${(e.remind||[]).map(remLabel).join("، ")||"عند الموعد"}</div>${e.note?`<div class="sm">${esc(e.note)}</div>`:""}</div>`;}).join(""):'<div class="empty">لا مواعيد قادمة</div>'}</div>
+  ${done.length?`<div class="card"><h3>المنجزة مؤخرًا</h3>${done.map(e=>`<div class="sm muted">✓ ${esc(e.title)} — ${gD(e.date)}</div>`).join("")}</div>`:""}`;};
+function nextOcc(e){if(!e.repeat||e.repeat==="none")return e.date;let d=e.date;const t=todayISO();let guard=0;
+  while((d<t||(d===t&&dt(d,e.time)<new Date()))&&guard++<800)d=stepRepeat(d,e.repeat);return d;}
+function stepRepeat(d,rep){if(rep==="daily")return addDays(d,1);if(rep==="weekly")return addDays(d,7);
+  const x=new Date(d+"T12:00:00");const day=x.getDate();x.setDate(1);x.setMonth(x.getMonth()+1);x.setDate(Math.min(day,new Date(x.getFullYear(),x.getMonth()+1,0).getDate()));return isoD(x);}
+function remLabel(m){m=Number(m);if(!m)return"عند الموعد";if(m%1440===0)return m===1440?"قبل يوم":m===2880?"قبل يومين":`قبل ${m/1440} أيام`;if(m%60===0)return m===60?"قبل ساعة":m===120?"قبل ساعتين":`قبل ${m/60} ساعات`;return`قبل ${m} دقيقة`;}
+
+/* Arabic natural-language parser */
+function parseNL(raw){let t=String(raw).replace(/[٠-٩]/g,d=>"٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/\s+/g," ").trim();
+  const r={kind:"موعد",title:"",person:"",place:"",date:todayISO(),time:"09:00",repeat:"none",remind:[60],note:raw};
+  for(const[w,k]of[["جلسة صلح","جلسة صلح"],["جلسه صلح","جلسة صلح"],["جلسة","جلسة"],["اجتماع","اجتماع"],["زيارة","زيارة"],["اتصال","اتصال"],["مكالمة","اتصال"],["مهمة","مهمة"],["سداد","مهمة"],["موعد","موعد"]])if(t.includes(w)){r.kind=k;break;}
+  const today=new Date(todayISO()+"T12:00:00");let d=null;
+  if(/بعد\s*(بكرة|بكره|غد)/.test(t)){d=new Date(today);d.setDate(d.getDate()+2);}
+  else if(/(بكرة|بكره|غدا|غدًا|غداً|الغد)/.test(t)){d=new Date(today);d.setDate(d.getDate()+1);}
+  else if(/اليوم/.test(t))d=new Date(today);
+  const DN=[["الأحد","الاحد"],["الاثنين","الإثنين","الأثنين"],["الثلاثاء","الثلاثا"],["الأربعاء","الاربعاء","الاربعا"],["الخميس"],["الجمعة","الجمعه"],["السبت"]];
+  DN.forEach((names,i)=>{if(!d&&names.some(n=>t.includes(n))){d=new Date(today);const diff=(i-today.getDay()+7)%7;d.setDate(d.getDate()+diff);}});
+  const dm=t.match(/يوم\s+(\d{1,2})(?!\s*[:.]\d)(?!\s*(?:ساعة|دقيقة|يوم|أيام))/);
+  if(!d&&dm){const n=+dm[1];if(n>=1&&n<=31){d=new Date(today);if(n<today.getDate())d.setMonth(d.getMonth()+1);d.setDate(n);}}
+  if(d)r.date=isoD(d);
+  const tmm=t.match(/(?:الساعة|الساعه|ساعة)\s*(\d{1,2})(?:[:.](\d{2}))?/)||t.match(/\b(\d{1,2})[:.](\d{2})\b/);
+  let H=null,M=0;if(tmm){H=+tmm[1];M=+(tmm[2]||0);}
+  const pm=/(العصر|عصرا|عصرًا|المغرب|مغربا|مساء|مساءً|مساءا|الليل|ليلا|بالليل|\sم(\s|$)|الظهر|ظهرا|ظهرًا)/.test(" "+t+" ");
+  const am=/(الصباح|صباحا|صباحًا|الصبح|الفجر|\sص(\s|$))/.test(" "+t+" ");
+  if(H==null){if(/العصر/.test(t))H=16;else if(/المغرب/.test(t))H=18;else if(/الظهر/.test(t))H=12;else if(/الصباح|الصبح/.test(t))H=9;}
+  else{if(pm&&H<12)H+=12;else if(!am&&!pm&&H>=1&&H<=6)H+=12;}
+  if(H!=null)r.time=pad(Math.min(H,23))+":"+pad(Math.min(M,59));
+  if(/كل\s*يوم|يوميا|يوميًا/.test(t))r.repeat="daily";else if(/كل\s*(أسبوع|اسبوع)|أسبوعيا|أسبوعيًا|اسبوعيا/.test(t))r.repeat="weekly";else if(/كل\s*شهر|شهريا|شهريًا/.test(t))r.repeat="monthly";
+  const rm=t.match(/(?:ذكرني|ذكّرني|نبهني|نبّهني|ذكرني)\s*قبل\s*(.+?)(?:$|[،,.])/);
+  if(rm){const s=rm[1];let m=null,x;
+    if(/نصف\s*ساعة|نص\s*ساعة/.test(s))m=30;else if(/ربع\s*ساعة/.test(s))m=15;else if(/ساعتين/.test(s))m=120;else if((x=s.match(/(\d+)\s*(?:ساعات|ساعة)/)))m=+x[1]*60;else if(/ساعة/.test(s))m=60;
+    else if((x=s.match(/(\d+)\s*(?:دقائق|دقيقة|دقايق)/)))m=+x[1];else if(/يومين/.test(s))m=2880;else if((x=s.match(/(\d+)\s*(?:أيام|ايام|يوم)/)))m=+x[1]*1440;else if(/يوم/.test(s))m=1440;else if(/أسبوع|اسبوع/.test(s))m=10080;
+    if(m)r.remind=[m];}
+  const STOP=["في","بكرة","بكره","غدا","غدًا","بعد","يوم","اليوم","الساعة","الساعه","ذكرني","ذكّرني","نبهني","كل","العصر","المغرب","الظهر","الصباح","مساء","مساءً","صباحا","صباحًا","عن","بخصوص"];
+  const takeUntilStop=s=>{const out=[];for(const w of s.split(" ")){if(STOP.includes(w)||/^\d/.test(w))break;out.push(w);if(out.length>=4)break;}return out.join(" ").replace(/[،,.]$/,"");};
+  const pi=t.indexOf("مع ");if(pi>-1)r.person=takeUntilStop(t.slice(pi+3));
+  const plm=t.match(/(?:^|\s)(?:في|بـ?)\s+((?:ال|مقر|مكتب|محكمة|المحكمة|مستشفى)\S*.*)$/);if(plm)r.place=takeUntilStop(plm[1]);
+  let head=t;const cut=head.search(/\s(مع|في|بكرة|بكره|غدا|بعد|يوم|اليوم|الساعة|ذكرني|كل)\s/);if(cut>0)head=head.slice(0,cut);
+  r.title=r.kind==="مهمة"||head.split(" ").length>1?head:(r.kind+(r.person?" مع "+r.person:""));
+  if(/^كل\s/.test(t)){const m2=t.match(/الساعة\s*\d{1,2}(?:[:.]\d{2})?\s+(.+)$/);if(m2)r.title=m2[1];}
+  return r;}
+
+/* ---- Assistant ---- */
+VIEW.assistant=function(){$("#app").innerHTML=`<div class="head"><h1>✨ المساعد القانوني</h1></div><div class="card">${aiPanel(null)}</div>`;bindAi($("#app"),null);};
+function aiPanel(caseId){const key=S.settings.apiKey;const conv=aiConv(caseId);
+  const quick=caseId?["لخّص القضية","جهّز لي الجلسة القادمة","مسودة مذكرة جوابية","اقترح الدفوع","المواعيد النظامية","ابحث عن مبادئ قضائية مشابهة"]:["اشرح لي مهلة الاعتراض على الأحكام","ما الفرق بين التظلم والاعتراض؟","صِغ لي خطاب مطالبة ودية","لخّص موقف المكتب هذا الأسبوع"];
+  return`${key?"":`<div class="banner w"><b>المساعد يحتاج مفتاح واجهة (API key) من Anthropic.</b> أنشئ مفتاحًا من console.anthropic.com وضعه في ⚙ الإعدادات. يُحفظ على جهازك فقط ويُرسل مباشرة إلى Anthropic عند ضغطك «إرسال». <button class="btn s g" data-act="settings">فتح الإعدادات</button></div>`}
+  <div class="banner i sm">${caseId?"يرى المساعد بيانات هذه القضية (التفاصيل، الجلسات، الأحكام، الملاحظات، الطلبات) وأسماء ملفاتها، ويقرأ محتوى الملفات النصية فقط عند تفعيل الخيار أدناه.":"يرى المساعد ملخصًا لقضاياك وجلساتك القادمة."} مخرجاته مسودات للمراجعة وليست رأيًا نهائيًا؛ تحقّق من كل مادة نظامية من مصدرها الرسمي.</div>
+  <div class="chat" id="chat">${conv.map(m=>`<div class="msg ${m.role==="user"?"u":"a"}">${esc(m.content)}</div>`).join("")||'<div class="muted sm">ابدأ بسؤال أو اختر من الأسئلة الجاهزة.</div>'}</div>
+  <div class="chips">${quick.map(q=>`<span class="chip" data-act="aiQuick" data-v="${esc(q)}">${esc(q)}</span>`).join("")}</div>
+  ${caseId?'<label class="sm" style="display:flex;gap:6px;align-items:center;margin-bottom:6px"><input type="checkbox" id="aiFiles"> إرفاق محتوى الملفات النصية (txt/md/csv) من الملف القانوني</label>':""}
+  <div class="fd"><textarea id="aiIn" placeholder="اكتب سؤالك..."></textarea></div>
+  <div style="display:flex;gap:8px;margin-top:6px"><button class="btn g" id="aiSend">إرسال</button><button class="btn" data-act="aiClear">مسح المحادثة</button><button class="btn" data-act="aiCopy">نسخ آخر رد</button></div>`;}
+function aiConv(caseId){S.ai=S.ai||{};return S.ai[caseId||"_"]=S.ai[caseId||"_"]||[];}
+function bindAi(root,caseId){const send=async(text)=>{text=(text||$("#aiIn",root).value).trim();if(!text)return;if(!S.settings.apiKey){toast("أضف مفتاح API من الإعدادات","err");return;}
+  const conv=aiConv(caseId);conv.push({role:"user",content:text});$("#aiIn",root).value="";const chat=$("#chat",root);
+  chat.insertAdjacentHTML("beforeend",`<div class="msg u">${esc(text)}</div><div class="msg a" id="aiWait">… جارٍ التفكير</div>`);chat.scrollTop=chat.scrollHeight;
+  try{const ctx=await aiContext(caseId,root);const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"content-type":"application/json","x-api-key":S.settings.apiKey,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+    body:JSON.stringify({model:S.settings.model||"claude-sonnet-5-5",max_tokens:4096,system:AI_SYS+"\n\n"+ctx,messages:conv.slice(-20).map(m=>({role:m.role,content:m.content}))})});
+    const j=await res.json();if(!res.ok)throw new Error((j.error&&j.error.message)||res.status);
+    const out=(j.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("\n");conv.push({role:"assistant",content:out});save();$("#aiWait").outerHTML=`<div class="msg a">${esc(out)}</div>`;}
+  catch(e){conv.pop();$("#aiWait").outerHTML=`<div class="msg a" style="color:var(--bad)">تعذّر الاتصال: ${esc(e.message)}</div>`;}chat.scrollTop=chat.scrollHeight;};
+  $("#aiSend",root).onclick=()=>send();$("#aiIn",root).onkeydown=e=>{if(e.key==="Enter"&&(e.ctrlKey||e.metaKey))send();};root._aiSend=send;}
+const AI_SYS=`أنت مساعد قانوني متخصص في الأنظمة السعودية تعمل داخل تطبيق «الحاجب المنصور القانوني» لمحامٍ سعودي.
+القواعد: اكتب بالعربية الفصحى وبأسلوب قانوني رسمي. لا تختلق مواد نظامية أو أرقامها أو سوابق قضائية أو تواريخ؛ إن لم تكن متأكدًا من نص مادة أو رقمها فصرّح بذلك واطلب التحقق من هيئة الخبراء (laws.boe.gov.sa) أو وزارة العدل أو ديوان المظالم.
+ميّز بين الحقيقة المؤكدة والاستنتاج. المخرجات مسودات للمراجعة. احسب المواعيد من البيانات المعطاة فقط ونبّه إلى أن المدد النظامية تختلف بحسب نوع الحكم والإجراء.`;
+async function aiContext(caseId,root){const t=todayISO();if(!caseId){const up=allSessions().filter(s=>s.date>=t).slice(0,15);
+    return"تاريخ اليوم: "+t+"\nملخص المكتب:\n- قضايا قيد النظر: "+S.cases.filter(c=>c.status==="open").length+"\n- الجلسات القادمة:\n"+up.map(s=>`  • ${s.date} ${s.time} — قضية ${s.c.no} (${s.c.court||""}) ${s.kind||""} — الموكل ${clientName(s.c.clientId)} ضد ${s.c.opponent||""}`).join("\n");}
+  const c=getCase(caseId);const strip=o=>JSON.stringify(o,(k,v)=>["docs","id","caseId"].includes(k)?undefined:v,1);
+  let s=`تاريخ اليوم: ${t}\nبيانات القضية:\n${strip({...c,clientName:clientName(c.clientId),category:CAT[c.cat||"najiz"]})}\nأسماء ملفات القضية: ${(c.docs||[]).map(d=>d.name).join("، ")||"لا يوجد"}`;
+  if($("#aiFiles",root)&&$("#aiFiles",root).checked){for(const d of c.docs||[]){if(/\.(txt|md|csv|json)$/i.test(d.name)&&d.size<200000){try{const b=await getFile(d.id);s+=`\n\n--- محتوى الملف ${d.name} ---\n`+(await b.text());}catch(e){}}}}
+  return s;}
+
+/* ---- Laws ---- */
+VIEW.laws=function(){const q=R.lq||"";const KEY_LAWS=["نظام المرافعات الشرعية","نظام الإثبات","نظام المعاملات المدنية","نظام العمل","نظام التنفيذ","نظام المحاكم التجارية","نظام الشركات","نظام المرافعات أمام ديوان المظالم","نظام التنفيذ أمام ديوان المظالم","نظام التأمينات الاجتماعية"];
+  $("#app").innerHTML=`<div class="head"><h1>📚 الأنظمة</h1></div>
+  <div class="card"><h3>بحث في الأنظمة واللوائح السعودية</h3><div class="filters"><input type="search" id="lq" placeholder="اكتب كلمات أو رقم المادة أو اسم النظام..." value="${esc(q)}"><button class="btn g" data-act="lawSearch">بحث في هيئة الخبراء ↗</button></div>
+    <div class="sm muted">يفتح البحث في موقع هيئة الخبراء بمجلس الوزراء (المصدر الرسمي). لا يعرض التطبيق نصوصًا نظامية من عنده حتى لا تُنقل نسخة غير معتمدة.</div>
+    <div class="chips" style="margin-top:10px">${KEY_LAWS.map(l=>`<span class="chip" data-act="lawGo" data-v="${esc(l)}">${esc(l)} ↗</span>`).join("")}</div></div>
+  <div class="card"><h3>مكتبتي النظامية <button class="btn g s" data-act="addLaw">+ نظام / لائحة</button></h3>
+    <div class="sm muted" style="margin-bottom:8px">نزّل الأنظمة المهمة من المصدر الرسمي (PDF) واحفظها هنا لتعمل دون اتصال.</div>
+    ${table([{l:"الاسم",h:l=>`<b>${esc(l.name)}</b><div class="sm muted">${esc(l.notes||"")}</div>`},{l:"الرابط الرسمي",h:l=>l.url?`<a href="${esc(l.url)}" target="_blank" rel="noopener">فتح ↗</a>`:"—"},
+      {l:"الملف",h:l=>l.file?`<button class="btn s" data-act="openDoc" data-f="${l.file.id}">فتح</button> <span class="sm muted">${esc(l.file.name)}</span>`:`<button class="btn s" data-act="lawFile" data-id="${l.id}">إرفاق PDF</button>`},
+      {l:"",h:l=>`<div class="acts"><button class="btn s" data-act="editLaw" data-id="${l.id}">تعديل</button><button class="btn s d" data-act="delLaw" data-id="${l.id}">حذف</button></div>`}],S.laws,{empty:"المكتبة فارغة"})}
+    <input type="file" id="lawFileIn" class="hidden" accept=".pdf,.doc,.docx,.txt" data-change="lawFile"></div>`;
+  $("#lq").oninput=e=>R.lq=e.target.value;$("#lq").onkeydown=e=>{if(e.key==="Enter")ACT.lawSearch();};};
+
+/* ---- Reports ---- */
+VIEW.reports=function(){const r=(k,ic,t,d,arg="")=>`<div class="card"><h3>${ic} ${t}</h3><div class="muted sm" style="margin-bottom:8px">${d}</div><div class="acts">${exportBtns(k,arg)}</div></div>`;
+  $("#app").innerHTML=`<div class="head"><h1>التقارير</h1><span class="sp"></span><label class="sm"><input type="checkbox" id="lh" ${S.settings.letterhead?"checked":""}> ترويسة المكتب</label></div>
+  <div class="banner i sm">كل تقرير بثلاث صيغ: PDF (طباعة/حفظ)، Word، Excel. ترتيب الأولوية: <span class="pill p-bad">عاجل</span> جلسة خلال ٣ أيام · <span class="pill p-warn">متابعة</span> خلال ١٤ يومًا · <span class="pill p-ok">مستقر</span> غير ذلك.</div>
+  <div class="grid2">${r("exec","📈","الموقف الإجمالي للمكتب (التقرير التنفيذي)","للإدارة العليا: القضايا، أقرب الجلسات، التنفيذ، الوكالات المنتهية أو القريبة، مع ترتيب الأولوية.")}
+  ${r("sessions7","🗓","الجلسات القادمة — ٧ أيام","جدول الجلسات القادمة خلال أسبوع.","7")}${r("sessions7","🗓","الجلسات القادمة — ٣٠ يومًا","","30")}${r("sessions7","🗓","الجلسات القادمة — ٩٠ يومًا","","90")}
+  ${r("cases","⚖️","تقرير القضايا — ناجز","","najiz")}${r("cases","⚖️","تقرير القضايا — معين","","muin")}
+  ${r("clients","👥","تقرير الموكلين","قضايا كل موكل وجلساته ووكالاته وتنفيذه.")}${r("poas","📜","تقرير الوكالات","")}
+  ${r("execs","💰","تقرير التنفيذ — ناجز","","najiz")}${r("execs","🏛","تقرير التنفيذ الإداري","","admin")}
+  ${r("viol","🚦","تقرير إيفاء — كل المنشآت","مؤشرات، مقارنة، ترتيب المنشآت، وبيان تفصيلي بمهل التظلم.","efaa")}${r("viol","🪪","تقرير إيفاء أفراد","","ind")}${r("viol","🧾","تقرير مخالفات نظام العمل","","hrsd")}</div>
+  <div class="card" style="margin-top:14px"><h3>📄 تقرير قضية</h3><div class="filters"><select id="repCase">${S.cases.map(c=>`<option value="${c.id}">${esc(c.no)} — ${esc(clientName(c.clientId))}</option>`).join("")}</select>
+    <button class="btn s" data-act="repCase" data-f="pdf">PDF</button><button class="btn s" data-act="repCase" data-f="doc">Word</button><button class="btn s" data-act="repCase" data-f="xlsx">Excel</button></div></div>`;
+  $("#lh").onchange=e=>{S.settings.letterhead=e.target.checked;save();};};
+
+/* ---- Changes ---- */
+VIEW.changes=function(){$("#app").innerHTML=`<div class="head"><h1>التغييرات</h1><span class="sp"></span><button class="btn" data-act="changesRead">✓ تعليم الكل كمقروء</button><button class="btn d" data-act="changesClear">مسح السجل</button></div>
+  ${S.changes.length?S.changes.map(c=>`<div class="note" ${c.ref&&c.ref.case?`data-act="case" data-id="${c.ref.case}" style="cursor:pointer"`:""}>${c.read?"":'<span class="pill p-gold">جديد</span> '}${esc(c.text)}<div class="sm muted">${new Date(c.at).toLocaleString("ar-SA-u-nu-latn")}</div></div>`).join(""):'<div class="empty">لا تغييرات</div>'}`;};
+
+/* ====================== REPORTS ====================== */
+function repShell(title,sub,inner){const s=S.settings;
+  return`<div class="rep">${s.letterhead?`<div class="lh"><div><b>${esc(s.office||"الحاجب المنصور القانوني")}</b>${s.lawyer?`<div>${esc(s.lawyer)}</div>`:""}</div><div style="text-align:left">${hD(todayISO())}<br>${gD(todayISO())}</div></div>`:""}
+  <h1>${esc(title)}</h1>${sub?`<div class="sub">${sub}</div>`:""}${inner}<div class="foot">أُعدّ آليًا من الحاجب المنصور القانوني بتاريخ ${gD(todayISO())} — يُراجَع قبل الاعتماد.</div></div>`;}
+const REP_CSS=`body{font-family:"Segoe UI",Tahoma,Arial,sans-serif;direction:rtl;color:#1d2622;font-size:12px;margin:18px}
+.lh{display:flex;justify-content:space-between;border-bottom:3px solid #c9a24a;padding-bottom:8px;margin-bottom:12px;color:#123d2f}
+h1{color:#123d2f;font-size:20px;margin:6px 0} h2{background:#123d2f;color:#fff;padding:6px 10px;font-size:14px;margin:16px 0 6px;border-radius:4px}
+.sub{color:#66706b;margin-bottom:10px} table{width:100%;border-collapse:collapse;margin:6px 0;page-break-inside:auto} th{background:#123d2f;color:#fff;padding:6px;text-align:right;font-size:11px}
+td{border:1px solid #ddd;padding:5px;vertical-align:top} tr:nth-child(even) td{background:#faf8f3}
+.k{display:inline-block;border:1px solid #ddd;border-right:4px solid #c9a24a;padding:6px 12px;margin:3px;min-width:120px;border-radius:4px} .k b{display:block;font-size:17px;color:#123d2f}
+.box{border-right:4px solid #c9a24a;background:#faf6ea;padding:7px 10px;margin:6px 0} .bad{color:#b23b3b;font-weight:700} .ok{color:#2e7d5b;font-weight:700} .warn{color:#b7791f;font-weight:700}
+.foot{margin-top:18px;color:#888;font-size:10px;border-top:1px solid #ddd;padding-top:6px} @page{size:A4;margin:12mm}`;
+const htab=(cols,rows)=>rows.length?`<table><thead><tr>${cols.map(c=>`<th>${c[0]}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr>${cols.map(c=>`<td>${esc(c[1](r))}</td>`).join("")}</tr>`).join("")}</tbody></table>`:"<div>لا بيانات</div>";
+const kp=(l,v)=>`<span class="k"><b>${esc(v)}</b>${esc(l)}</span>`;
+const sheet=(name,cols,rows)=>({name,cols:cols.map(c=>c[0]),rows:rows.map(r=>cols.map(c=>c[1](r)))});
+const C_SESS=[["التاريخ الهجري",s=>hD(s.date)],["التاريخ الميلادي",s=>s.date],["الوقت",s=>tm(s.time)],["القضية",s=>s.c.no],["المحكمة",s=>(s.c.court||"")+(s.c.circuit?" — "+s.c.circuit:"")],["الأطراف",s=>clientName(s.c.clientId)+" ضد "+(s.c.opponent||"")],["نوع الجلسة",s=>s.kind||""],["مرئية",s=>s.virtual?"نعم":"لا"]];
+const C_CASE=[["رقم القضية",c=>c.no],["المحكمة",c=>c.court||""],["الدائرة",c=>c.circuit||""],["التصنيف",c=>c.type||""],["الموكل",c=>clientName(c.clientId)],["صفة الموكل",c=>c.role||""],["الخصم",c=>c.opponent||""],["الحالة",c=>(CASE_ST[c.status]||[""])[0]],["الجلسة القادمة",c=>{const n=nextSession(c);return n?n.date+" "+tm(n.time):"—";}],["الأولوية",c=>priority(c)[0]]];
+const C_EXEC=[["رقم الطلب",e=>e.no],["النوع",e=>e.kind||""],["الحالة",e=>(EXEC_ST[e.status]||[""])[0]],["طالب التنفيذ",e=>e.applicant||clientName(e.clientId)],["المنفذ ضده",e=>e.against||""],["المطالبة",e=>num(e.amount)],["المحصل",e=>num(e.collected)],["المتبقي",e=>num(e.amount)-num(e.collected)],["نهاية المهلة",e=>e.deadline||""],["آخر قرار",e=>e.lastDecision||""],["تاريخ القرار",e=>e.decisionDate||""]];
+const C_POA=[["رقم الوكالة",p=>p.no],["الموكل",p=>clientName(p.clientId)],["النوع",p=>p.kind],["الإصدار",p=>p.issued||""],["الانتهاء",p=>p.expires||""],["المتبقي (يوم)",p=>{const d=daysTo(p.expires);return d==null?"":d;}]];
+const C_VIOL=src=>[["رقم المخالفة",v=>v.no],[src==="hrsd"?"البند":"مرجع الجهة",v=>v.ref||""],[src==="ind"?"الشخص":"المنشأة",v=>v.entity],["الجهة المصدرة",v=>v.authority||""],["السبب / الشرح",v=>v.reason||""],["التاريخ",v=>v.date||""],["القيمة",v=>num(v.amount)],["استحقاق الدفع",v=>v.due||""],["الحالة",v=>(VST[v.status]||[""])[0]],
+  ...(src==="hrsd"?[["العامل",v=>v.worker||""],["رقم السداد",v=>v.payNo||""],["الاعتراض/التسوية",v=>v.objNo||""],["عمر المخالفة (يوم)",v=>v.date?-daysTo(v.date):""]]:[["آخر موعد للتظلم أمام الجهة",v=>(violDeadlines(v)||{}).p1||""],["نهاية التظلم أمام الديوان",v=>(violDeadlines(v)||{}).p2||""],["المتبقي (يوم)",v=>{const d=violDeadlines(v);return d&&d.left!=null?d.left:"";}],["الإجراء المقترح",v=>(violDeadlines(v)||{}).action||""]])];
+const REPORTS={
+  exec(){const t=todayISO();const up=allSessions().filter(s=>s.date>=t&&s.date<=addDays(t,14)&&s.status!=="ended");const ex=S.execs.filter(e=>e.status!=="ended");
+    const tot=ex.reduce((a,e)=>(a.m+=num(e.amount),a.c+=num(e.collected),a),{m:0,c:0});const poas=S.poas.filter(p=>{const d=daysTo(p.expires);return d!=null&&d<=30;});
+    const pr=S.cases.filter(c=>c.status==="open").sort((a,b)=>priority(a)[2]-priority(b)[2]);
+    const html=repShell("الموقف الإجمالي للمكتب","لقطة من آخر بيانات محفوظة — "+both(t),
+      `<div>${kp("قضايا قيد النظر",S.cases.filter(c=>c.status==="open").length)}${kp("صدر فيها حكم / منتهية",S.cases.filter(c=>c.status!=="open").length)}${kp("جلسات خلال ١٤ يومًا",up.length)}${kp("طلبات تنفيذ قائمة",ex.filter(e=>e.status==="active"||e.status==="waiting").length)}${kp("المتبقي للتحصيل",money(tot.m-tot.c))}${kp("وكالات تحتاج تجديدًا",poas.length)}</div>
+      <h2>أقرب الجلسات</h2>${htab(C_SESS.filter((c,i)=>[0,2,3,4,5,6].includes(i)),up)}
+      <h2>ترتيب أولوية القضايا</h2>${htab([["الأولوية",c=>priority(c)[0]],...C_CASE.slice(0,1),["المحكمة",c=>c.court||""],["الأطراف",c=>clientName(c.clientId)+" ضد "+(c.opponent||"")],["الجلسة القادمة",c=>{const n=nextSession(c);return n?hD(n.date)+" "+tm(n.time):"—";}]],pr)}
+      <h2>التنفيذ</h2>${htab([["البيان",x=>x[0]],["المبلغ",x=>x[1]]],[["المطالب به",money(tot.m)],["المحصّل",money(tot.c)],["المتبقي",money(tot.m-tot.c)]])}
+      <h2>وكالات تنتهي قريبًا أو انتهت</h2>${htab(C_POA,poas)}`);
+    return{title:"الموقف الإجمالي للمكتب",html,sheets:[sheet("الجلسات",C_SESS,up),sheet("القضايا",C_CASE,pr),sheet("التنفيذ",C_EXEC,ex),sheet("الوكالات",C_POA,poas)]};},
+  sessions7(days){days=+days||7;const t=todayISO();const up=allSessions().filter(s=>s.date>=t&&s.date<=addDays(t,days)&&s.status!=="ended");
+    return{title:`الجلسات القادمة — ${days} يومًا`,html:repShell(`الجلسات القادمة خلال ${days} يومًا`,`${up.length} جلسة · من ${gD(t)} إلى ${gD(addDays(t,days))}`,htab(C_SESS,up)),sheets:[sheet("الجلسات",C_SESS,up)]};},
+  cases(cat){const l=S.cases.filter(c=>(c.cat||"najiz")===cat);return{title:"تقرير القضايا — "+CAT[cat],html:repShell("تقرير القضايا",CAT[cat]+" — "+l.length+" قضية",htab(C_CASE,l)),sheets:[sheet("القضايا",C_CASE,l)]};},
+  case(id){const c=getCase(id);if(!c)return null;const ss=(c.sessions||[]).slice().sort((a,b)=>a.date.localeCompare(b.date));const n=nextSession(c);const fin=c.status!=="open";
+    const js=(c.judgments||[]);const cs=[["التاريخ",s=>both(s.date)],["الوقت",s=>tm(s.time)],["النوع",s=>s.kind||""],["الحالة",s=>(SESS_ST[s.status]||[""])[0]],["النتيجة",s=>s.result||""]];
+    const cj=[["رقم الحكم",j=>j.no||""],["الدرجة",j=>j.degree||""],["التاريخ",j=>j.date||""],["المنطوق",j=>j.ruling||""],["نهاية مهلة الاعتراض",j=>{const a=appealInfo(j);return a?a.end+(j.appealed?" (قُدّم)":a.left>=0?` (متبقٍ ${a.left} يوم)`:" (انتهت)"):"";}]];
+    const html=repShell((fin?"التقرير النهائي للقضية رقم ":"تقرير القضية رقم ")+c.no,`${esc(clientName(c.clientId))} ضد ${esc(c.opponent||"")} · ${esc(c.court||"")} ${c.circuit?"— "+esc(c.circuit):""}`,
+      `<div>${kp("حالة القضية",(CASE_ST[c.status]||[""])[0])}${kp("الجلسات",ss.length)}${kp("الأحكام",js.length)}${kp("الأولوية",priority(c)[0])}</div>
+      ${n?`<div class="box">الجلسة القادمة: ${both(n.date)} — ${tm(n.time)} · ${esc(n.kind||"")}</div>`:""}
+      <h2>بيانات القضية</h2>${htab([["البيان",x=>x[0]],["التفاصيل",x=>x[1]]],[["رقم القضية",c.no],["المنصة",CAT[c.cat||"najiz"]],["المحكمة",c.court],["الدائرة",c.circuit],["التصنيف",c.type],["تاريخ القيد",c.filed?hD(c.filed)+" — "+c.filed:""],["الموكل",clientName(c.clientId)],["صفة الموكل",c.role],["الخصم",c.opponent]].filter(x=>x[1]))}
+      ${c.subject?`<div class="box"><b>موضوع الدعوى:</b> ${esc(c.subject)}</div>`:""}${c.claims?`<div class="box"><b>الطلبات:</b> ${esc(c.claims)}</div>`:""}
+      <h2>الجلسات</h2>${htab(cs,ss)}${js.length?`<h2>الأحكام الصادرة</h2>${htab(cj,js)}`:""}
+      ${(c.parties||[]).length?`<h2>الأطراف</h2>${htab([["الاسم",p=>p.name],["الصفة",p=>p.role],["الوكيل",p=>p.agent||""]],c.parties)}`:""}
+      ${(c.requests||[]).length?`<h2>الطلبات</h2>${htab([["الطلب",r=>r.title],["التاريخ",r=>r.date||""],["الحالة",r=>r.status],["الرد",r=>r.reply||""]],c.requests)}`:""}
+      ${(c.notes||[]).length?`<h2>الملاحظات</h2>${c.notes.map(x=>`<div class="box">${esc(x.at.slice(0,10))}: ${esc(x.text)}</div>`).join("")}`:""}`);
+    return{title:"تقرير القضية "+c.no,html,sheets:[sheet("الجلسات",cs,ss),sheet("الأحكام",cj,js)]};},
+  clients(){const rows=S.clients.map(c=>({c,cs:S.cases.filter(x=>x.clientId===c.id),ps:S.poas.filter(x=>x.clientId===c.id),es:S.execs.filter(x=>x.clientId===c.id)}));
+    const cols=[["الموكل",r=>r.c.name],["النوع",r=>r.c.type||""],["الهوية/السجل",r=>r.c.idno||""],["القضايا",r=>r.cs.length],["جلسات قادمة",r=>r.cs.filter(nextSession).length],["الوكالات",r=>r.ps.map(p=>p.no).join("، ")],["طلبات التنفيذ",r=>r.es.length]];
+    return{title:"تقرير الموكلين",html:repShell("تقرير الموكلين",rows.length+" موكل",htab(cols,rows)),sheets:[sheet("الموكلون",cols,rows)]};},
+  client(id){const c=S.clients.find(x=>x.id===id);const cs=S.cases.filter(x=>x.clientId===id);const ss=allSessions().filter(s=>s.c.clientId===id&&s.date>=todayISO());
+    const ps=S.poas.filter(x=>x.clientId===id),es=S.execs.filter(x=>x.clientId===id);
+    return{title:"ملف الموكل "+c.name,html:repShell("ملف الموكل: "+c.name,esc([c.type,c.idno,c.phone].filter(Boolean).join(" · ")),`<h2>الجلسات القادمة</h2>${htab(C_SESS,ss)}<h2>القضايا</h2>${htab(C_CASE,cs)}<h2>الوكالات</h2>${htab(C_POA,ps)}<h2>التنفيذ</h2>${htab(C_EXEC,es)}`),
+      sheets:[sheet("الجلسات",C_SESS,ss),sheet("القضايا",C_CASE,cs),sheet("الوكالات",C_POA,ps),sheet("التنفيذ",C_EXEC,es)]};},
+  poas(){const l=S.poas.slice().sort((a,b)=>(a.expires||"").localeCompare(b.expires||""));return{title:"تقرير الوكالات",html:repShell("تقرير الوكالات",l.length+" وكالة",htab(C_POA,l)),sheets:[sheet("الوكالات",C_POA,l)]};},
+  execs(src){const l=S.execs.filter(e=>(e.src||"najiz")===src);const t=l.reduce((a,e)=>(a.m+=num(e.amount),a.c+=num(e.collected),a),{m:0,c:0});
+    const ttl=src==="admin"?"تقرير التنفيذ الإداري":"تقرير التنفيذ";return{title:ttl,html:repShell(ttl,l.length+" طلب",`<div>${kp("المطالب به",money(t.m))}${kp("المحصّل",money(t.c))}${kp("المتبقي",money(t.m-t.c))}</div>${htab(C_EXEC,l)}`),sheets:[sheet("التنفيذ",C_EXEC,l)]};},
+  adminEntity(name){const l=S.execs.filter(e=>e.src==="admin"&&e.against===name);const t=l.reduce((a,e)=>(a.m+=num(e.amount),a.c+=num(e.collected),a),{m:0,c:0});
+    const late=l.filter(e=>e.deadline&&daysTo(e.deadline)<0&&e.status!=="paid");
+    return{title:"ملف تنفيذ — "+name,html:repShell("ملف التنفيذ الإداري: "+name,l.length+" أمر",`<div>${kp("المطالب به",money(t.m))}${kp("المحصّل",money(t.c))}${kp("المتبقي",money(t.m-t.c))}${kp("متأخر",late.length)}</div>${htab(C_EXEC,l)}`),sheets:[sheet("الأوامر",C_EXEC,l)]};},
+  viol(src,entity){let l=S.viols.filter(v=>v.src===src);if(entity)l=l.filter(v=>v.entity===entity);l=l.slice().sort((a,b)=>(a.date||"").localeCompare(b.date||""));
+    const groups=Object.values(l.reduce((g,v)=>{(g[v.entity]=g[v.entity]||{n:v.entity,id:v.entityId,r:[]}).r.push(v);return g;},{})).sort((a,b)=>sumV(b.r)-sumV(a.r));
+    const unpaid=l.filter(v=>v.status!=="paid");const urgent=l.filter(v=>{const d=violDeadlines(v);return src!=="hrsd"&&d&&d.left!=null&&d.left<=14;});
+    const gc=[["الترتيب",(g)=>groups.indexOf(g)+1],[src==="ind"?"الشخص":"المنشأة",g=>g.n],["الرقم",g=>g.id||""],["عدد المخالفات",g=>g.r.length],["الإجمالي",g=>sumV(g.r)],["غير المسدد",g=>sumV(g.r.filter(v=>v.status!=="paid"))]];
+    const ttl=(src==="efaa"?"تقرير إيفاء":src==="ind"?"تقرير إيفاء الأفراد":"تقرير مخالفات نظام العمل")+(entity?" — "+entity:" — الكل");
+    const byAuth=Object.entries(l.reduce((g,v)=>{const k=v.authority||"غير محدد";g[k]=(g[k]||0)+num(v.amount);return g;},{})).sort((a,b)=>b[1]-a[1]);
+    const html=repShell(ttl,`${l.length} مخالفة · ${groups.length} ${src==="ind"?"شخص":"منشأة"}`,
+      `<div>${kp("عدد المخالفات",l.length)}${kp("إجمالي الغرامات",money(sumV(l)))}${kp("المسدَّد",money(sumV(l.filter(v=>v.status==="paid"))))}${kp("غير المسدَّد",money(sumV(unpaid)))}${kp("مهل تنتهي خلال ١٤ يومًا",urgent.length)}</div>
+      ${urgent.length?`<div class="box bad">تنبيه: ${urgent.length} مخالفة تنتهي مهلة التظلم الخاصة بها خلال ١٤ يومًا. إذا لم يُقدَّم التظلم خلال المهلة فقد يتعذر قبوله لاحقًا.</div>`:""}
+      ${!entity?`<h2>ترتيب ${src==="ind"?"الأشخاص":"المنشآت"} حسب القيمة</h2>${htab(gc,groups)}`:""}
+      <h2>توزيع الغرامات حسب الجهة المصدرة</h2>${htab([["الجهة",x=>x[0]],["الإجمالي",x=>money(x[1])]],byAuth)}
+      <h2>البيان التفصيلي</h2>${groups.map(g=>`<div class="box"><b>${esc(g.n)}</b> ${g.id?"("+esc(g.id)+")":""} — ${g.r.length} مخالفة · ${money(sumV(g.r))}</div>${htab(C_VIOL(src),g.r)}`).join("")}
+      ${src!=="hrsd"?`<div class="box">طريقة حساب المهل: ${S.settings.violP1} يومًا من تاريخ المخالفة للتظلم أمام الجهة المصدرة، ثم ${S.settings.violP2} يومًا للتظلم أمام ديوان المظالم (قيم افتراضية قابلة للتعديل — راجع النظام الخاص بكل جهة).</div>`:""}`);
+    return{title:ttl,html,sheets:[...(!entity?[sheet("الترتيب",gc,groups)]:[]),sheet("البيان التفصيلي",C_VIOL(src),l)]};},
+  violEntity(arg){const i=arg.indexOf("|");return REPORTS.viol(arg.slice(0,i),arg.slice(i+1));}
+};
+const asciiName=(...p)=>["Hajib",...p].map(x=>String(x||"").replace(/[^A-Za-z0-9-]+/g,"")).filter(Boolean).join("-");
+function runReport(key,arg,fmt){const r=REPORTS[key]&&REPORTS[key](arg);if(!r){toast("لا بيانات للتقرير","err");return;}const ar=String(arg||"");const fname=asciiName(key,/^[A-Za-z0-9]+$/.test(ar)?ar:(ar?"item":""),todayISO());
+  if(fmt==="pdf"){const ifr=document.createElement("iframe");ifr.style.cssText="position:fixed;width:0;height:0;border:0;left:-9999px";document.body.appendChild(ifr);
+    const d=ifr.contentDocument;d.open();d.write(`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>${esc(r.title)}</title><style>${REP_CSS}</style></head><body>${r.html}</body></html>`);d.close();
+    setTimeout(()=>{ifr.contentWindow.focus();ifr.contentWindow.print();setTimeout(()=>ifr.remove(),60000);},300);}
+  else if(fmt==="doc"){download(new Blob(["\ufeff",`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><style>${REP_CSS}</style></head><body dir="rtl">${r.html}</body></html>`],{type:"application/msword"}),fname+".doc");}
+  else exportSheets(fname,r.sheets);}
+function exportSheets(name,sheets){if(window.XLSX){const wb=XLSX.utils.book_new();wb.Workbook={Views:[{RTL:true}]};
+    sheets.forEach((s,i)=>{const ws=XLSX.utils.aoa_to_sheet([s.cols,...s.rows]);ws["!cols"]=s.cols.map(()=>({wch:20}));XLSX.utils.book_append_sheet(wb,ws,(s.name||"ورقة").slice(0,28)+(sheets.filter(x=>x.name===s.name).length>1?i:""));});
+    XLSX.writeFile(wb,name+".xlsx");}
+  else{const s=sheets[0];const csv=[s.cols,...s.rows].map(r=>r.map(v=>`"${String(v==null?"":v).replace(/"/g,'""')}"`).join(",")).join("\r\n");download(new Blob(["\ufeff"+csv],{type:"text/csv"}),name+".csv");toast("تعذّر تحميل مكتبة Excel — صُدّر بصيغة CSV");}}
+
+/* ====================== IMPORT ====================== */
+const IMPORT_TPL={
+  cases:{l:"القضايا والجلسات",cols:["رقم القضية","المنصة (ناجز/معين)","المحكمة","الدائرة","التصنيف","الحالة (قيد النظر/صدر فيها حكم/منتهية)","الموكل","صفة الموكل","الخصم","تاريخ القيد","الموضوع","تاريخ الجلسة القادمة","وقت الجلسة","نوع الجلسة","جلسة مرئية (نعم/لا)","رابط الجلسة"]},
+  poas:{l:"الوكالات",cols:["رقم الوكالة","الموكل","نوع الوكالة","تاريخ الإصدار","تاريخ الانتهاء"]},
+  execs:{l:"طلبات التنفيذ",cols:["رقم الطلب","المصدر (ناجز/إداري)","نوع الطلب","الحالة (قيد التنفيذ/بانتظار الرد/مسدد/منتهي)","طالب التنفيذ","المنفذ ضده","المبلغ المطالب به","المحصل","آخر قرار","تاريخ آخر قرار","تاريخ التقديم","نهاية المهلة"]},
+  viols:{l:"المخالفات (إيفاء / أفراد / الموارد البشرية)",cols:["المصدر (إيفاء/أفراد/موارد)","المنشأة أو الشخص","السجل أو الهوية","رقم المخالفة","رقم المرجع أو البند","الجهة المصدرة","السبب","تاريخ المخالفة","القيمة","تاريخ الاستحقاق","الحالة (لم تسدد/مسددة/اعتراض/تنفيذ)","رقم السداد","رقم الاعتراض","العامل"]}};
+function normDate(v){if(v==null||v==="")return"";if(v instanceof Date&&!isNaN(v))return isoD(v);const s=String(v).trim().replace(/[٠-٩]/g,d=>"٠١٢٣٤٥٦٧٨٩".indexOf(d));
+  let m=s.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})/);if(m){if(+m[1]<1600){return hijriToG(+m[1],+m[2],+m[3])||"";}return m[1]+"-"+pad(m[2])+"-"+pad(m[3]);}
+  m=s.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})/);if(m){if(+m[3]<1600)return hijriToG(+m[3],+m[2],+m[1])||"";return m[3]+"-"+pad(m[2])+"-"+pad(m[1]);}
+  if(/^\d{5}$/.test(s)){const d=new Date(Math.round((+s-25569)*864e5));return isoD(d);}return"";}
+function hijriToG(y,mo,d){/* search via Intl (Umm al-Qura) */const f=new Intl.DateTimeFormat("en-u-ca-islamic-umalqura-nu-latn",{year:"numeric",month:"numeric",day:"numeric"});
+  let g=new Date(Math.round((y-1)*354.367+(mo-1)*29.53+d)*864e5+Date.UTC(622,6,16));for(let i=0;i<5;i++){const p=f.formatToParts(g);const gy=+p.find(x=>x.type==="year").value,gm=+p.find(x=>x.type==="month").value,gd=+p.find(x=>x.type==="day").value;
+    const diff=(y-gy)*354+(mo-gm)*29.5+(d-gd);if(Math.abs(diff)<0.5)return isoD(g);g=new Date(g.getTime()+Math.round(diff)*864e5);}return isoD(g);}
+const pick=(row,starts)=>{for(const k of Object.keys(row))if(k.trim().startsWith(starts))return String(row[k]==null?"":row[k] instanceof Date?row[k].toISOString():row[k]).trim();return"";};
+const pickD=(row,starts)=>{for(const k of Object.keys(row))if(k.trim().startsWith(starts))return normDate(row[k]);return"";};
+function importRows(kind,rows){let added=0,updated=0;
+  if(kind==="cases")rows.forEach(r=>{const no=pick(r,"رقم القضية");if(!no)return;let c=S.cases.find(x=>x.no===no);const stT=pick(r,"الحالة");
+    const v={no,cat:/معين|مظالم/.test(pick(r,"المنصة"))?"muin":"najiz",court:pick(r,"المحكمة"),circuit:pick(r,"الدائرة"),type:pick(r,"التصنيف"),status:/حكم/.test(stT)?"judged":/منته/.test(stT)?"closed":"open",
+      clientId:resolveClient(pick(r,"الموكل")),role:pick(r,"صفة الموكل")||"مدعي",opponent:pick(r,"الخصم"),filed:pickD(r,"تاريخ القيد"),subject:pick(r,"الموضوع")};
+    if(c){Object.keys(v).forEach(k=>{if(v[k])c[k]=v[k];});updated++;}else{c={id:uid(),sessions:[],notes:[],requests:[],parties:[],judgments:[],docs:[],...v};S.cases.push(c);added++;}
+    const sd=pickD(r,"تاريخ الجلسة");if(sd){const time=(pick(r,"وقت الجلسة").match(/\d{1,2}:\d{2}/)||["09:00"])[0].padStart(5,"0");
+      const ex=c.sessions.find(s=>s.date===sd&&s.time===time);if(!ex){c.sessions.push({id:uid(),date:sd,time,kind:pick(r,"نوع الجلسة")||"جلسة مرافعة",status:"scheduled",virtual:/نعم|yes/i.test(pick(r,"جلسة مرئية")),link:pick(r,"رابط")});logChange(`جلسة جديدة للقضية ${no}: ${sd} ${time}`,{case:c.id});}}});
+  if(kind==="poas")rows.forEach(r=>{const no=pick(r,"رقم الوكالة");if(!no)return;const v={no,clientId:resolveClient(pick(r,"الموكل")),kind:pick(r,"نوع الوكالة")||"وكالة قضائية",issued:pickD(r,"تاريخ الإصدار"),expires:pickD(r,"تاريخ الانتهاء")};
+    const p=S.poas.find(x=>x.no===no);if(p){Object.assign(p,v);updated++;}else{S.poas.push({id:uid(),...v});added++;}});
+  if(kind==="execs")rows.forEach(r=>{const no=pick(r,"رقم الطلب");if(!no)return;const st=pick(r,"الحالة");
+    const v={no,src:/إداري|اداري|مظالم/.test(pick(r,"المصدر"))?"admin":"najiz",kind:pick(r,"نوع الطلب"),status:/انتظار/.test(st)?"waiting":/مسدد/.test(st)?"paid":/منته/.test(st)?"ended":"active",
+      applicant:pick(r,"طالب التنفيذ"),against:pick(r,"المنفذ ضده"),amount:num(pick(r,"المبلغ")),collected:num(pick(r,"المحصل")),lastDecision:pick(r,"آخر قرار"),decisionDate:pickD(r,"تاريخ آخر قرار"),filed:pickD(r,"تاريخ التقديم"),deadline:pickD(r,"نهاية المهلة")};
+    const e=S.execs.find(x=>x.no===no);if(e){if(e.lastDecision!==v.lastDecision&&v.lastDecision)logChange(`قرار تنفيذ جديد للطلب ${no}: ${v.lastDecision}`);Object.assign(e,v);updated++;}else{S.execs.push({id:uid(),...v});added++;}});
+  if(kind==="viols")rows.forEach(r=>{const no=pick(r,"رقم المخالفة");if(!no)return;const s=pick(r,"المصدر"),st=pick(r,"الحالة");
+    const v={src:/أفراد|افراد/.test(s)?"ind":/موارد|عمل/.test(s)?"hrsd":"efaa",entity:pick(r,"المنشأة")||"—",entityId:pick(r,"السجل"),no,ref:pick(r,"رقم المرجع"),authority:pick(r,"الجهة"),reason:pick(r,"السبب"),
+      date:pickD(r,"تاريخ المخالفة"),amount:num(pick(r,"القيمة")),due:pickD(r,"تاريخ الاستحقاق"),status:/مسدد/.test(st)&&!/لم/.test(st)?"paid":/اعتراض|تسوية/.test(st)?"objection":/تنفيذ/.test(st)?"enforce":"unpaid",payNo:pick(r,"رقم السداد"),objNo:pick(r,"رقم الاعتراض"),worker:pick(r,"العامل")};
+    const x=S.viols.find(y=>y.no===no&&y.src===v.src);if(x){if(x.status!==v.status)logChange(`تغيّرت حالة المخالفة ${no} (${v.entity}) إلى ${VST[v.status][0]}`);Object.assign(x,v);updated++;}
+    else{S.viols.push({id:uid(),isNew:true,...v});added++;logChange(`مخالفة جديدة: ${v.entity} — ${no} — ${money(v.amount)}`);}});
+  return{added,updated};}
+
+/* ====================== REMINDERS / ICS ====================== */
+function fired(){try{return JSON.parse(localStorage.getItem("hajib_fired")||"{}");}catch(e){return{};}}
+function setFired(o){try{const now=Date.now();Object.keys(o).forEach(k=>{if(now-o[k]>864e5*3)delete o[k];});localStorage.setItem("hajib_fired",JSON.stringify(o));}catch(e){}}
+function notify(title,body){toast("🔔 "+title+": "+body);try{if(S.settings.notify&&"Notification"in window&&Notification.permission==="granted")new Notification(title,{body});}catch(e){}}
+function reminderTick(){const now=Date.now();const f=fired();const mins=String(S.settings.remindMins||"").split(/[,،\s]+/).map(Number).filter(n=>n>0);
+  allSessions().forEach(s=>{if(s.status==="ended"||!s.time)return;const at=dt(s.date,s.time).getTime();mins.forEach(m=>{const k="s"+s.id+"_"+m+"_"+s.date+s.time;
+    if(!f[k]&&now>=at-m*6e4&&now<at){f[k]=now;notify(`جلسة بعد ${m} دقيقة`,`قضية ${s.c.no} — ${s.c.court||""} — ${tm(s.time)}${s.virtual?" (مرئية)":""}`);}});});
+  S.events.forEach(e=>{if(e.done)return;const d=nextOcc(e);const at=dt(d,e.time).getTime();(e.remind&&e.remind.length?e.remind:[0]).forEach(m=>{const k="e"+e.id+"_"+m+"_"+d;
+    if(!f[k]&&now>=at-m*6e4&&now<at+6e4){f[k]=now;notify("السكرتير — تذكير",`${e.kind}: ${e.title} — ${both(d)} ${tm(e.time)}${e.place?" — "+e.place:""}`);}});});
+  setFired(f);updateAlertN();}
+function icsEsc(s){return String(s||"").replace(/\\/g,"\\\\").replace(/\n/g,"\\n").replace(/[,;]/g,m=>"\\"+m);}
+function icsDT(d,t){return d.replace(/-/g,"")+"T"+(t||"09:00").replace(":","")+"00";}
+function buildICS(){const L=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Hajib Mansour//AR","CALSCALE:GREGORIAN","X-WR-CALNAME:الحاجب المنصور القانوني","X-WR-TIMEZONE:Asia/Riyadh"];
+  const stamp=new Date().toISOString().replace(/[-:]/g,"").slice(0,15)+"Z";const mins=String(S.settings.remindMins||"30").split(/[,،\s]+/).map(Number).filter(n=>n>0);const t=todayISO();
+  const ev=(id,d,tm2,sum,loc,desc,alarms,rrule)=>{L.push("BEGIN:VEVENT","UID:"+id+"@hajib","DTSTAMP:"+stamp,"DTSTART;TZID=Asia/Riyadh:"+icsDT(d,tm2),"DURATION:PT1H","SUMMARY:"+icsEsc(sum));
+    if(loc)L.push("LOCATION:"+icsEsc(loc));if(desc)L.push("DESCRIPTION:"+icsEsc(desc));if(rrule)L.push("RRULE:"+rrule);
+    alarms.forEach(m=>L.push("BEGIN:VALARM","ACTION:DISPLAY","DESCRIPTION:"+icsEsc(sum),"TRIGGER:-PT"+m+"M","END:VALARM"));L.push("END:VEVENT");};
+  allSessions().filter(s=>s.date>=t&&s.status!=="ended").forEach(s=>ev("s"+s.id,s.date,s.time,`${s.kind||"جلسة"} — قضية ${s.c.no}`,(s.c.court||"")+(s.c.circuit?" — "+s.c.circuit:""),`${clientName(s.c.clientId)} ضد ${s.c.opponent||""}${s.link?"\nرابط الجلسة: "+s.link:""}`,mins));
+  S.events.filter(e=>!e.done).forEach(e=>ev("e"+e.id,e.date,e.time,`${e.kind}: ${e.title}`,e.place,e.person?"مع "+e.person:"",(e.remind||[]).filter(m=>m>0),{daily:"FREQ=DAILY",weekly:"FREQ=WEEKLY",monthly:"FREQ=MONTHLY"}[e.repeat]));
+  S.poas.forEach(p=>{if(p.expires&&p.expires>=t)ev("p"+p.id,addDays(p.expires,-30),"09:00","تجديد وكالة "+p.no+" — "+clientName(p.clientId),"","تنتهي الوكالة في "+p.expires,[0]);});
+  L.push("END:VCALENDAR");
+  /* Asia/Riyadh is a fixed UTC+3 zone; include a minimal VTIMEZONE so calendar apps resolve it */
+  const tz=["BEGIN:VTIMEZONE","TZID:Asia/Riyadh","BEGIN:STANDARD","DTSTART:19700101T000000","TZOFFSETFROM:+0300","TZOFFSETTO:+0300","TZNAME:+03","END:STANDARD","END:VTIMEZONE"];
+  L.splice(6,0,...tz);return L.join("\r\n");}
+
+/* ====================== ACTIONS ====================== */
+const ACT={
+  go:d=>{$$("#modals .ov").forEach(o=>o.remove());go(d.v);},theme:()=>{const n=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",n);try{localStorage.setItem("hajib_theme",n);}catch(e){}},
+  wk:d=>{R.week=d.v==="0"?0:R.week+Number(d.v);refresh();},wf:d=>{R.wf=d.v;refresh();},
+  cf:d=>{R.cf[d.k]=d.v;refresh();},pf:d=>{R.pf=d.v;refresh();},ef:d=>{R.ef=d.v;refresh();},
+  case:d=>openCase(d.id,d.tab||"details"),ctab:(d,el)=>{const ov=el.closest(".ov");drawCase(ov,d.v);},
+  copy:d=>{navigator.clipboard&&navigator.clipboard.writeText(d.v).then(()=>toast("نُسخ","ok"));},
+  addCase:d=>formModal("قضية جديدة",F_CASE,{cat:d.v||"najiz",clientId:d.client||""},v=>{const c={id:uid(),sessions:[],notes:[],requests:[],parties:[],judgments:[],docs:[],...v};S.cases.push(c);logChange("أُضيفت قضية "+c.no,{case:c.id});}),
+  editCase:d=>{const c=getCase(d.id);formModal("تعديل القضية",F_CASE,c,v=>{if(v.status!==c.status)logChange(`تغيّرت حالة القضية ${c.no} إلى ${CASE_ST[v.status][0]}`,{case:c.id});Object.assign(c,v);setTimeout(redrawCase,0);});},
+  delCase:async(d,el)=>{const c=getCase(d.id);if(!confirmBox("حذف القضية "+c.no+" بكل جلساتها وملفاتها؟"))return;for(const f of c.docs||[])await idbDel("files",f.id);S.cases=S.cases.filter(x=>x.id!==c.id);logChange("حُذفت القضية "+c.no);el.closest(".ov").remove();save();refresh();},
+  addSessionPick:()=>{if(!S.cases.length){toast("أضف قضية أولًا","err");return;}modal("اختر القضية",`<div class="fd"><select id="pickC">${S.cases.map(c=>`<option value="${c.id}">${esc(c.no)} — ${esc(clientName(c.clientId))}</option>`).join("")}</select></div>`,{foot:'<button class="btn g" id="pk">متابعة</button>',onMount:(ov,close)=>{$("#pk",ov).onclick=()=>{const id=$("#pickC",ov).value;close();ACT.addSess({id});};}});},
+  addSess:d=>{const c=getCase(d.id);formModal("إضافة جلسة — قضية "+c.no,F_SESS,null,v=>{(c.sessions=c.sessions||[]).push({id:uid(),...v});logChange(`جلسة جديدة للقضية ${c.no}: ${v.date} ${v.time}`,{case:c.id});setTimeout(redrawCase,0);});},
+  editSess:d=>{const c=getCase(d.id),s=c.sessions.find(x=>x.id===d.s);formModal("تعديل الجلسة",F_SESS,s,v=>{if(v.date!==s.date||v.time!==s.time)logChange(`تغيّر موعد جلسة القضية ${c.no} إلى ${v.date} ${v.time}`,{case:c.id});Object.assign(s,v);setTimeout(redrawCase,0);});},
+  delSess:d=>{if(!confirmBox("حذف الجلسة؟"))return;const c=getCase(d.id);c.sessions=c.sessions.filter(x=>x.id!==d.s);save();redrawCase();refresh();},
+  addJudg:d=>subEdit(d.id,"judgments",F_JUDG,null,"إضافة حكم"),editJudg:d=>subEdit(d.id,"judgments",F_JUDG,getCase(d.id).judgments.find(x=>x.id===d.j),"تعديل حكم"),
+  delJudg:d=>{if(!confirmBox("حذف الحكم؟"))return;const c=getCase(d.id);c.judgments=c.judgments.filter(x=>x.id!==d.j);save();redrawCase();},
+  addReq:d=>subEdit(d.id,"requests",F_REQ,null,"إضافة طلب"),editReq:d=>subEdit(d.id,"requests",F_REQ,getCase(d.id).requests.find(x=>x.id===d.r),"تعديل طلب"),
+  delReq:d=>{const c=getCase(d.id);c.requests=c.requests.filter(x=>x.id!==d.r);save();redrawCase();},
+  addParty:d=>subEdit(d.id,"parties",F_PARTY,null,"إضافة طرف"),editParty:d=>subEdit(d.id,"parties",F_PARTY,getCase(d.id).parties.find(x=>x.id===d.p),"تعديل طرف"),
+  delParty:d=>{const c=getCase(d.id);c.parties=c.parties.filter(x=>x.id!==d.p);save();redrawCase();},
+  addNote:(d,el)=>{const ta=el.closest(".md-b").querySelector("#newNote");const t=ta.value.trim();if(!t)return;const c=getCase(d.id);(c.notes=c.notes||[]).unshift({id:uid(),at:new Date().toISOString(),text:t});save();redrawCase();},
+  delNote:d=>{const c=getCase(d.id);c.notes=c.notes.filter(x=>x.id!==d.n);save();redrawCase();},
+  pickFiles:(d,el)=>el.closest(".md-b").querySelector("#cfiles").click(),
+  openDoc:async d=>{try{const b=await getFile(d.f);if(!b){toast("الملف غير موجود","err");return;}const u=URL.createObjectURL(b);window.open(u,"_blank");setTimeout(()=>URL.revokeObjectURL(u),60000);}catch(e){toast("تعذّر فتح الملف","err");}},
+  dlDoc:async d=>{const c=getCase(d.id);const m=c.docs.find(x=>x.id===d.f);try{const b=await getFile(d.f);b?download(b,m.name):toast("الملف غير موجود","err");}catch(e){toast("تعذّر فك تشفير الملف","err");}},
+  delDoc:async d=>{if(!confirmBox("حذف الملف؟"))return;const c=getCase(d.id);await idbDel("files",d.f);c.docs=c.docs.filter(x=>x.id!==d.f);save();redrawCase();},
+  addPoa:()=>formModal("وكالة جديدة",F_POA,null,v=>{S.poas.push({id:uid(),...v});logChange("أُضيفت وكالة "+v.no);}),
+  editPoa:d=>formModal("تعديل الوكالة",F_POA,S.poas.find(x=>x.id===d.id),v=>{Object.assign(S.poas.find(x=>x.id===d.id),v);}),
+  delPoa:d=>{if(confirmBox("حذف الوكالة؟")){S.poas=S.poas.filter(x=>x.id!==d.id);save();refresh();}},
+  addExec:d=>formModal("طلب تنفيذ جديد",F_EXEC,{src:d.v},v=>{S.execs.push({id:uid(),...v});logChange("أُضيف طلب تنفيذ "+v.no);}),
+  editExec:d=>{const e=S.execs.find(x=>x.id===d.id);formModal("تعديل طلب التنفيذ",F_EXEC,e,v=>{if(v.lastDecision&&v.lastDecision!==e.lastDecision)logChange(`قرار جديد في طلب التنفيذ ${e.no}: ${v.lastDecision}`);Object.assign(e,v);});},
+  delExec:d=>{if(confirmBox("حذف طلب التنفيذ؟")){S.execs=S.execs.filter(x=>x.id!==d.id);save();refresh();}},
+  client:d=>{$$("#modals .ov").forEach(o=>o.remove());R.v="clients";R.client=d.id;refresh();scrollTo(0,0);},clientBack:()=>{R.client=null;refresh();},
+  addClient:()=>formModal("موكل جديد",F_CLIENT,null,v=>{if(S.clients.some(c=>c.name===v.name)){toast("الموكل موجود مسبقًا","err");return false;}S.clients.push({id:uid(),...v});}),
+  editClient:d=>formModal("تعديل الموكل",F_CLIENT,S.clients.find(x=>x.id===d.id),v=>{Object.assign(S.clients.find(x=>x.id===d.id),v);}),
+  delClient:d=>{const used=S.cases.some(c=>c.clientId===d.id)||S.poas.some(p=>p.clientId===d.id)||S.execs.some(e=>e.clientId===d.id);
+    if(used&&!confirmBox("هذا الموكل مرتبط بقضايا أو وكالات أو تنفيذ؛ سيبقى السجل دون اسم موكل. متابعة الحذف؟"))return;if(!used&&!confirmBox("حذف الموكل؟"))return;
+    S.clients=S.clients.filter(x=>x.id!==d.id);R.client=null;save();refresh();},
+  harvestClients:()=>{const before=S.clients.length;[...S.cases,...S.poas,...S.execs].forEach(x=>{if(x.clientId&&!S.clients.some(c=>c.id===x.clientId))x.clientId="";});
+    S.execs.forEach(e=>{if(!e.clientId&&e.applicant)e.clientId=resolveClient(e.applicant);});save();refresh();toast(`حُصر الموكلون — أُضيف ${S.clients.length-before} موكل`,"ok");},
+  addViol:d=>formModal("مخالفة جديدة — "+VSRC[d.v],F_VIOL(d.v),null,v=>{S.viols.push({id:uid(),src:d.v,isNew:true,...v});logChange(`مخالفة جديدة: ${v.entity} — ${v.no}`);}),
+  editViol:d=>{const x=S.viols.find(v=>v.id===d.id);formModal("تعديل المخالفة",F_VIOL(x.src),x,v=>{if(v.status!==x.status)logChange(`تغيّرت حالة المخالفة ${x.no} إلى ${VST[v.status][0]}`);Object.assign(x,v);});},
+  delViol:d=>{if(confirmBox("حذف المخالفة؟")){S.viols=S.viols.filter(v=>v.id!==d.id);save();refresh();}},
+  vEntity:d=>{R.vEntity=d.v;refresh();},markRead:d=>{S.viols.forEach(v=>{if(v.src===d.v)v.isNew=false;});save();refresh();},
+  nlEx:d=>{$("#nl").value=d.v;},
+  nlParse:()=>{const t=$("#nl").value.trim();if(!t){toast("اكتب الموعد أولًا","err");return;}const p=parseNL(t);eventForm(p,"معاينة الموعد — راجع واحفظ");},
+  editEvent:d=>{const e=S.events.find(x=>x.id===d.id);eventForm(e,"تعديل الموعد");},
+  delEvent:d=>{if(confirmBox("حذف الموعد؟")){S.events=S.events.filter(x=>x.id!==d.id);save();refresh();}},
+  doneEvent:d=>{const e=S.events.find(x=>x.id===d.id);if(e.repeat&&e.repeat!=="none"){e.date=stepRepeat(nextOcc(e),e.repeat);toast("تم — نُقل للموعد التالي","ok");}else e.done=true;save();refresh();},
+  snooze:d=>{const e=S.events.find(x=>x.id===d.id);const n=new Date(dt(nextOcc(e),e.time).getTime()+36e5);e.date=isoD(n);e.time=pad(n.getHours())+":"+pad(n.getMinutes());save();refresh();toast("أُجّل ساعة","ok");},
+  testRemind:d=>{const e=S.events.find(x=>x.id===d.id);if(S.settings.notify&&"Notification"in window&&Notification.permission!=="granted")Notification.requestPermission();notify("السكرتير — تذكير",`${e.kind}: ${e.title} — ${both(nextOcc(e))} ${tm(e.time)}${e.place?" — "+e.place:""}`);},
+  aiQuick:(d,el)=>{const root=el.closest(".md-b")||$("#app");root._aiSend&&root._aiSend(d.v);},
+  aiClear:(d,el)=>{const ov=el.closest(".ov");const cid=ov?ov.dataset.case:null;S.ai&&delete S.ai[cid||"_"];save();ov?redrawCase():refresh();},
+  aiCopy:(d,el)=>{const root=el.closest(".md-b")||$("#app");const m=$$(".msg.a",root).pop();if(m&&navigator.clipboard)navigator.clipboard.writeText(m.textContent).then(()=>toast("نُسخ","ok"));},
+  lawSearch:()=>{const q=($("#lq")||{}).value||"";window.open("https://www.google.com/search?q="+encodeURIComponent("site:laws.boe.gov.sa "+q),"_blank","noopener");},
+  lawGo:d=>window.open("https://www.google.com/search?q="+encodeURIComponent("site:laws.boe.gov.sa "+d.v),"_blank","noopener"),
+  addLaw:()=>formModal("إضافة نظام / لائحة",F_LAW,null,v=>{S.laws.push({id:uid(),...v});}),editLaw:d=>formModal("تعديل",F_LAW,S.laws.find(x=>x.id===d.id),v=>{Object.assign(S.laws.find(x=>x.id===d.id),v);}),
+  delLaw:async d=>{if(!confirmBox("حذف؟"))return;const l=S.laws.find(x=>x.id===d.id);if(l.file)await idbDel("files",l.file.id);S.laws=S.laws.filter(x=>x.id!==d.id);save();refresh();},
+  lawFile:d=>{const i=$("#lawFileIn");i.dataset.id=d.id;i.click();},
+  rep:d=>runReport(d.r,d.a,d.f),repCase:d=>{const id=$("#repCase").value;if(!id){toast("لا قضايا","err");return;}runReport("case",id,d.f);},
+  changesRead:()=>{S.changes.forEach(c=>c.read=true);save();refresh();},changesClear:()=>{if(confirmBox("مسح سجل التغييرات؟")){S.changes=[];save();refresh();}},
+  alerts:()=>modal("التنبيهات",alertsHTML(),{}),
+  exportICS:()=>{download(new Blob([buildICS()],{type:"text/calendar"}),"Hajib-calendar.ics");toast("افتح الملف على جوالك لإضافة الجلسات والمواعيد مع التنبيهات إلى التقويم","ok");},
+  openImport:()=>openImport(),settings:()=>openSettings()
+};
+const F_REQ=[{k:"title",l:"الطلب",req:true,full:true},{k:"date",l:"التاريخ",t:"date"},{k:"status",l:"الحالة",t:"select",opts:["بانتظار الرد","مقبول","مرفوض"],def:"بانتظار الرد"},{k:"reply",l:"الرد",t:"textarea",full:true}];
+const F_PARTY=[{k:"name",l:"الاسم",req:true},{k:"role",l:"الصفة",t:"select",opts:["مدعي","مدعى عليه","متدخل","وكيل","شاهد","خبير"],def:"مدعى عليه"},{k:"idno",l:"الهوية / السجل"},{k:"agent",l:"الوكيل"}];
+const F_LAW=[{k:"name",l:"اسم النظام / اللائحة",req:true,full:true},{k:"url",l:"الرابط الرسمي",t:"url",full:true},{k:"notes",l:"ملاحظات",t:"textarea",full:true}];
+function eventForm(obj,title){const o={...obj,remindTxt:(obj.remind||[]).join(",")};const isNew=!obj.id;
+  formModal(title,F_EVENT,o,v=>{v.remind=String(v.remindTxt||"").split(/[,،\s]+/).map(Number).filter(n=>n>=0);delete v.remindTxt;
+    if(isNew)S.events.push({id:uid(),done:false,...v});else Object.assign(S.events.find(x=>x.id===obj.id),v);
+    if(isNew&&$("#nl"))$("#nl").value="";},{extraFoot:`<span class="sm muted" style="align-self:center">${isNew?"رسالة التذكير: «⏰ "+esc(obj.kind||"")+": "+esc(obj.title||"")+" — "+esc(both(obj.date))+" "+esc(tm(obj.time))+"»":""}</span>`});}
+
+document.addEventListener("click",e=>{const el=e.target.closest("[data-act]");if(!el)return;if(el.tagName==="A"&&el.getAttribute("href")&&el.getAttribute("href")!=="#")return;
+  const f=ACT[el.dataset.act];if(f){e.preventDefault();e.stopPropagation();f(el.dataset,el);}});
+document.addEventListener("change",async e=>{const el=e.target;if(!el.dataset||!el.dataset.change)return;
+  if(el.dataset.change==="caseFiles"){const c=getCase(el.dataset.id);for(const f of el.files){if(f.size>50*1048576){toast(f.name+": أكبر من ٥٠ م.ب","err");continue;}const id=uid();try{await putFile(id,f);(c.docs=c.docs||[]).push({id,name:f.name,size:f.size,type:f.type,added:new Date().toISOString()});}catch(err){toast("تعذّر حفظ "+f.name,"err");}}
+    save();redrawCase();toast("تم رفع الملفات","ok");}
+  if(el.dataset.change==="lawFile"){const f=el.files[0];if(!f)return;const l=S.laws.find(x=>x.id===el.dataset.id);const id=uid();await putFile(id,f);l.file={id,name:f.name};save();refresh();el.value="";}});
+document.addEventListener("dragover",e=>{const d=e.target.closest&&e.target.closest(".drop");if(d){e.preventDefault();d.classList.add("on");}});
+document.addEventListener("dragleave",e=>{const d=e.target.closest&&e.target.closest(".drop");if(d)d.classList.remove("on");});
+document.addEventListener("drop",e=>{const d=e.target.closest&&e.target.closest(".drop");if(!d)return;e.preventDefault();d.classList.remove("on");const inp=d.parentElement.querySelector("#cfiles");if(!inp)return;
+  const dtf=new DataTransfer();[...e.dataTransfer.files].forEach(f=>dtf.items.add(f));inp.files=dtf.files;inp.dispatchEvent(new Event("change",{bubbles:true}));});
+
+/* global search */
+function gsearch(q){q=q.trim().toLowerCase();const box=$("#gres");if(!q){box.classList.add("hidden");return;}const out=[];
+  S.cases.forEach(c=>{if([c.no,c.opponent,clientName(c.clientId),c.court].join(" ").toLowerCase().includes(q))out.push(`<div data-act="case" data-id="${c.id}">⚖️ قضية ${esc(c.no)} — ${esc(clientName(c.clientId))} ضد ${esc(c.opponent||"")}</div>`);});
+  S.clients.forEach(c=>{if((c.name+" "+c.idno+" "+c.phone).toLowerCase().includes(q))out.push(`<div data-act="client" data-id="${c.id}">👤 ${esc(c.name)}</div>`);});
+  S.poas.forEach(p=>{if((p.no+" "+clientName(p.clientId)).toLowerCase().includes(q))out.push(`<div data-act="go" data-v="poas">📜 وكالة ${esc(p.no)}</div>`);});
+  S.execs.forEach(e=>{if([e.no,e.against,e.applicant].join(" ").toLowerCase().includes(q))out.push(`<div data-act="go" data-v="${e.src==="admin"?"adminexec":"execs"}">💰 تنفيذ ${esc(e.no)} — ${esc(e.against||"")}</div>`);});
+  S.viols.forEach(v=>{if([v.no,v.entity,v.entityId].join(" ").toLowerCase().includes(q))out.push(`<div data-act="go" data-v="viol_${v.src}">🚦 ${esc(v.entity)} — ${esc(v.no)}</div>`);});
+  box.innerHTML=out.slice(0,30).join("")||'<div class="muted">لا نتائج</div>';box.classList.remove("hidden");}
+
+/* ====================== IMPORT UI ====================== */
+function openImport(){modal("استيراد من Excel",`<div class="banner i sm">صدّر البيانات من المنصة (أو اكتبها في ملف Excel) بأسماء الأعمدة في القالب، ثم ارفع الملف. التكرار يُحدَّث ولا يُكرَّر (يُطابَق بالرقم)، والجديد يُعلَّم ويُسجَّل في «التغييرات». التواريخ الهجرية بصيغة 1448/05/15 مقبولة.</div>
+  <div class="fd"><label>نوع البيانات</label><select id="impKind">${Object.entries(IMPORT_TPL).map(([k,v])=>`<option value="${k}">${v.l}</option>`).join("")}</select></div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0"><button class="btn" id="tplBtn">⬇ تنزيل القالب</button><button class="btn g" id="impBtn">⬆ اختيار ملف Excel / CSV</button><input type="file" id="impFile" class="hidden" accept=".xlsx,.xls,.csv"></div><div id="impRes"></div>`,
+  {onMount:(ov)=>{$("#tplBtn",ov).onclick=()=>{const k=$("#impKind",ov).value;exportSheets("Hajib-template-"+k,[{name:"البيانات",cols:IMPORT_TPL[k].cols,rows:[]}]);};
+    $("#impBtn",ov).onclick=()=>$("#impFile",ov).click();
+    $("#impFile",ov).onchange=async e=>{const f=e.target.files[0];if(!f)return;if(!window.XLSX){toast("مكتبة Excel لم تُحمَّل — تحقق من الاتصال","err");return;}
+      try{const wb=XLSX.read(new Uint8Array(await f.arrayBuffer()),{type:"array",cellDates:true});const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:"",raw:true});
+        if(!rows.length){$("#impRes",ov).innerHTML='<div class="banner r">الملف لا يحتوي صفوف بيانات تحت سطر العناوين.</div>';e.target.value="";return;}
+        const r=importRows($("#impKind",ov).value,rows);save();refresh();$("#impRes",ov).innerHTML=`<div class="banner w">تمت القراءة: ${rows.length} صف — أُضيف ${r.added}، وحُدِّث ${r.updated}.</div>`;toast("تم الاستيراد","ok");}
+      catch(err){toast("تعذّر قراءة الملف: "+err.message,"err");}e.target.value="";};}});}
+
+/* ====================== SETTINGS ====================== */
+function openSettings(){const s=S.settings;
+  modal("الإعدادات",`<div class="fg">
+    ${fieldHTML({k:"office",l:"اسم المكتب (للترويسة)"},s.office)}${fieldHTML({k:"lawyer",l:"اسم المحامي"},s.lawyer)}
+    ${fieldHTML({k:"calcUrl",l:"رابط الحاسبات",t:"url",ph:"https://..."},s.calcUrl)}${fieldHTML({k:"minutesUrl",l:"رابط موقع المحاضر",t:"url",ph:"https://..."},s.minutesUrl)}
+    ${fieldHTML({k:"remindMins",l:"التنبيه قبل الجلسة (دقائق)",hint:"مثال: 30,10"},s.remindMins)}${fieldHTML({k:"appealDays",l:"مدة الاعتراض الافتراضية (يوم)",t:"number",hint:"تحقّق من المدة النظامية لكل حكم"},s.appealDays)}
+    ${fieldHTML({k:"violP1",l:"مهلة التظلم أمام الجهة المصدرة (يوم)",t:"number"},s.violP1)}${fieldHTML({k:"violP2",l:"مهلة التظلم أمام ديوان المظالم (يوم)",t:"number"},s.violP2)}
+    ${fieldHTML({k:"apiKey",l:"مفتاح Anthropic API للمساعد",t:"password",ph:"sk-ant-...",hint:"يُحفظ على جهازك فقط — ويُشفَّر إذا فعّلت القفل"},s.apiKey)}
+    ${fieldHTML({k:"model",l:"نموذج المساعد",t:"select",opts:[["claude-sonnet-5-5","Claude Sonnet 5.5 (متوازن)"],["claude-opus-5-5","Claude Opus 5.5 (الأقوى)"],["claude-haiku-5-5","Claude Haiku 5.5 (الأسرع)"]]},s.model)}
+    ${fieldHTML({k:"notify",l:"إشعارات المتصفح للجلسات والمواعيد",t:"check",full:true},s.notify)}</div>
+  <hr style="border:none;border-top:1px solid var(--line);margin:14px 0">
+  <b>الحماية والتشفير</b><div class="acts" style="margin:8px 0">${KEY?'<span class="pill p-ok">مفعّل ومشفّر 🔒</span><button class="btn s" id="chgPass">تغيير الرمز</button><button class="btn s" id="lockNow">قفل الآن</button><button class="btn s d" id="rmLock">إلغاء القفل</button>':'<span class="pill p-mut">غير مفعّل</span><button class="btn s g" id="setLock">تفعيل قفل الدخول والتشفير</button>'}</div>
+  <b>النسخ الاحتياطي (يشمل الملفات)</b><div class="acts" style="margin:8px 0"><button class="btn s g" id="bkExp">⬇ نسخ احتياطي الآن</button><button class="btn s" id="bkImp">⬆ استرجاع نسخة</button><input type="file" id="bkFile" class="hidden" accept=".json"></div>
+  <div class="sm muted">آخر نسخة احتياطية: ${s.lastBackup?new Date(s.lastBackup).toLocaleString("ar-SA-u-nu-latn"):"لم تُنشأ بعد"} — انقل الملف لجهازك الآخر واسترجعه هناك.</div>
+  <b style="display:block;margin-top:12px">البيانات التجريبية</b><div class="acts" style="margin:8px 0"><button class="btn s d" id="clrDemo">مسح البيانات التجريبية</button><button class="btn s d" id="clrAll">مسح كل البيانات</button></div>`,
+  {lg:true,foot:'<button class="btn g" id="stSave">حفظ الإعدادات</button>',onMount:(ov,close)=>{
+    $("#stSave",ov).onclick=async()=>{const F=[{k:"office"},{k:"lawyer"},{k:"calcUrl"},{k:"minutesUrl"},{k:"remindMins"},{k:"appealDays",t:"number"},{k:"violP1",t:"number"},{k:"violP2",t:"number"},{k:"apiKey"},{k:"model"},{k:"notify",t:"check"}];
+      const v=readForm(ov,F);["appealDays","violP1","violP2"].forEach(k=>{if(!v[k]||v[k]<0)v[k]=DEF_SETTINGS[k];});
+      if(v.notify&&!s.notify&&"Notification"in window){const p=await Notification.requestPermission();if(p!=="granted"){v.notify=false;toast("لم يُسمح بالإشعارات من المتصفح","err");}}
+      Object.assign(S.settings,v);save();close();refresh();toast("حُفظت الإعدادات","ok");};
+    const b=(id,fn)=>{const el=$("#"+id,ov);if(el)el.onclick=fn;};
+    b("setLock",()=>{close();setupLock();});b("chgPass",()=>{close();changePass();});b("rmLock",()=>{close();removeLock();});b("lockNow",()=>{KEY=null;location.reload();});
+    b("bkExp",exportBackup);b("bkImp",()=>$("#bkFile",ov).click());$("#bkFile",ov).onchange=e=>importBackup(e.target.files[0],close);
+    b("clrDemo",async()=>{if(!confirmBox("مسح كل السجلات التجريبية؟"))return;for(const k of["cases","clients","poas","execs","viols","events"])S[k]=S[k].filter(x=>!x.demo);save();close();refresh();toast("مُسحت البيانات التجريبية","ok");});
+    b("clrAll",async()=>{if(!confirmBox("سيُحذف كل شيء نهائيًا. هل صدّرت نسخة احتياطية؟"))return;if(!confirmBox("تأكيد أخير: مسح كل البيانات والملفات؟"))return;
+      for(const k of await idbKeys("files"))await idbDel("files",k);const st={...S.settings};S={clients:[],cases:[],poas:[],execs:[],viols:[],events:[],laws:[],changes:[],settings:st,seeded:true};save();close();refresh();});}});}
+async function exportBackup(){toast("جارٍ تجهيز النسخة...");const files={};for(const k of await idbKeys("files")){try{const b=await getFile(k);if(b)files[k]={type:b.type,data:b64.enc(await b.arrayBuffer())};}catch(e){}}
+  S.settings.lastBackup=new Date().toISOString();save();const dump={_app:"hajib",_v:1,_at:S.settings.lastBackup,state:{...S,settings:{...S.settings,apiKey:""}},files};
+  download(new Blob([JSON.stringify(dump)],{type:"application/json"}),"Hajib-backup-"+todayISO()+".json");toast("تم التصدير — مفتاح API لا يُضمَّن في النسخة","ok");}
+async function importBackup(file,close){if(!file)return;if(!confirmBox("الاسترجاع يستبدل كل البيانات الحالية. متابعة؟"))return;
+  try{const d=JSON.parse(await file.text());if(d._app!=="hajib"||!d.state)throw new Error("ملف غير صالح");for(const k of await idbKeys("files"))await idbDel("files",k);
+    for(const[k,v]of Object.entries(d.files||{}))await putFile(k,new Blob([b64.dec(v.data)],{type:v.type}));const key=S.settings.apiKey;
+    S=Object.assign({clients:[],cases:[],poas:[],execs:[],viols:[],events:[],laws:[],changes:[]},d.state);S.settings={...DEF_SETTINGS,...d.state.settings,apiKey:key};S.seeded=true;
+    await idbSet("kv","state",KEY?await encObj(KEY,S):S);close&&close();refresh();toast("تم الاسترجاع","ok");}catch(e){toast("فشل الاسترجاع: "+e.message,"err");}}
+
+/* lock */
+async function reEncAll(oldK,newK){for(const k of await idbKeys("files")){const v=await idbGet("files",k);if(!v)continue;const plain=v.enc?await decBlob(oldK,v):v;await idbSet("files",k,newK?await encBlob(newK,plain):plain);}}
+function passForm(title,fields,fn){modal(title,fields.map(([id,l])=>`<div class="fd" style="margin-bottom:8px"><label>${l}</label><input type="password" id="${id}"></div>`).join("")+'<div class="sm" style="color:var(--bad)">تنبيه: لا يمكن استرجاع البيانات إذا نُسي الرمز. صدّر نسخة احتياطية أولًا.</div>',
+  {foot:'<button class="btn g" id="pOk">تأكيد</button>',onMount:(ov,close)=>{$("#pOk",ov).onclick=async()=>{try{await fn(id=>$("#"+id,ov).value,close);}catch(e){toast(e.message,"err");}};}});}
+async function verify(pass){const m=await idbGet("kv","meta");const k=await deriveKey(pass,m.salt);try{await decObj(k,m.verifier);}catch(e){throw new Error("الرمز غير صحيح");}return k;}
+async function setNewKey(pass,oldK){const salt=b64.enc(crypto.getRandomValues(new Uint8Array(16)));const k=await deriveKey(pass,salt);await reEncAll(oldK,k);KEY=k;
+  await idbSet("kv","state",await encObj(KEY,S));await idbSet("kv","meta",{enc:true,salt,verifier:await encObj(KEY,"ok")});}
+function setupLock(){passForm("تفعيل قفل الدخول والتشفير",[["p1","رمز جديد (٤ خانات فأكثر)"],["p2","تأكيد الرمز"]],async(g,close)=>{if(g("p1").length<4)throw new Error("الرمز قصير");if(g("p1")!==g("p2"))throw new Error("الرمزان غير متطابقين");await setNewKey(g("p1"),null);close();toast("فُعّل القفل والتشفير","ok");});}
+function changePass(){passForm("تغيير الرمز",[["p0","الرمز الحالي"],["p1","الرمز الجديد"],["p2","تأكيد الجديد"]],async(g,close)=>{const old=await verify(g("p0"));if(g("p1").length<4||g("p1")!==g("p2"))throw new Error("الرمز الجديد غير صالح أو غير متطابق");await setNewKey(g("p1"),old);close();toast("تغيّر الرمز","ok");});}
+function removeLock(){passForm("إلغاء القفل",[["p0","الرمز الحالي"]],async(g,close)=>{const old=await verify(g("p0"));await reEncAll(old,null);KEY=null;await idbSet("kv","state",S);await idbDel("kv","meta");close();toast("أُلغي القفل","ok");});}
+function lockScreen(meta){return new Promise(res=>{const{ov}=modal("الحاجب المنصور — دخول محمي",`<div class="fd"><label>رمز الدخول</label><input type="password" id="lp"></div><div id="lerr" style="color:var(--bad);min-height:20px" class="sm"></div>`,{foot:'<button class="btn g" id="lok">دخول</button>'});
+  ov.querySelector(".x").remove();ov.style.background="var(--pri)";const tryIt=async()=>{try{const k=await deriveKey($("#lp",ov).value,meta.salt);await decObj(k,meta.verifier);KEY=k;ov.remove();res();}catch(e){$("#lerr",ov).textContent="رمز خاطئ";$("#lp",ov).value="";$("#lp",ov).focus();}};
+  $("#lok",ov).onclick=tryIt;$("#lp",ov).onkeydown=e=>{if(e.key==="Enter")tryIt();};});}
+
+/* ====================== DEMO ====================== */
+function seed(){if(S.seeded)return;S.seeded=true;const t=todayISO();const wk=new Date(t+"T12:00:00");const sun=addDays(t,-wk.getDay());
+  const c1={id:uid(),demo:true,name:"شركة النخبة للمقاولات (تجريبي)",type:"شركة",idno:"1010000000",phone:"",email:"",notes:"بيانات تجريبية — امسحها من الإعدادات"},
+        c2={id:uid(),demo:true,name:"عبدالله س. (تجريبي)",type:"فرد",idno:"",phone:"",email:"",notes:""};
+  S.clients.push(c1,c2);
+  const mk=(o)=>({id:uid(),demo:true,sessions:[],notes:[],requests:[],parties:[],judgments:[],docs:[],...o});
+  S.cases.push(mk({no:"4470000001",cat:"najiz",court:"المحكمة التجارية بالرياض",circuit:"الدائرة التجارية الخامسة",type:"دعوى تجارية",status:"open",clientId:c1.id,role:"مدعي",opponent:"مؤسسة الأفق (تجريبي)",filed:addDays(t,-80),subject:"مطالبة بقيمة توريدات",
+      sessions:[{id:uid(),date:addDays(sun,2),time:"09:00",kind:"جلسة مرافعة",status:"scheduled",virtual:true,link:""},{id:uid(),date:addDays(t,-20),time:"10:00",kind:"جلسة أولى",status:"held",result:"قدّم الخصم مذكرة"}]}),
+    mk({no:"4470000002",cat:"najiz",court:"المحكمة العمالية بالرياض",circuit:"الدائرة العمالية الثالثة",type:"دعوى عمالية",status:"judged",clientId:c2.id,role:"مدعى عليه",opponent:"عامل سابق (تجريبي)",filed:addDays(t,-150),
+      sessions:[{id:uid(),date:addDays(sun,3),time:"10:30",kind:"جلسة مرافعة",status:"scheduled"}],judgments:[{id:uid(),no:"J-1",degree:"ابتدائي",date:addDays(t,-12),received:addDays(t,-10),ruling:"حكم تجريبي",appealed:false}]}),
+    mk({no:"4480000003",cat:"muin",court:"المحكمة الإدارية بالرياض",circuit:"الدائرة الإدارية الثالثة",type:"دعوى إلغاء قرار إداري",status:"open",clientId:c1.id,role:"مدعي",opponent:"جهة حكومية (تجريبي)",sessions:[{id:uid(),date:addDays(sun,4),time:"12:00",kind:"جلسة أولى",status:"scheduled"}]}));
+  S.poas.push({id:uid(),demo:true,no:"P-0001",clientId:c1.id,kind:"وكالة قضائية",issued:addDays(t,-300),expires:addDays(t,9)},{id:uid(),demo:true,no:"P-0002",clientId:c2.id,kind:"وكالة خاصة",issued:addDays(t,-60),expires:addDays(t,300)});
+  S.execs.push({id:uid(),demo:true,no:"E-0001",src:"najiz",kind:"طلب تنفيذ حكم",status:"active",applicant:c1.name,clientId:c1.id,against:"مؤسسة الأفق (تجريبي)",amount:96500,collected:0,lastDecision:"إشعار بالسداد",decisionDate:addDays(t,-5),filed:addDays(t,-30)},
+    {id:uid(),demo:true,no:"A-0001",src:"admin",kind:"أمر تنفيذ إداري",status:"active",applicant:c1.name,clientId:c1.id,against:"جهة حكومية (تجريبي)",amount:240000,collected:0,reason:"مستحقات عقد توريد",filed:addDays(t,-10),deadline:addDays(t,18)});
+  S.viols.push({id:uid(),demo:true,src:"efaa",entity:c1.name,entityId:"1010000000",no:"V-1001",ref:"م/4491/26",authority:"وزارة الموارد البشرية والتنمية الاجتماعية",kind:"عامة",reason:"عدم الالتزام بنسب التوطين",date:addDays(t,-50),amount:20000,due:addDays(t,10),status:"unpaid",isNew:true},
+    {id:uid(),demo:true,src:"hrsd",entity:c1.name,entityId:"1-123456",no:"V-880305",ref:"(4) عدم توفير شروط السلامة",authority:"وزارة الموارد البشرية",kind:"نظام العمل",reason:"غياب وسائل الحماية في موقع العمل",date:addDays(t,-40),amount:9000,status:"unpaid",worker:"عامل 6"});
+  S.events.push({id:uid(),demo:true,kind:"اجتماع",title:"اجتماع مع المدير المالي",person:"المدير المالي",place:"مقر الشركة",date:addDays(t,1),time:"17:00",repeat:"none",remind:[60],done:false});
+  save();}
+
+/* ====================== BOOT ====================== */
+(async()=>{try{const th=localStorage.getItem("hajib_theme");if(th)document.documentElement.setAttribute("data-theme",th);}catch(e){}
+  $("#gq").addEventListener("input",e=>gsearch(e.target.value));document.addEventListener("click",e=>{if(!e.target.closest(".gsearch"))$("#gres").classList.add("hidden");});
+  $("#gres").addEventListener("click",()=>{$("#gres").classList.add("hidden");$("#gq").value="";});
+  try{await openDB();const meta=await idbGet("kv","meta");if(meta&&meta.enc)await lockScreen(meta);await load();}catch(e){toast("تعذّر فتح التخزين المحلي: "+e.message,"err");}
+  seed();refresh();addEventListener("resize",navTop);
+  reminderTick();setInterval(reminderTick,30000);
+  if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});})();
+</script>
+</body>
+</html>
