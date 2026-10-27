@@ -9,6 +9,7 @@
 <meta name="referrer" content="no-referrer">
 <title>الحاجب المنصور القانوني</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23c9a24a'/%3E%3Cpath d='M32 14v34M20 48h24M14 24h36M14 24l-6 14h12zM50 24l-6 14h12z' stroke='%23123d2f' stroke-width='3' fill='none' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="fonts/fonts.css">
 <script src="xlsx.full.min.js" defer></script>
 <style>
 :root{
@@ -40,25 +41,25 @@ a{color:var(--gold-2)}
 .top{background:var(--pri);color:#fff;position:sticky;top:0;z-index:40;box-shadow:var(--shadow)}
 .top-row{display:flex;align-items:center;gap:10px;padding:10px 16px;flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.05rem;white-space:nowrap}
-.brand small{display:block;font-weight:500;font-size:.68rem;color:var(--gold);letter-spacing:.5px}
+.brand small{display:block;font-weight:500;font-size:.68rem;color:var(--acc-l,var(--gold));letter-spacing:.5px}
 .portals{display:flex;gap:6px;flex-wrap:wrap}
 .portal{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);color:#fff;text-decoration:none;border-radius:9px;padding:4px 10px;font-size:.78rem;line-height:1.3}
-.portal small{display:block;color:#b9cbc2;font-size:.66rem}
+.portal small{display:block;color:rgba(255,255,255,.62);font-size:.66rem}
 .portal:hover{background:rgba(255,255,255,.16)}
-.portal.gold{background:var(--gold);color:var(--pri);border-color:var(--gold)} .portal.gold small{color:var(--pri)}
+.portal.gold{background:var(--gold);color:#fff;border-color:var(--gold)} .portal.gold small{color:rgba(255,255,255,.85)}
 .sp{flex:1}
 .gsearch{position:relative;min-width:200px;flex:0 1 280px}
 .gsearch input{width:100%;border:none;border-radius:10px;padding:8px 12px;background:rgba(255,255,255,.12);color:#fff}
-.gsearch input::placeholder{color:#b9cbc2}
+.gsearch input::placeholder{color:rgba(255,255,255,.6)}
 .gres{position:absolute;top:110%;inset-inline:0;background:var(--card);color:var(--ink);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.25);max-height:360px;overflow:auto;z-index:60}
 .gres div{padding:9px 12px;border-bottom:1px solid var(--line);cursor:pointer}
 .gres div:hover{background:var(--gold-soft)}
 .ibtn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);color:#fff;border-radius:10px;height:36px;min-width:36px;padding:0 10px;cursor:pointer;position:relative}
 .ibtn:hover{background:rgba(255,255,255,.2)}
-.dot-n{position:absolute;top:-6px;inset-inline-start:-6px;background:var(--gold);color:var(--pri);border-radius:20px;font-size:.68rem;padding:0 6px;font-weight:800}
+.dot-n{position:absolute;top:-6px;inset-inline-start:-6px;background:var(--gold);color:#fff;border-radius:20px;font-size:.68rem;padding:0 6px;font-weight:800}
 .tool-row{display:flex;gap:8px;padding:0 16px 10px;flex-wrap:wrap;align-items:center}
 .tbtn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);color:#fff;border-radius:9px;padding:5px 12px;cursor:pointer;font-size:.85rem}
-.tbtn.gold{background:var(--gold);color:var(--pri);border-color:var(--gold);font-weight:700}
+.tbtn.gold{background:var(--gold);color:#fff;border-color:var(--gold);font-weight:700}
 .nav{display:flex;gap:4px;overflow-x:auto;background:var(--card);border-bottom:1px solid var(--line);padding:8px 12px;position:sticky;z-index:30;scrollbar-width:thin}
 .nav button{border:none;background:transparent;padding:7px 13px;border-radius:9px;cursor:pointer;white-space:nowrap;color:var(--muted);font-weight:600}
 .nav button.on{background:var(--pri);color:#fff}
@@ -79,7 +80,13 @@ h1{font-size:1.35rem;margin:0}
 .btn{border:1px solid var(--line);background:var(--card);border-radius:9px;padding:7px 13px;cursor:pointer;font-weight:600;white-space:nowrap}
 .btn:hover{border-color:var(--gold)}
 .btn.p{background:var(--pri);border-color:var(--pri);color:#fff}
-.btn.g{background:var(--gold);border-color:var(--gold);color:var(--pri)}
+.btn.g{background:var(--gold);border-color:var(--gold);color:#fff}
+h1,h3,.brand,.kpi b,.md-h b,.whead b{font-family:var(--head,inherit)}
+.idcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:8px 0}
+.idc{border:2px solid var(--line);border-radius:12px;overflow:hidden;cursor:pointer;background:var(--card)}
+.idc.on{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-soft)}
+.idc .bar{padding:10px;display:flex;gap:8px;align-items:center;color:#fff}
+.idc .sw{display:flex;gap:4px;padding:8px 10px}.idc .sw i{width:22px;height:22px;border-radius:6px;display:block;border:1px solid rgba(0,0,0,.08)}
 .btn.d{color:var(--bad)} .btn.d:hover{border-color:var(--bad)}
 .btn.s{padding:4px 9px;font-size:.8rem}
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:var(--card)}
@@ -105,7 +112,7 @@ table.t tr.click{cursor:pointer}
 .week{display:grid;grid-template-columns:repeat(var(--cols,5),minmax(170px,1fr));gap:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--card)}
 .wcol{border-inline-start:1px solid var(--line);min-height:260px;display:flex;flex-direction:column}
 .wcol:first-child{border-inline-start:none}
-.whead{background:var(--bg);padding:8px 10px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:6px}
+.whead{background:var(--bg);padding:8px 10px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:6px;align-items:flex-start}
 .whead.today{background:var(--gold-soft)}
 .whead b{display:block} .whead .sm{line-height:1.3}
 .wbody{padding:8px;display:flex;flex-direction:column;gap:8px;flex:1}
@@ -163,7 +170,7 @@ footer{text-align:center;color:var(--muted);font-size:.78rem;padding:20px}
 <header class="top">
   <div class="top-row">
     <div class="brand">
-      <svg width="34" height="34" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#c9a24a"/><path d="M32 14v34M20 48h24M14 24h36M14 24l-6 14h12zM50 24l-6 14h12z" stroke="#123d2f" stroke-width="3" fill="none" stroke-linejoin="round"/></svg>
+      <span id="brandLogo"></span>
       <div>الحاجب المنصور القانوني<small id="brandSub">سكرتير المحامي</small></div>
     </div>
     <nav class="portals" id="portals"></nav>
@@ -171,7 +178,7 @@ footer{text-align:center;color:var(--muted);font-size:.78rem;padding:20px}
     <div class="gsearch"><input id="gq" placeholder="ابحث برقم القضية أو اسم الطرف أو الموكل..." autocomplete="off"><div class="gres hidden" id="gres"></div></div>
   </div>
   <div class="tool-row">
-    <span class="sm" style="color:#b9cbc2" id="lastSave">—</span>
+    <span class="sm" style="color:rgba(255,255,255,.62)" id="lastSave">—</span>
     <span class="sp"></span>
     <button class="tbtn" data-act="go" data-v="assistant">✨ المساعد القانوني</button>
     <button class="tbtn" data-act="go" data-v="secretary">🗓 السكرتير</button>
@@ -220,7 +227,7 @@ async function putFile(id,blob){await idbSet("files",id,KEY?await encBlob(KEY,bl
 async function getFile(id){const v=await idbGet("files",id);if(!v)return null;if(v.enc){if(!KEY)throw new Error("locked");return decBlob(KEY,v);}return v;}
 
 /* ---------------- State ---------------- */
-const DEF_SETTINGS={office:"",lawyer:"",remindMins:"30,10",appealDays:30,violP1:60,violP2:60,calcUrl:"",minutesUrl:"",apiKey:"",model:"claude-sonnet-5-5",notify:false,letterhead:true};
+const DEF_SETTINGS={office:"",lawyer:"",remindMins:"30,10",appealDays:30,violP1:60,violP2:60,calcUrl:"",minutesUrl:"",apiKey:"",model:"claude-sonnet-5-5",notify:false,letterhead:true,identity:"diwan"};
 let S={clients:[],cases:[],poas:[],execs:[],viols:[],events:[],laws:[],changes:[],settings:{...DEF_SETTINGS}};
 let saveT=null;
 function save(){clearTimeout(saveT);saveT=setTimeout(async()=>{try{await idbSet("kv","state",KEY?await encObj(KEY,S):S);
@@ -261,6 +268,34 @@ const clientName=id=>(S.clients.find(c=>c.id===id)||{}).name||"";
 const getCase=id=>S.cases.find(c=>c.id===id);
 function remainPill(d,warnAt=30){if(d==null)return'<span class="pill p-mut">—</span>';if(d<0)return`<span class="pill p-mut">منتهية منذ ${-d} يوم</span>`;
   if(d===0)return'<span class="pill p-bad">اليوم</span>';return`<span class="pill ${d<=7?"p-bad":d<=warnAt?"p-warn":"p-ok"}">${d} يوم</span>`;}
+
+/* ---------------- Visual identities ---------------- */
+const LOGO={
+  diwan:'<path d="M32 13l5.5 13.3L51 32l-13.5 5.7L32 51l-5.5-13.3L13 32l13.5-5.7z" fill="none" stroke="P" stroke-width="3.2" stroke-linejoin="round"/><rect x="23" y="23" width="18" height="18" fill="none" stroke="P" stroke-width="3.2" transform="rotate(45 32 32)"/><circle cx="32" cy="32" r="3.4" fill="P"/>',
+  midad:'<path d="M32 9c7 9 12 17 12 25 0 7-5 12-12 20-7-8-12-13-12-20 0-8 5-16 12-25z" fill="P"/><path d="M32 22v19" stroke="A" stroke-width="2.6" stroke-linecap="round"/><circle cx="32" cy="22" r="3" fill="A"/>',
+  mizan:'<path d="M32 13v34M22 47h20M14 21h36" stroke="P" stroke-width="3.4" stroke-linecap="round" fill="none"/><path d="M14 21l-6 13a6 6 0 0 0 12 0zM50 21l-6 13a6 6 0 0 0 12 0z" fill="P"/><circle cx="32" cy="13" r="3.4" fill="P"/>',
+  qasr:'<path d="M15 53V33c0-10 7.6-18 17-18s17 8 17 18v20" fill="none" stroke="P" stroke-width="3.4"/><path d="M23 53V35c0-6 4-10.5 9-10.5s9 4.5 9 10.5v18" fill="P"/><path d="M11 53h42" stroke="P" stroke-width="3.4" stroke-linecap="round"/>'};
+const IDS={
+  diwan:{name:"الديوان",desc:"كحلي ونحاسي — خط كوفي حديث (Noto Kufi Arabic): رسمي واضح للمكاتب",font:"'Noto Kufi Arabic'",head:"'Noto Kufi Arabic'",
+    L:{pri:"#14213d",pri2:"#22365f",acc:"#b5651d",acc2:"#97521a",soft:"#f6eadf",bg:"#f3f4f7",accL:"#e3a56d"},D:{pri:"#101a30",pri2:"#1b2a4a",acc:"#c97a36",acc2:"#b5651d",soft:"#35281c",bg:"#0b101b",card:"#131b2b",line:"#233049",accL:"#e3a56d"}},
+  midad:{name:"المِداد",desc:"عنابي ورملي — خط نسخ كلاسيكي (Amiri للعناوين وNoto Naskh للنص): وقار قضائي",font:"'Noto Naskh Arabic'",head:"'Amiri'",
+    L:{pri:"#5b1a2b",pri2:"#76263b",acc:"#9a7442",acc2:"#7e5e34",soft:"#f3ebdf",bg:"#f7f3ee",accL:"#dcc6a2"},D:{pri:"#3d111d",pri2:"#5a1d2c",acc:"#b08a55",acc2:"#9a7442",soft:"#3a2e1f",bg:"#140b0e",card:"#1f1418",line:"#3a2429",accL:"#dcc6a2"}},
+  mizan:{name:"الميزان",desc:"فحمي وفيروزي — خط عصري تقني (IBM Plex Sans Arabic): بسيط وعالي الوضوح في الجداول",font:"'IBM Plex Sans Arabic'",head:"'IBM Plex Sans Arabic'",
+    L:{pri:"#1f2329",pri2:"#30363f",acc:"#0e7f74",acc2:"#0b6a61",soft:"#e1f2ef",bg:"#f4f6f7",accL:"#5fd3c6"},D:{pri:"#15181c",pri2:"#252a31",acc:"#13968a",acc2:"#0e7f74",soft:"#16302d",bg:"#0d0f12",card:"#171b20",line:"#2a3038",accL:"#5fd3c6"}},
+  qasr:{name:"القصر",desc:"نيلي وطوبي — طابع أندلسي منصوري (Reem Kufi للعناوين وTajawal للنص): مميز وفاخر",font:"'Tajawal'",head:"'Reem Kufi'",
+    L:{pri:"#2b2d6e",pri2:"#3b3e8c",acc:"#b9512b",acc2:"#9b4323",soft:"#f7e7df",bg:"#f5f4f9",accL:"#f2a985"},D:{pri:"#1d1f4d",pri2:"#2c2f6c",acc:"#cc6339",acc2:"#b9512b",soft:"#3a2219",bg:"#0e0e1c",card:"#17182c",line:"#2a2c4a",accL:"#f2a985"}}};
+const curId=()=>IDS[S.settings.identity]||IDS.diwan;
+const logoSVG=(k,size=34,I=IDS[k]||IDS.diwan)=>`<svg width="${size}" height="${size}" viewBox="0 0 64 64"><rect width="64" height="64" rx="15" fill="${I.L.accL}"/>${LOGO[k]||LOGO.diwan}</svg>`.replace(/"P"/g,`"${I.L.pri}"`).replace(/"A"/g,`"${I.L.accL}"`);
+function isDark(){const a=document.documentElement.getAttribute("data-theme");return a==="dark"||(a!=="light"&&matchMedia("(prefers-color-scheme: dark)").matches);}
+function applyId(){const k=IDS[S.settings.identity]?S.settings.identity:"diwan";const I=IDS[k];const v=isDark()?{...I.L,...I.D}:I.L;const st=document.documentElement.style;
+  [["--pri",v.pri],["--pri-2",v.pri2],["--gold",v.acc],["--gold-2",v.acc2],["--gold-soft",v.soft],["--bg",v.bg],["--acc-l",v.accL],["--head",I.head+",serif"]].forEach(([n,x])=>st.setProperty(n,x));
+  ["--card","--line"].forEach(n=>{const x=v[n.slice(2)];x?st.setProperty(n,x):st.removeProperty(n);});
+  document.body.style.fontFamily=I.font+",'Segoe UI',Tahoma,system-ui,sans-serif";$("#brandLogo").innerHTML=logoSVG(k);
+  const fav=$('link[rel="icon"]');if(fav)fav.href="data:image/svg+xml,"+encodeURIComponent(logoSVG(k,64));$('meta[name="theme-color"]').setAttribute("content",v.pri);}
+function idCards(sel){return`<div class="idcards">${Object.entries(IDS).map(([k,I])=>`<div class="idc ${sel===k?"on":""}" data-act="pickId" data-v="${k}">
+  <div class="bar" style="background:${I.L.pri};font-family:${I.head}">${logoSVG(k,30)}<b style="font-size:1.05rem">${I.name}</b></div>
+  <div style="padding:8px 10px;font-family:${I.font}"><div style="font-family:${I.head};font-size:1.15rem;color:${I.L.pri}">الحاجب المنصور القانوني</div><div class="sm muted">جلسة مرافعة — ١٥ جمادى الأولى ١٤٤٨هـ</div><div class="sm" style="margin-top:4px">${I.desc}</div></div>
+  <div class="sw">${[I.L.pri,I.L.pri2,I.L.acc,I.L.soft,I.L.bg].map(c=>`<i style="background:${c}"></i>`).join("")}</div></div>`).join("")}</div>`;}
 
 /* ---------------- Labels ---------------- */
 const CASE_ST={open:["قيد النظر","p-info"],judged:["صدر فيها حكم","p-gold"],closed:["منتهية","p-mut"]};
@@ -712,14 +747,14 @@ VIEW.changes=function(){$("#app").innerHTML=`<div class="head"><h1>التغيي�
 function repShell(title,sub,inner){const s=S.settings;
   return`<div class="rep">${s.letterhead?`<div class="lh"><div><b>${esc(s.office||"الحاجب المنصور القانوني")}</b>${s.lawyer?`<div>${esc(s.lawyer)}</div>`:""}</div><div style="text-align:left">${hD(todayISO())}<br>${gD(todayISO())}</div></div>`:""}
   <h1>${esc(title)}</h1>${sub?`<div class="sub">${sub}</div>`:""}${inner}<div class="foot">أُعدّ آليًا من الحاجب المنصور القانوني بتاريخ ${gD(todayISO())} — يُراجَع قبل الاعتماد.</div></div>`;}
-const REP_CSS=`body{font-family:"Segoe UI",Tahoma,Arial,sans-serif;direction:rtl;color:#1d2622;font-size:12px;margin:18px}
-.lh{display:flex;justify-content:space-between;border-bottom:3px solid #c9a24a;padding-bottom:8px;margin-bottom:12px;color:#123d2f}
-h1{color:#123d2f;font-size:20px;margin:6px 0} h2{background:#123d2f;color:#fff;padding:6px 10px;font-size:14px;margin:16px 0 6px;border-radius:4px}
-.sub{color:#66706b;margin-bottom:10px} table{width:100%;border-collapse:collapse;margin:6px 0;page-break-inside:auto} th{background:#123d2f;color:#fff;padding:6px;text-align:right;font-size:11px}
+const repCss=()=>{const I=curId();return`body{font-family:${I.font},"Segoe UI",Tahoma,Arial,sans-serif;direction:rtl;color:#1d2622;font-size:12px;margin:18px}
+.lh{display:flex;justify-content:space-between;border-bottom:3px solid ${I.L.acc};padding-bottom:8px;margin-bottom:12px;color:${I.L.pri}}
+h1,h2{font-family:${I.head},serif} h1{color:${I.L.pri};font-size:20px;margin:6px 0} h2{background:${I.L.pri};color:#fff;padding:6px 10px;font-size:14px;margin:16px 0 6px;border-radius:4px}
+.sub{color:#66706b;margin-bottom:10px} table{width:100%;border-collapse:collapse;margin:6px 0;page-break-inside:auto} th{background:${I.L.pri};color:#fff;padding:6px;text-align:right;font-size:11px}
 td{border:1px solid #ddd;padding:5px;vertical-align:top} tr:nth-child(even) td{background:#faf8f3}
-.k{display:inline-block;border:1px solid #ddd;border-right:4px solid #c9a24a;padding:6px 12px;margin:3px;min-width:120px;border-radius:4px} .k b{display:block;font-size:17px;color:#123d2f}
-.box{border-right:4px solid #c9a24a;background:#faf6ea;padding:7px 10px;margin:6px 0} .bad{color:#b23b3b;font-weight:700} .ok{color:#2e7d5b;font-weight:700} .warn{color:#b7791f;font-weight:700}
-.foot{margin-top:18px;color:#888;font-size:10px;border-top:1px solid #ddd;padding-top:6px} @page{size:A4;margin:12mm}`;
+.k{display:inline-block;border:1px solid #ddd;border-right:4px solid ${I.L.acc};padding:6px 12px;margin:3px;min-width:120px;border-radius:4px} .k b{display:block;font-size:17px;color:${I.L.pri}}
+.box{border-right:4px solid ${I.L.acc};background:${I.L.soft};padding:7px 10px;margin:6px 0} .bad{color:#b23b3b;font-weight:700} .ok{color:#2e7d5b;font-weight:700} .warn{color:#b7791f;font-weight:700}
+.foot{margin-top:18px;color:#888;font-size:10px;border-top:1px solid #ddd;padding-top:6px} @page{size:A4;margin:12mm}`;};
 const htab=(cols,rows)=>rows.length?`<table><thead><tr>${cols.map(c=>`<th>${c[0]}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr>${cols.map(c=>`<td>${esc(c[1](r))}</td>`).join("")}</tr>`).join("")}</tbody></table>`:"<div>لا بيانات</div>";
 const kp=(l,v)=>`<span class="k"><b>${esc(v)}</b>${esc(l)}</span>`;
 const sheet=(name,cols,rows)=>({name,cols:cols.map(c=>c[0]),rows:rows.map(r=>cols.map(c=>c[1](r)))});
@@ -788,9 +823,9 @@ const REPORTS={
 const asciiName=(...p)=>["Hajib",...p].map(x=>String(x||"").replace(/[^A-Za-z0-9-]+/g,"")).filter(Boolean).join("-");
 function runReport(key,arg,fmt){const r=REPORTS[key]&&REPORTS[key](arg);if(!r){toast("لا بيانات للتقرير","err");return;}const ar=String(arg||"");const fname=asciiName(key,/^[A-Za-z0-9]+$/.test(ar)?ar:(ar?"item":""),todayISO());
   if(fmt==="pdf"){const ifr=document.createElement("iframe");ifr.style.cssText="position:fixed;width:0;height:0;border:0;left:-9999px";document.body.appendChild(ifr);
-    const d=ifr.contentDocument;d.open();d.write(`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>${esc(r.title)}</title><style>${REP_CSS}</style></head><body>${r.html}</body></html>`);d.close();
+    const d=ifr.contentDocument;d.open();d.write(`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>${esc(r.title)}</title><link rel="stylesheet" href="${new URL("fonts/fonts.css",location.href).href}"><style>${repCss()}</style></head><body>${r.html}</body></html>`);d.close();
     setTimeout(()=>{ifr.contentWindow.focus();ifr.contentWindow.print();setTimeout(()=>ifr.remove(),60000);},300);}
-  else if(fmt==="doc"){download(new Blob(["\ufeff",`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><style>${REP_CSS}</style></head><body dir="rtl">${r.html}</body></html>`],{type:"application/msword"}),fname+".doc");}
+  else if(fmt==="doc"){download(new Blob(["\ufeff",`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><style>${repCss()}</style></head><body dir="rtl">${r.html}</body></html>`],{type:"application/msword"}),fname+".doc");}
   else exportSheets(fname,r.sheets);}
 function exportSheets(name,sheets){if(window.XLSX){const wb=XLSX.utils.book_new();wb.Workbook={Views:[{RTL:true}]};
     sheets.forEach((s,i)=>{const ws=XLSX.utils.aoa_to_sheet([s.cols,...s.rows]);ws["!cols"]=s.cols.map(()=>({wch:20}));XLSX.utils.book_append_sheet(wb,ws,(s.name||"ورقة").slice(0,28)+(sheets.filter(x=>x.name===s.name).length>1?i:""));});
@@ -859,7 +894,8 @@ function buildICS(){const L=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Hajib Ma
 
 /* ====================== ACTIONS ====================== */
 const ACT={
-  go:d=>{$$("#modals .ov").forEach(o=>o.remove());go(d.v);},theme:()=>{const n=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",n);try{localStorage.setItem("hajib_theme",n);}catch(e){}},
+  go:d=>{$$("#modals .ov").forEach(o=>o.remove());go(d.v);},theme:()=>{const n=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",n);try{localStorage.setItem("hajib_theme",n);}catch(e){}applyId();},
+  pickId:(d,el)=>{S.settings.identity=d.v;save();applyId();$$(".idc").forEach(x=>x.classList.toggle("on",x.dataset.v===d.v));refresh();toast("الهوية: "+IDS[d.v].name,"ok");},
   wk:d=>{R.week=d.v==="0"?0:R.week+Number(d.v);refresh();},wf:d=>{R.wf=d.v;refresh();},
   cf:d=>{R.cf[d.k]=d.v;refresh();},pf:d=>{R.pf=d.v;refresh();},ef:d=>{R.ef=d.v;refresh();},
   case:d=>openCase(d.id,d.tab||"details"),ctab:(d,el)=>{const ov=el.closest(".ov");drawCase(ov,d.v);},
@@ -973,6 +1009,8 @@ function openSettings(){const s=S.settings;
     ${fieldHTML({k:"model",l:"نموذج المساعد",t:"select",opts:[["claude-sonnet-5-5","Claude Sonnet 5.5 (متوازن)"],["claude-opus-5-5","Claude Opus 5.5 (الأقوى)"],["claude-haiku-5-5","Claude Haiku 5.5 (الأسرع)"]]},s.model)}
     ${fieldHTML({k:"notify",l:"إشعارات المتصفح للجلسات والمواعيد",t:"check",full:true},s.notify)}</div>
   <hr style="border:none;border-top:1px solid var(--line);margin:14px 0">
+  <b>الهوية البصرية</b> <span class="sm muted">— اضغط على النموذج لتطبيقه فورًا</span>${idCards(s.identity)}
+  <hr style="border:none;border-top:1px solid var(--line);margin:14px 0">
   <b>الحماية والتشفير</b><div class="acts" style="margin:8px 0">${KEY?'<span class="pill p-ok">مفعّل ومشفّر 🔒</span><button class="btn s" id="chgPass">تغيير الرمز</button><button class="btn s" id="lockNow">قفل الآن</button><button class="btn s d" id="rmLock">إلغاء القفل</button>':'<span class="pill p-mut">غير مفعّل</span><button class="btn s g" id="setLock">تفعيل قفل الدخول والتشفير</button>'}</div>
   <b>النسخ الاحتياطي (يشمل الملفات)</b><div class="acts" style="margin:8px 0"><button class="btn s g" id="bkExp">⬇ نسخ احتياطي الآن</button><button class="btn s" id="bkImp">⬆ استرجاع نسخة</button><input type="file" id="bkFile" class="hidden" accept=".json"></div>
   <div class="sm muted">آخر نسخة احتياطية: ${s.lastBackup?new Date(s.lastBackup).toLocaleString("ar-SA-u-nu-latn"):"لم تُنشأ بعد"} — انقل الملف لجهازك الآخر واسترجعه هناك.</div>
@@ -1035,7 +1073,7 @@ function seed(){if(S.seeded)return;S.seeded=true;const t=todayISO();const wk=new
   $("#gq").addEventListener("input",e=>gsearch(e.target.value));document.addEventListener("click",e=>{if(!e.target.closest(".gsearch"))$("#gres").classList.add("hidden");});
   $("#gres").addEventListener("click",()=>{$("#gres").classList.add("hidden");$("#gq").value="";});
   try{await openDB();const meta=await idbGet("kv","meta");if(meta&&meta.enc)await lockScreen(meta);await load();}catch(e){toast("تعذّر فتح التخزين المحلي: "+e.message,"err");}
-  seed();refresh();addEventListener("resize",navTop);
+  seed();applyId();matchMedia("(prefers-color-scheme: dark)").addEventListener("change",applyId);refresh();addEventListener("resize",navTop);
   reminderTick();setInterval(reminderTick,30000);
   if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});})();
 </script>
